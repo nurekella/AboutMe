@@ -1,7 +1,7 @@
 - 👋 Hi, I’m Nurbol Khamzauly.
 - 👀 I’m interested in Linux, Cloud and DevOps, IaaC.
 - 🌱 I’m currently learning DevOps Methodology.
-- 📫 Don't hesiatate to drop me an email to nurekella1@gmail.com, also via Telegram @nurekella.
+- 📫 Don't hesiatate to drop me an email to nurekella@gmail.com, also via Telegram @nurekella.
 - Thank you!
 
 <!---
