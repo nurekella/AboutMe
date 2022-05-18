@@ -11,6 +11,8 @@
 Mob: +7 777 481 4393
 Telegram: @nurekella
 Instagram: @nurekella
+HeadHunter: https://hh.kz/resume/f83dd5feff021a96700039ed1f703748534f4d
+
 
 <!---
 nurekella/nurekella is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
