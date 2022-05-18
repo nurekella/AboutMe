@@ -6,6 +6,12 @@
 Весь мой опыт работы указан ниже.
 Спасибо!
 
+Способы связи:
+
+Mob: +7 777 481 4393
+Telegram: @nurekella
+Instagram: @nurekella
+
 <!---
 nurekella/nurekella is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
 You can click the Preview link to take a look at your changes.
