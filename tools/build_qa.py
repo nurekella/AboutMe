@@ -320,6 +320,7 @@ SITE_NAV = """<nav class="sitenav"><div class="sitenav-in">
 <a class="sbrand" href="./">nurekella<b>/</b>devops</a>
 <a href="./">главная</a><a href="resume.html">резюме</a>
 <a href="qa-trainer.html" aria-current="page">тренажёр</a>
+<a href="devops-plan.html">план</a><a href="cv-review.html">разбор резюме</a>
 <a href="https://github.com/nurekella">github</a>
 </div></nav>"""
 
@@ -488,6 +489,10 @@ tbody tr:last-child td{border-bottom:0}
 .q[data-v="0"] .rate button[data-v="0"]{background:var(--s0);border-color:var(--s0);color:var(--surface)}
 .q[data-v="1"] .rate button[data-v="1"]{background:var(--s1);border-color:var(--s1);color:var(--surface)}
 .q[data-v="2"] .rate button[data-v="2"]{background:var(--s2);border-color:var(--s2);color:var(--surface)}
+.keyhint{font-family:var(--mono);font-size:11px;color:var(--muted);margin:0 0 18px;line-height:1.9}
+.keyhint kbd{font-family:var(--mono);font-size:10.5px;background:var(--surface);
+  border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:1px 5px;color:var(--ink-2)}
+.q.active{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft),var(--shadow)}
 .empty{color:var(--muted);font-family:var(--mono);font-size:12.5px;padding:18px 0}
 .empty[hidden]{display:none}
 
@@ -503,6 +508,13 @@ tbody tr:last-child td{border-bottom:0}
   .main{padding-top:24px}
   .qh{grid-template-columns:28px minmax(0,1fr);row-gap:6px}
   .mark{grid-column:2}
+  .keyhint{display:none}
+  .q{padding:16px 15px}
+  .reveal{padding:13px 14px;font-size:12px}
+  .rate{gap:8px}
+  .rate button{flex:1;min-width:76px;padding:11px 8px;font-size:12px;text-align:center}
+  .rate button.clr{flex:0 0 auto;min-width:44px;margin-left:0}
+  .rate .rl{flex-basis:100%;margin:0 0 2px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
@@ -519,6 +531,7 @@ tbody tr:last-child td{border-bottom:0}
       <button class="chip on" data-filter="all" type="button">все</button>
       <button class="chip" data-filter="todo" type="button">не оценено</button>
       <button class="chip" data-filter="weak" type="button">0 и 1</button>
+      <button class="chip" id="resume" type="button">продолжить</button>
       <button class="chip" id="collapse" type="button">скрыть ответы</button>
       <button class="chip" id="reset" type="button">сбросить</button>
     </div>
@@ -537,6 +550,8 @@ tbody tr:last-child td{border-bottom:0}
       <h1>{{TITLE}}</h1>
       <div class="prose lead">{{INTRO}}</div>
     </header>
+    <p class="keyhint">С клавиатуры: <kbd>Space</kbd> показать ответ · <kbd>0</kbd> <kbd>1</kbd> <kbd>2</kbd> оценка ·
+      <kbd>J</kbd> / <kbd>K</kbd> следующий и предыдущий вопрос · <kbd>/</kbd> поиск</p>
     <p class="empty" id="empty" hidden>Ничего не найдено — измени запрос или фильтр.</p>
     {{BODY}}
   </main>
@@ -654,6 +669,66 @@ tbody tr:last-child td{border-bottom:0}
     cards.forEach(paint); recount(); applyFilter();
   });
 
+  function visibleCards(){
+    return cards.filter(function(c){return !c.classList.contains("hide")});
+  }
+  var activeIdx=-1;
+  function setActive(i,scroll){
+    var vis=visibleCards();
+    if(!vis.length) return;
+    if(i<0) i=0; if(i>=vis.length) i=vis.length-1;
+    cards.forEach(function(c){c.classList.remove("active")});
+    var card=vis[i]; card.classList.add("active"); activeIdx=i;
+    if(scroll!==false) card.scrollIntoView({block:"center",behavior:"smooth"});
+  }
+  function activeCard(){
+    var vis=visibleCards();
+    if(activeIdx<0||activeIdx>=vis.length) return null;
+    return vis[activeIdx];
+  }
+
+  document.getElementById("resume").addEventListener("click",function(){
+    var vis=visibleCards();
+    for(var i=0;i<vis.length;i++){
+      if(state[vis[i].getAttribute("data-q")]===undefined){ setActive(i); return; }
+    }
+    setActive(0);
+  });
+
+  document.addEventListener("keydown",function(e){
+    var s2=document.getElementById("search");
+    if(e.key==="/"&&document.activeElement!==s2){ e.preventDefault(); s2.focus(); return; }
+    if(document.activeElement===s2){ if(e.key==="Escape") s2.blur(); return; }
+    if(e.metaKey||e.ctrlKey||e.altKey) return;
+
+    var k=e.key.toLowerCase();
+    if(k==="j"){ e.preventDefault(); setActive(activeIdx<0?0:activeIdx+1); return; }
+    if(k==="k"){ e.preventDefault(); setActive(activeIdx<0?0:activeIdx-1); return; }
+
+    var card=activeCard();
+    if(!card) return;
+    var n=card.getAttribute("data-q");
+    if(e.key===" "||e.key==="Enter"){
+      var btn=card.querySelector(".reveal");
+      if(btn&&!btn.hidden){ e.preventDefault(); btn.click(); }
+      return;
+    }
+    if(k==="0"||k==="1"||k==="2"){
+      e.preventDefault();
+      state[n]=k; save(); paint(card); recount();
+      var vis=visibleCards(), pos=vis.indexOf(card);
+      applyFilter();
+      var nv=visibleCards();
+      setActive(nv.indexOf(card)>=0?nv.indexOf(card)+1:Math.min(pos,nv.length-1));
+      return;
+    }
+    if(k==="x"){ e.preventDefault(); delete state[n]; save(); paint(card); recount(); applyFilter(); }
+  });
+
+  cards.forEach(function(card,i){
+    card.addEventListener("click",function(){ setActive(visibleCards().indexOf(card),false); });
+  });
+
   cards.forEach(paint); recount(); applyFilter();
 })();
 </script>
@@ -666,6 +741,9 @@ DOC_HEAD = """<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Тренажёр для подготовки к собеседованию DevOps/SRE: 151 вопрос с ответами, объяснениями и самооценкой. Linux, Kubernetes, Docker, Terraform, Ansible, CI/CD, мониторинг и SRE.">
+<meta name="theme-color" content="#EFF1F3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1319" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#9096;</text></svg>">
 """
 
