@@ -1,3 +1,10 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Тренажёр для подготовки к собеседованию DevOps/SRE: 151 вопрос с ответами, объяснениями и самооценкой. Linux, Kubernetes, Docker, Terraform, Ansible, CI/CD, мониторинг и SRE.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#9096;</text></svg>">
 <title>Тренажёр DevOps-собеседования — DevOps: вопросы, ответы и объяснения</title>
 <style>
 :root{
@@ -169,7 +176,24 @@ tbody tr:last-child td{border-bottom:0}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
-
+<style>
+.sitenav{border-bottom:1px solid var(--line);background:var(--bg)}
+.sitenav-in{max-width:1240px;margin:0 auto;padding:12px 28px;display:flex;
+  align-items:center;gap:6px 18px;flex-wrap:wrap;font-family:var(--mono);font-size:12px}
+.sitenav .sbrand{margin-right:auto;color:var(--ink);text-decoration:none;letter-spacing:.04em}
+.sitenav .sbrand b{color:var(--accent)}
+.sitenav a{color:var(--muted);text-decoration:none;padding:4px 8px;border-radius:6px;letter-spacing:.04em}
+.sitenav a:hover{background:var(--surface);color:var(--accent)}
+.sitenav a[aria-current="page"]{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+@media (max-width:900px){.sitenav-in{padding:10px 18px}}
+</style></head>
+<body>
+<nav class="sitenav"><div class="sitenav-in">
+<a class="sbrand" href="./">nurekella<b>/</b>devops</a>
+<a href="./">главная</a><a href="resume.html">резюме</a>
+<a href="qa-trainer.html" aria-current="page">тренажёр</a>
+<a href="https://github.com/nurekella">github</a>
+</div></nav>
 <div class="topbar">
   <div class="topbar-in">
     <div class="score">
@@ -2062,3 +2086,6 @@ predict_linear(node_filesystem_avail_bytes{mountpoint="/"}[6h], 4*3600) &lt; 0</
   cards.forEach(paint); recount(); applyFilter();
 })();
 </script>
+
+</body>
+</html>

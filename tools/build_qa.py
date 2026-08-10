@@ -6,7 +6,9 @@ import re
 import sys
 
 SRC = "INTERVIEW_QA.md"
-OUT = "site/qa-trainer.html"
+OUT = "docs/qa-trainer.html"
+
+OUT_USED = []
 
 MARKERS = ("Что проверяют", "Глубже", "Типичная ошибка", "Типичные ошибки")
 ANSWER_STARTS = ("**Ответ", "**Как отвечать", "**Структура", "**Хорошие вопросы")
@@ -314,6 +316,25 @@ def build(doc_title, intro_blocks, sections):
     return tpl
 
 
+SITE_NAV = """<nav class="sitenav"><div class="sitenav-in">
+<a class="sbrand" href="./">nurekella<b>/</b>devops</a>
+<a href="./">главная</a><a href="resume.html">резюме</a>
+<a href="qa-trainer.html" aria-current="page">тренажёр</a>
+<a href="https://github.com/nurekella">github</a>
+</div></nav>"""
+
+SITE_NAV_CSS = """<style>
+.sitenav{border-bottom:1px solid var(--line);background:var(--bg)}
+.sitenav-in{max-width:1240px;margin:0 auto;padding:12px 28px;display:flex;
+  align-items:center;gap:6px 18px;flex-wrap:wrap;font-family:var(--mono);font-size:12px}
+.sitenav .sbrand{margin-right:auto;color:var(--ink);text-decoration:none;letter-spacing:.04em}
+.sitenav .sbrand b{color:var(--accent)}
+.sitenav a{color:var(--muted);text-decoration:none;padding:4px 8px;border-radius:6px;letter-spacing:.04em}
+.sitenav a:hover{background:var(--surface);color:var(--accent)}
+.sitenav a[aria-current="page"]{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+@media (max-width:900px){.sitenav-in{padding:10px 18px}}
+</style>"""
+
 TEMPLATE = r"""<title>Тренажёр DevOps-собеседования — {{TITLE}}</title>
 <style>
 :root{
@@ -485,7 +506,7 @@ tbody tr:last-child td{border-bottom:0}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
-
+<!--SPLIT-->
 <div class="topbar">
   <div class="topbar-in">
     <div class="score">
@@ -639,15 +660,42 @@ tbody tr:last-child td{border-bottom:0}
 """
 
 
+DOC_HEAD = """<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Тренажёр для подготовки к собеседованию DevOps/SRE: 151 вопрос с ответами, объяснениями и самооценкой. Linux, Kubernetes, Docker, Terraform, Ansible, CI/CD, мониторинг и SRE.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#9096;</text></svg>">
+"""
+
+
+def wrap_standalone(fragment):
+    """Полный HTML-документ для отдачи с GitHub Pages."""
+    head, body = fragment.split("<!--SPLIT-->", 1)
+    return DOC_HEAD + head + SITE_NAV_CSS + "</head>\n<body>\n" + SITE_NAV + body + "\n</body>\n</html>\n"
+
+
 def main():
+    fragment_mode = "--fragment" in sys.argv
+    out_path = OUT
+    for i, a in enumerate(sys.argv):
+        if a == "-o" and i + 1 < len(sys.argv):
+            out_path = sys.argv[i + 1]
+
     with open(SRC, encoding="utf-8") as fh:
         text = fh.read()
     doc_title, intro_blocks, sections = parse(text)
     out = build(doc_title, intro_blocks, sections)
-    with open(OUT, "w", encoding="utf-8") as fh:
+    if fragment_mode:
+        out = out.replace("<!--SPLIT-->\n", "")
+    else:
+        out = wrap_standalone(out)
+    with open(out_path, "w", encoding="utf-8") as fh:
         fh.write(out)
+    OUT_USED.append(out_path)
     nq = sum(1 for s in sections for it in s["items"] if it["num"])
-    print("sections=%d questions=%d bytes=%d" % (len(sections), nq, len(out)))
+    print("%s: sections=%d questions=%d chars=%d" % (out_path, len(sections), nq, len(out)))
     if nq != 151:
         print("WARNING: ожидалось 151 вопрос", file=sys.stderr)
 
