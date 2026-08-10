@@ -6,7 +6,7 @@ import re
 import sys
 
 SRC = "INTERVIEW_QA.md"
-OUT = "qa-trainer.html"
+OUT = "site/qa-trainer.html"
 
 MARKERS = ("Что проверяют", "Глубже", "Типичная ошибка", "Типичные ошибки")
 ANSWER_STARTS = ("**Ответ", "**Как отвечать", "**Структура", "**Хорошие вопросы")
