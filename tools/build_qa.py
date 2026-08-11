@@ -390,6 +390,20 @@ SCRIPT = r"""<script>
     cards.forEach(paint);
   }
 
+  // ── кнопка «показать/скрыть ответ» ──
+  function revealState(card){
+    var n=card.getAttribute("data-q");
+    var rev=card.querySelector(".reveal");
+    var ans=document.querySelector('[data-ans="'+n+'"]');
+    if(!rev||!ans) return;
+    var open=!ans.hidden;
+    var locked = exam && data.v[n]===undefined && !open;
+    rev.disabled=!!locked;
+    rev.classList.toggle("open",open);
+    rev.textContent = locked ? "Сначала поставь оценку"
+                    : (open ? "Скрыть ответ" : "Показать ответ");
+  }
+
   // ── карточка ──
   function paint(card){
     var n=card.getAttribute("data-q"), v=data.v[n];
@@ -397,11 +411,7 @@ SCRIPT = r"""<script>
     var rev=card.querySelector(".reveal");
     if(v===undefined){ card.removeAttribute("data-v"); if(mark) mark.textContent=""; }
     else { card.setAttribute("data-v",v); if(mark) mark.textContent=LABEL[v]; }
-    if(rev){
-      var locked = exam && v===undefined;
-      rev.disabled=!!locked;
-      if(!rev.hidden) rev.textContent = locked ? "Сначала поставь оценку" : "Показать ответ";
-    }
+    revealState(card);
     card.classList.toggle("hasnote", !!(data.notes[n]&&data.notes[n].trim()));
     var ta=card.querySelector("[data-noteta]");
     if(ta && ta.value!==(data.notes[n]||"")) ta.value=data.notes[n]||"";
@@ -558,8 +568,10 @@ SCRIPT = r"""<script>
   document.addEventListener("click",function(e){
     var r=e.target.closest(".reveal");
     if(r&&!r.disabled){
-      document.querySelector('[data-ans="'+r.getAttribute("data-reveal")+'"]').hidden=false;
-      r.hidden=true; return;
+      var ansEl=document.querySelector('[data-ans="'+r.getAttribute("data-reveal")+'"]');
+      ansEl.hidden=!ansEl.hidden;
+      revealState(r.closest(".q"));
+      return;
     }
     var del=e.target.closest("[data-del]");
     if(del){
@@ -631,7 +643,6 @@ SCRIPT = r"""<script>
 
   el("collapse").addEventListener("click",function(){
     document.querySelectorAll("[data-ans]").forEach(function(a){a.hidden=true});
-    document.querySelectorAll(".reveal").forEach(function(x){x.hidden=false});
     cards.forEach(paint);
     window.scrollTo({top:0,behavior:"smooth"});
   });
@@ -683,7 +694,6 @@ SCRIPT = r"""<script>
     chosen.forEach(function(c){ var q=c.getAttribute("data-q"); delete data.v[q] });
     save();
     document.querySelectorAll("[data-ans]").forEach(function(a){a.hidden=true});
-    document.querySelectorAll(".reveal").forEach(function(x){x.hidden=false});
     el("examBtn").textContent="завершить"; el("examBtn").classList.add("on");
     el("resultPanel").hidden=true; query=""; el("search").value="";
     collect(); recount(); applyFilter(); setActive(0);
@@ -857,7 +867,7 @@ SCRIPT = r"""<script>
     var card=activeCard(); if(!card) return;
     if(e.key===" "||e.key==="Enter"){
       var btn=card.querySelector(".reveal");
-      if(btn&&!btn.hidden&&!btn.disabled){ e.preventDefault(); btn.click() }
+      if(btn&&!btn.disabled){ e.preventDefault(); btn.click() }
       return;
     }
     if(k==="0"||k==="1"||k==="2"){
@@ -1115,6 +1125,8 @@ tbody tr:last-child td{border-bottom:0}
   border-radius:6px;padding:4px 9px;white-space:nowrap}
 .jump[hidden]{display:none}
 #dueN:empty{display:none}
+.reveal.open{border-style:solid;border-color:var(--line);color:var(--muted);background:none}
+.reveal.open:hover{border-color:var(--accent);color:var(--accent);background:var(--surface-2)}
 .reveal[disabled]{opacity:.5;cursor:not-allowed;border-style:solid}
 .reveal[disabled]:hover{border-color:var(--line);background:var(--surface-2)}
 body.cards .rail,body.cards .keyhint,body.cards section .sect-head,
@@ -1267,7 +1279,7 @@ body.cards .cardnav{display:flex}
       <div class="prow"><button class="chip" id="statsClose" type="button">закрыть</button></div>
     </div>
 
-    <p class="keyhint">С клавиатуры: <kbd>Space</kbd> показать ответ · <kbd>0</kbd> <kbd>1</kbd> <kbd>2</kbd> оценка ·
+    <p class="keyhint">С клавиатуры: <kbd>Space</kbd> показать и скрыть ответ · <kbd>0</kbd> <kbd>1</kbd> <kbd>2</kbd> оценка ·
       <kbd>J</kbd> / <kbd>K</kbd> следующий и предыдущий вопрос · <kbd>N</kbd> заметка ·
       <kbd>R</kbd> запись · <kbd>G</kbd> + номер переход · <kbd>/</kbd> поиск</p>
     <p class="empty" id="empty" hidden>Ничего не найдено — измени запрос или фильтр.</p>
