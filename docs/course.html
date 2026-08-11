@@ -1,0 +1,2577 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Курсы DevOps по грейдам — уроки с практикой</title>
+<meta name="description" content="Курс DevOps своими уроками по грейдам junior, middle, senior: короткая теория, практика с командами, проверка результата и вопросы тренажёра, которые урок закрывает.">
+<meta name="theme-color" content="#EFF1F3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1319" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="theme.js"></script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#9096;</text></svg>">
+<style>
+  .bar{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+  .bar-in{max-width:1240px;margin:0 auto;padding:11px 28px;display:flex;flex-wrap:wrap;
+    align-items:center;gap:8px}
+  .chip{font-family:var(--mono);font-size:11px;letter-spacing:.04em;background:var(--surface);
+    border:1px solid var(--line);color:var(--muted);padding:6px 11px;border-radius:7px;cursor:pointer}
+  .chip:hover{border-color:var(--accent);color:var(--accent)}
+  .chip.on{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+  .barscore{display:flex;align-items:center;gap:10px;margin-right:auto;font-family:var(--mono);
+    font-size:11px;color:var(--muted);letter-spacing:.04em}
+  .barscore .big{font-size:1.2rem;color:var(--accent);letter-spacing:-.02em}
+  .barscore .meter{width:96px;height:5px;background:var(--line-soft);border-radius:3px;overflow:hidden;display:block}
+  .barscore .mfill{display:block;height:100%;width:0;background:var(--accent);transition:width .3s ease}
+  .tsep{width:1px;height:18px;background:var(--line);display:inline-block}
+
+  .grades{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 12px}
+  .gcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 15px;
+    box-shadow:var(--shadow);cursor:pointer;transition:border-color .2s ease}
+  .gcard:hover{border-color:var(--accent)}
+  .gcard.picked{outline:2px solid var(--accent);outline-offset:-2px}
+  .gcard .gt{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0 0 9px;
+    font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2)}
+  .gcard .gt span:last-child{color:var(--muted);letter-spacing:0}
+  .gbar{display:block;height:6px;background:var(--line-soft);border-radius:3px;overflow:hidden}
+  .gfill{display:block;height:100%;width:0;background:var(--accent);transition:width .3s ease}
+  .gcard .gs{margin:9px 0 0;font-size:.8rem;color:var(--muted);line-height:1.35}
+  .gcard.done{border-color:var(--s2)}
+  .gcard.done .gfill{background:var(--s2)}
+  .gcard.done .gt{color:var(--s2)}
+  .gverdict{margin:0 0 26px;font-size:.9rem;color:var(--ink-2);max-width:var(--measure)}
+  @media (max-width:720px){.grades{grid-template-columns:1fr}}
+
+  .track h2{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-2);margin:34px 0 4px}
+  .track .lead{font-size:.92rem;color:var(--muted);margin:0 0 16px;max-width:var(--measure)}
+
+  .lesson{background:var(--surface);border:1px solid var(--line);border-radius:11px;
+    margin:0 0 10px;box-shadow:var(--shadow);overflow:hidden}
+  .lesson[hidden]{display:none}
+  .lesson.done{border-color:var(--s2)}
+  .lhead{display:flex;align-items:flex-start;gap:12px;padding:15px 18px;cursor:pointer}
+  .lhead:hover{background:var(--surface-2)}
+  .tick{appearance:none;-webkit-appearance:none;width:18px;height:18px;flex:none;margin-top:2px;
+    border:1.5px solid var(--line);border-radius:5px;background:var(--surface);position:relative;cursor:pointer}
+  .tick:hover{border-color:var(--accent)}
+  .tick:checked{background:var(--s2,#1C6B4B);border-color:var(--s2,#1C6B4B)}
+  .tick:checked::after{content:"";position:absolute;left:5.5px;top:2px;width:4px;height:9px;
+    border:solid var(--surface);border-width:0 1.8px 1.8px 0;transform:rotate(45deg)}
+  .lt{flex:1;min-width:0}
+  .lt h3{margin:0;font-size:1.06rem;line-height:1.3}
+  .lesson.done .lt h3{color:var(--muted)}
+  .lwhy{margin:5px 0 0;font-size:.9rem;color:var(--ink-2);line-height:1.4}
+  .lmeta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0 0}
+  .grade{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
+    padding:2px 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+  .grade[data-gr="junior"]{color:var(--s2);border-color:var(--s2);background:var(--s2b)}
+  .grade[data-gr="middle"]{color:var(--s1);border-color:var(--s1);background:var(--s1b)}
+  .grade[data-gr="senior"]{color:var(--s0);border-color:var(--s0);background:var(--s0b)}
+  .time{font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;
+    color:var(--muted);border:1px solid var(--line-soft);border-radius:999px;padding:2px 7px}
+  .num{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:24px}
+  .toggle{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:4px 9px;background:var(--surface);
+    cursor:pointer;white-space:nowrap;flex:none}
+  .lesson.open .toggle{border-color:var(--accent);color:var(--accent)}
+  .lbody{padding:0 18px 18px;border-top:1px solid var(--line-soft);margin-top:0}
+  .lbody[hidden]{display:none}
+  .lbody h4{margin:20px 0 8px;font-size:.98rem}
+  .lbody pre{margin:0 0 14px;background:var(--surface-2);border:1px solid var(--line-soft);
+    border-radius:8px;padding:14px 16px;overflow-x:auto}
+  .lbody pre code{background:none;border:0;padding:0;font-size:.83rem;line-height:1.55}
+  .lbody .callout{border-left:2px solid var(--line);background:var(--surface-2);
+    padding:10px 15px;border-radius:0 6px 6px 0;margin:0 0 12px;max-width:var(--measure);font-size:.94rem}
+  .lbody .callout .clabel{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+    text-transform:uppercase;margin-bottom:5px;color:var(--muted)}
+  .lbody .step{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+    color:var(--accent);margin:20px 0 9px;padding-left:9px;border-left:2px solid var(--accent)}
+  .lbody .callout.do{border-left-color:var(--accent);background:var(--accent-soft)}
+  .lbody .callout.check{border-left-color:var(--s2,#1C6B4B)}
+  .lbody .callout.trap{border-left-color:var(--s0,#A33A32)}
+  .lbody .sub-list{margin:6px 0 0;padding-left:1.15em}
+  .qlinks{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin:16px 0 0;
+    padding-top:13px;border-top:1px solid var(--line-soft)}
+  .qlinks .ql{font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--muted);margin-right:4px}
+  .qlinks a{font-family:var(--mono);font-size:11px;text-decoration:none;border:1px solid var(--line);
+    color:var(--muted);padding:3px 8px;border-radius:6px}
+  .qlinks a:hover{border-color:var(--accent);color:var(--accent)}
+  .empty{color:var(--muted);font-size:.94rem;margin:20px 0}
+  .empty[hidden]{display:none}
+  @media (max-width:900px){ .bar-in{padding:10px 18px} .lhead{padding:13px 15px} .lbody{padding:0 15px 15px} }
+  @media print{
+    .bar,.topnav,.grades,.gverdict{display:none}
+    .lbody[hidden]{display:block!important}
+    .lesson{break-inside:avoid;border:1px solid #999;box-shadow:none}
+    .toggle,.tick{display:none}
+    body{background:#fff;color:#000}
+  }
+</style>
+</head>
+<body>
+<nav class="topnav"><div class="topnav-in">
+<a class="brand" href="index.html">nurekella<b>/</b>devops</a>
+<a class="nl" href="index.html">главная</a>
+<a class="nl" href="qa-trainer.html">тренажёр</a>
+<a class="nl" href="course.html" aria-current="page">курсы</a>
+<a class="nl" href="roadmap.html">roadmap</a>
+<a class="nl" href="resources.html">материалы</a>
+<a class="nl" href="repos.html">репозитории</a>
+<a class="nl" href="checklist.html">чеклист</a>
+<a class="nl" href="devops-plan.html">план</a>
+<a class="nl" href="diary.html">дневник</a>
+</div></nav>
+
+<div class="bar">
+  <div class="bar-in">
+    <span class="barscore">
+      <span class="big" id="pct">0%</span>
+      <span class="meter"><span class="mfill" id="mfill"></span></span>
+      <span id="score">0 из 0 уроков</span>
+    </span>
+    <button class="chip on" data-gf="all" type="button">все грейды</button>
+    <button class="chip" data-gf="junior" type="button">junior</button>
+    <button class="chip" data-gf="middle" type="button">middle</button>
+    <button class="chip" data-gf="senior" type="button">senior</button>
+    <span class="tsep" aria-hidden="true"></span>
+    <button class="chip" id="next" type="button">следующий урок</button>
+    <button class="chip" id="onlyTodo" type="button">только непройденные</button>
+    <button class="chip" id="expandAll" type="button">раскрыть все</button>
+    <button class="chip" id="reset" type="button">сбросить</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <header class="masthead">
+    <p class="eyebrow">Курсы</p>
+    <h1>Курс DevOps: уроки с практикой</h1>
+    <div class="prose lead"><p>Не видеокурс и не пересказ документации. Каждый урок устроен одинаково: короткая теория, потом практика, которую ты выполняешь руками в терминале, потом проверка результата и типичная ошибка. В конце — номера вопросов <a href="qa-trainer.html" target="_blank" rel="noopener">тренажёра</a>, которые этот урок закрывает: прошёл урок — иди переставь себе оценку.</p>
+<p><strong>Правила, без которых курс не работает.</strong></p>
+<ol><li><strong>Читать без терминала бессмысленно.</strong> Урок считается пройденным, когда выполнена практика, а не когда прочитан текст.</li><li><strong>Один урок за раз.</strong> Отметил галочку — закрыл ноутбук. Три урока подряд забываются к утру.</li><li><strong>Ломать специально.</strong> В каждом уроке есть шаг «сломай и почини». Это не украшение: на собеседовании спрашивают именно про поломки.</li><li><strong>Не искать идеальную среду.</strong> Всё, что нужно — Linux (или Docker) и <code>kubectl</code> с <code>k3d</code> начиная с двенадцатого урока. Облачный аккаунт не нужен нигде.</li></ol>
+<p>Порядок один: junior целиком, потом middle, потом senior. Если junior кажется скучным — прогони его на скорость, но прогони: провал на базовом вопросе стоит дороже, чем незнание senior-темы.</p></div>
+  </header>
+
+  <div class="grades">
+    <div class="gcard" data-gcard="junior">
+      <p class="gt"><span>junior</span><span data-glabel="junior">0 / 0</span></p>
+      <span class="gbar"><span class="gfill" data-gfill="junior"></span></span>
+      <p class="gs" data-gstate="junior"></p>
+    </div>
+    <div class="gcard" data-gcard="middle">
+      <p class="gt"><span>middle</span><span data-glabel="middle">0 / 0</span></p>
+      <span class="gbar"><span class="gfill" data-gfill="middle"></span></span>
+      <p class="gs" data-gstate="middle"></p>
+    </div>
+    <div class="gcard" data-gcard="senior">
+      <p class="gt"><span>senior</span><span data-glabel="senior">0 / 0</span></p>
+      <span class="gbar"><span class="gfill" data-gfill="senior"></span></span>
+      <p class="gs" data-gstate="senior"></p>
+    </div>
+  </div>
+  <p class="gverdict" id="gverdict"></p>
+
+<section class="track" data-track="Грейд junior — фундамент">
+<h2>Грейд junior — фундамент</h2>
+<div class="lead">Двенадцать уроков. Цель — не «узнать про Linux», а уметь за минуту ответить на вопрос «сервис не работает, что смотришь» и показать это руками.</div>
+<article class="lesson" id="l1" data-n="1" data-grade="junior" data-min="30">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 1 пройденным">
+<div class="lt"><h3><span class="num">01</span> Рабочее место, которое можно ломать</h3>
+<p class="lwhy">Сделать себе песочницу, где не страшно удалить лишнее, и больше не бояться экспериментов.</p>
+<div class="lmeta"><span class="grade" data-gr="junior">junior</span>
+<span class="time">30 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Учиться на рабочем ноутбуке страшно, поэтому люди читают вместо того, чтобы делать. Решение — одноразовый контейнер: запустил, сломал, выбросил, запустил заново. Контейнер — это не виртуальная машина: он использует ядро хоста, а изоляцию даёт через namespaces и cgroups. Отсюда его главное свойство для учёбы — старт за секунду и удаление без следа.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code># 1. Одноразовая машина: выйдешь — исчезнет (--rm)
+docker run --rm -it --name lab ubuntu:24.04 bash
+
+# внутри контейнера
+apt-get update &amp;&amp; apt-get install -y procps iproute2 curl less vim
+ps aux
+exit
+
+# 2. Тот же контейнер, но переживающий выход
+docker run -dit --name lab ubuntu:24.04 bash
+docker exec -it lab bash
+# ... поработал, вышел ...
+docker stop lab &amp;&amp; docker start lab &amp;&amp; docker exec -it lab bash
+
+# 3. Посмотреть, чем контейнер отличается от хоста
+hostname                    # внутри
+cat /proc/1/cmdline; echo   # PID 1 — это bash, а не systemd
+ls /                        # свой корень</code></pre></div>
+<p>Теперь сломай и починь: удали <code>/etc/hosts</code> внутри контейнера, проверь, что сломалось (<code>ping google.com</code>), и восстанови контейнер одной командой — <code>docker rm -f lab</code> и заново <code>docker run</code>. Это и есть смысл одноразовой среды.</p>
+<div class="callout check"><span class="clabel">Проверка</span>Ты можешь за десять секунд получить чистый Linux и не думаешь «а если я сломаю систему». Объясни вслух разницу между образом и контейнером: образ — неизменяемый шаблон из слоёв, контейнер — запущенный процесс с writable-слоем поверх.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Учиться в контейнере <code>alpine</code> и потом удивляться, что на сервере другие команды: в Alpine — BusyBox, у которого урезанные <code>ps</code>, <code>grep</code>, <code>awk</code>. Для учёбы бери <code>ubuntu</code> или <code>debian</code>, они ближе к тому, что стоит в проде.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q195">195</a><a href="qa-trainer.html#q196">196</a><a href="qa-trainer.html#q44">44</a></div>
+</div></article>
+<article class="lesson" id="l2" data-n="2" data-grade="junior" data-min="40">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 2 пройденным">
+<div class="lt"><h3><span class="num">02</span> Файлы, права и владельцы</h3>
+<p class="lwhy">Перестать угадывать <code>chmod 777</code> и понимать, почему сервис не читает свой конфиг.</p>
+<div class="lmeta"><span class="grade" data-gr="junior">junior</span>
+<span class="time">40 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Права — это три группы по три бита: владелец, группа, остальные. <code>r=4</code>, <code>w=2</code>, <code>x=1</code>. Для каталога <code>x</code> — это право войти внутрь, а не «выполнить»: без него <code>ls</code> по пути не работает, даже если файл читаемый. Есть четвёртая цифра: <code>4</code> — SUID (процесс запускается с правами владельца файла), <code>2</code> — SGID, <code>1</code> — sticky bit (в каталоге удалять файл может только его владелец — так устроен <code>/tmp</code>). <code>umask</code> — маска, которая вычитается из прав по умолчанию у новых файлов.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>mkdir -p ~/lab/perm &amp;&amp; cd ~/lab/perm
+touch a.txt &amp;&amp; mkdir sub
+ls -l                      # разобрать вывод по столбцам: права, ссылки, владелец, группа, размер, дата
+
+# отнять x у каталога и увидеть последствия
+chmod 644 sub &amp;&amp; ls sub/    # Permission denied — хотя r стоит
+chmod 755 sub &amp;&amp; ls sub/    # снова работает
+
+# umask
+umask                       # обычно 0022
+touch b.txt &amp;&amp; ls -l b.txt  # 644, потому что 666 - 022
+umask 077 &amp;&amp; touch c.txt &amp;&amp; ls -l c.txt   # 600: файл видит только владелец
+
+# особые биты
+ls -l /usr/bin/passwd       # rws — SUID, поэтому обычный юзер меняет /etc/shadow
+ls -ld /tmp                 # rwt — sticky bit
+sudo chmod 2775 sub &amp;&amp; ls -ld sub   # SGID: новые файлы наследуют группу каталога
+
+# типы файлов
+ls -l /dev/null /dev/sda /etc/os-release 2&gt;/dev/null   # c, b, -
+ln -s a.txt link.txt &amp;&amp; ln a.txt hard.txt &amp;&amp; ls -li     # symlink и hardlink: сравни inode</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Объясни вслух, что делает <code>chmod 2755</code>, и почему <code>chmod -R 777 /var/www</code> — это не «починил доступ», а «выключил защиту». Удали <code>a.txt</code> и проверь, что <code>hard.txt</code> остался, а <code>link.txt</code> сломался — и скажи почему.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Путать права на файл с правами на путь к нему. Файл <code>640</code> в каталоге <code>700</code>, принадлежащем root, недоступен никому, кроме root, независимо от прав самого файла.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q166">166</a><a href="qa-trainer.html#q167">167</a><a href="qa-trainer.html#q8">8</a><a href="qa-trainer.html#q23">23</a></div>
+</div></article>
+<article class="lesson" id="l3" data-n="3" data-grade="junior" data-min="45">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 3 пройденным">
+<div class="lt"><h3><span class="num">03</span> Поиск: find, grep, awk, sed</h3>
+<p class="lwhy">Находить причину в логах за минуту, а не листать файл глазами.</p>
+<div class="lmeta"><span class="grade" data-gr="junior">junior</span>
+<span class="time">45 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Разделение труда: <code>find</code> ищет <strong>файлы</strong> по свойствам (имя, размер, время, владелец), <code>grep</code> ищет <strong>строки</strong> по шаблону, <code>awk</code> работает со строкой как с набором <strong>полей</strong> и умеет считать, <code>sed</code> <strong>меняет</strong> текст потоком. Девяносто процентов задач закрываются связкой «найти файлы → отфильтровать строки → посчитать по полю».</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>mkdir -p ~/lab/logs &amp;&amp; cd ~/lab/logs
+# сгенерировать похожий на настоящий access-лог
+for i in $(seq 1 500); do
+  code=$(shuf -e 200 200 200 200 301 404 500 502 -n1)
+  ip="10.0.0.$((RANDOM%20))"
+  echo "$ip - - [11/Aug/2026:10:$((RANDOM%60)):00] \"GET /api/v$((RANDOM%3)) HTTP/1.1\" $code $((RANDOM%5000))"
+done &gt; access.log
+
+# find: что искать и где
+find . -name "*.log" -size +1k -mmin -60
+find /var/log -type f -size +10M 2&gt;/dev/null
+
+# grep: сколько пятисоток и какие именно
+grep -c ' 500 ' access.log
+grep -E ' (500|502) ' access.log | head -3
+grep -v ' 200 ' access.log | wc -l     # инверсия
+
+# awk: считать по полю
+awk '{print $9}' access.log | sort | uniq -c | sort -rn        # распределение кодов
+awk '$9&gt;=500 {print $1}' access.log | sort | uniq -c | sort -rn # кто получает ошибки
+awk '{sum+=$11} END {print "средний размер:", sum/NR}' access.log
+
+# sed: заменить, не открывая редактор
+sed 's/GET/POST/' access.log | head -2      # в поток
+sed -i.bak 's/HTTP\/1.1/HTTP\/2/' access.log &amp;&amp; ls   # на месте, с бэкапом</code></pre></div>
+<p>Теперь задача на время: одной строкой найди IP, который дал больше всего ошибок 5xx. Проверь себя: <code>awk '$9&gt;=500{c[$1]++} END{for(i in c) print c[i], i}' access.log | sort -rn | head -1</code>.</p>
+<div class="callout check"><span class="clabel">Проверка</span>Ты можешь без подсказки посчитать распределение кодов ответа в незнакомом логе и назвать топ-3 источника ошибок. Это буквально вопрос с собеседования «разбери этот вывод».</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span><code>cat file | grep x</code> вместо <code>grep x file</code>, и <code>grep</code> там, где нужен <code>awk</code>. Второе хуже: считать поля через <code>cut</code> и <code>grep</code> в три этапа — признак того, что человек не умеет <code>awk</code>.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q168">168</a><a href="qa-trainer.html#q169">169</a><a href="qa-trainer.html#q24">24</a></div>
+</div></article>
+<article class="lesson" id="l4" data-n="4" data-grade="junior" data-min="40">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 4 пройденным">
+<div class="lt"><h3><span class="num">04</span> Процессы, сигналы, нагрузка</h3>
+<p class="lwhy">Отвечать на «сервер тормозит» действиями, а не перезагрузкой.</p>
+<div class="lmeta"><span class="grade" data-gr="junior">junior</span>
+<span class="time">40 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Процесс завершают сигналом. <code>SIGTERM</code> (15) — просьба закрыться: приложение успевает сбросить буферы, закрыть соединения, снять блокировки. <code>SIGKILL</code> (9) — казнь ядром: процесс не получает управление вообще, поэтому теряет данные и оставляет мусор. Зомби — процесс, который завершился, но его код возврата не забрал родитель; сам он ресурсов не ест, но говорит о баге в родителе. Load average — среднее число процессов, готовых работать или ждущих диск, за 1, 5 и 15 минут; сравнивать надо с числом ядер: 10 на 16 ядрах — норма, 10 на двух — беда.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>nproc                       # сколько ядер — без этого числа load average бессмыслен
+uptime                      # три числа: тренд важнее абсолютного значения
+
+# кто ест CPU и память
+ps aux --sort=-%cpu | head -5
+ps aux --sort=-%mem | head -5
+top -b -n1 | head -15       # в интерактивном top: M — по памяти, P — по CPU, 1 — по ядрам
+
+# сигналы вживую
+sleep 300 &amp;
+PID=$!
+kill -l | head -3           # список сигналов
+kill -TERM $PID             # вежливо
+jobs
+
+# что делает процесс прямо сейчас
+sleep 300 &amp;
+sudo strace -p $! 2&gt;&amp;1 | head -5   # видно, что висит в nanosleep
+kill %2
+
+# создать нагрузку и увидеть её
+yes &gt; /dev/null &amp; yes &gt; /dev/null &amp;
+sleep 5; uptime              # load average пошёл вверх
+kill %1 %2
+
+# состояния процессов: D — ждёт диск, Z — зомби
+ps -eo pid,stat,comm | awk '$2 ~ /^[DZ]/'</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Расскажи вслух порядок действий на «сервер тормозит»: <code>uptime</code> и <code>nproc</code> → что за нагрузка (CPU, память, диск, сеть) → кто её создаёт → что изменилось за последний час. Именно порядок, а не список команд, — то, что оценивают.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span><code>kill -9</code> как первая реакция. У баз данных и брокеров это прямой путь к повреждённым данным и долгому восстановлению. Сначала <code>SIGTERM</code>, потом ждём, и только если процесс висит в необрываемом состоянии — <code>-9</code>.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q3">3</a><a href="qa-trainer.html#q4">4</a><a href="qa-trainer.html#q5">5</a><a href="qa-trainer.html#q6">6</a></div>
+</div></article>
+<article class="lesson" id="l5" data-n="5" data-grade="junior" data-min="45">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 5 пройденным">
+<div class="lt"><h3><span class="num">05</span> Диск, inode и память</h3>
+<p class="lwhy">Разобрать самую частую аварию: «на диске нет места», в том числе её злую версию, когда файлов нет.</p>
+<div class="lmeta"><span class="grade" data-gr="junior">junior</span>
+<span class="time">45 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> <code>df</code> спрашивает у файловой системы, сколько занято, <code>du</code> считает по дереву каталогов. Расхождение обычно означает удалённый, но открытый процессом файл: ссылки на него нет, места он не освобождает, потому что дескриптор ещё открыт. Отдельная поломка — кончились inode: место есть, а файл не создать, потому что закончились «учётные карточки» файлов. Память: в <code>free -h</code> смотреть надо на <code>available</code>, а не на <code>free</code> — ядро специально занимает свободную память кэшем и отдаёт её приложениям по требованию.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>df -h                       # места
+df -i                       # inode — отдельная колонка, о которой забывают
+du -xh --max-depth=1 / 2&gt;/dev/null | sort -h | tail   # где занято, не пересекая ФС
+
+# воспроизвести расхождение df и du
+cd /tmp &amp;&amp; dd if=/dev/zero of=big bs=1M count=200
+tail -f big &gt; /dev/null &amp;          # процесс держит файл открытым
+rm big                              # файла нет...
+df -h /tmp                          # ...а место занято
+sudo lsof +L1 | head                # вот виновник: ссылок 0, дескриптор открыт
+kill %1 &amp;&amp; df -h /tmp               # место вернулось без перезагрузки
+
+# кончились inode
+mkdir /tmp/inodes &amp;&amp; cd /tmp/inodes
+for i in $(seq 1 20000); do : &gt; f$i; done
+df -i /tmp | tail -1                # число файлов выросло, место почти не изменилось
+cd /tmp &amp;&amp; rm -rf inodes
+
+# память
+free -h                             # available — единственная честная цифра
+cat /proc/meminfo | head -5
+dmesg -T | grep -i -E 'killed process|out of memory' | tail   # следы OOM killer</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Ты можешь освободить место на проде, не перезагружая сервер, и объяснить, почему <code>df</code> и <code>du</code> расходятся. Отдельно — назвать три причины «нет места»: реально занято, кончились inode, удалённый открытый файл.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Ответ «перезагрузил, помогло». Помогло потому, что перезапуск закрыл дескриптор; причина осталась — скорее всего, logrotate без <code>copytruncate</code> или без сигнала приложению.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q173">173</a><a href="qa-trainer.html#q187">187</a><a href="qa-trainer.html#q2">2</a><a href="qa-trainer.html#q22">22</a><a href="qa-trainer.html#q13">13</a><a href="qa-trainer.html#q11">11</a></div>
+</div></article>
+<article class="lesson" id="l6" data-n="6" data-grade="junior" data-min="45">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 6 пройденным">
+<div class="lt"><h3><span class="num">06</span> systemd: свой сервис и его логи</h3>
+<p class="lwhy">Уметь завести сервис так, чтобы он поднимался после перезагрузки и падения, и читать, почему он не поднялся.</p>
+<div class="lmeta"><span class="grade" data-gr="junior">junior</span>
+<span class="time">45 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> systemd управляет юнитами и строит граф зависимостей, а не запускает скрипты по номерам, как SysV. Ключевые поля: <code>After</code> — порядок, <code>Wants</code>/<code>Requires</code> — зависимость (жёсткая или мягкая), <code>Type</code> — как systemd понимает, что сервис запустился (<code>simple</code> — сразу, <code>notify</code> — по сигналу от приложения, <code>forking</code> — по уходу в фон), <code>Restart</code> — политика перезапуска, <code>ExecStart</code> — что запускать. Логи пишутся в journald, и это преимущество: <code>journalctl -u сервис</code> покажет и вывод приложения, и системные сообщения о нём в одной ленте.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code># простое приложение
+sudo tee /usr/local/bin/hello.sh &gt;/dev/null &lt;&lt;'EOF'
+#!/bin/bash
+while true; do echo "жив, $(date +%T)"; sleep 5; done
+EOF
+sudo chmod +x /usr/local/bin/hello.sh
+
+sudo tee /etc/systemd/system/hello.service &gt;/dev/null &lt;&lt;'EOF'
+[Unit]
+Description=Учебный сервис
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/hello.sh
+Restart=on-failure
+RestartSec=3
+User=nobody
+# минимальный харденинг: сервису не нужен весь диск и не нужны новые привилегии
+NoNewPrivileges=true
+ProtectSystem=strict
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable --now hello
+systemctl status hello --no-pager
+journalctl -u hello -n 10 --no-pager
+
+# сломать и прочитать причину
+sudo sed -i 's|/usr/local/bin/hello.sh|/usr/local/bin/net.sh|' /etc/systemd/system/hello.service
+sudo systemctl daemon-reload &amp;&amp; sudo systemctl restart hello
+systemctl status hello --no-pager        # exit code 203/EXEC — не нашёл файл
+journalctl -u hello -p err -n 5 --no-pager
+sudo sed -i 's|/usr/local/bin/net.sh|/usr/local/bin/hello.sh|' /etc/systemd/system/hello.service
+sudo systemctl daemon-reload &amp;&amp; sudo systemctl restart hello
+
+# полезное в разборе
+systemctl list-units --failed
+systemctl cat hello                      # итоговый юнит со всеми override
+journalctl -u hello --since "10 min ago"
+journalctl -b -p err                     # ошибки с этой загрузки</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Ты можешь с нуля написать юнит, объяснить <code>Type=simple</code> против <code>notify</code> и разницу <code>Wants</code> и <code>Requires</code>, и найти причину невзлетевшего сервиса за две команды.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span><code>Restart=always</code> на сервисе, который падает из-за неверного конфига: systemd будет перезапускать его вечно, а в мониторинге это выглядит как «сервис флапает». <code>on-failure</code> плюс <code>StartLimitBurst</code> честнее — сервис уйдёт в failed, и это будет видно.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q179">179</a><a href="qa-trainer.html#q9">9</a><a href="qa-trainer.html#q20">20</a><a href="qa-trainer.html#q16">16</a></div>
+</div></article>
+<article class="lesson" id="l7" data-n="7" data-grade="junior" data-min="50">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 7 пройденным">
+<div class="lt"><h3><span class="num">07</span> Сеть руками: когда ping не отвечает</h3>
+<p class="lwhy">Проверять доступность сервиса, а не «пинговать» — в проде ICMP закрыт почти везде.</p>
+<div class="lmeta"><span class="grade" data-gr="junior">junior</span>
+<span class="time">50 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> «Не работает» — это как минимум пять разных проблем: не резолвится имя, не открыт порт, TCP есть но приложение не отвечает, отвечает ошибкой, отвечает медленно. Проверять надо по слоям снизу вверх, каждый раз получая однозначный ответ. <code>ping</code> проверяет только ICMP, который часто запрещён политикой, — его отсутствие ничего не говорит о сервисе.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code># 1. Имя
+dig +short github.com
+dig github.com A +noall +answer      # TTL видно в выводе — важно для понимания кэша
+getent hosts github.com              # так резолвит система, а не только dig
+
+# 2. Порт
+timeout 3 bash -c '&lt;/dev/tcp/github.com/443' &amp;&amp; echo "порт открыт" || echo "порт закрыт"
+nc -zv github.com 443 2&gt;&amp;1 | tail -1
+
+# 3. Приложение
+curl -sS -o /dev/null -w 'код %{http_code}, dns %{time_namelookup}s, connect %{time_connect}s, tls %{time_appconnect}s, всего %{time_total}s\n' https://github.com
+
+# 4. Что слушает локально и кто это
+ss -tulpn | head
+ss -tan state established | head     # активные соединения
+ss -tan state time-wait | wc -l      # много TIME_WAIT — отдельный разговор
+
+# 5. Маршрут и путь
+ip -brief addr; ip route
+mtr -rwc 5 1.1.1.1 2&gt;/dev/null || traceroute -n 1.1.1.1
+
+# 6. Видеть пакеты своими глазами
+sudo tcpdump -ni any -c 5 'tcp port 443'   # в другом окне: curl https://github.com
+
+# 7. Сломать резолв и починить
+echo "127.0.0.1 github.com" | sudo tee -a /etc/hosts
+curl -sS -m 3 https://github.com ; echo "код возврата: $?"
+sudo sed -i '/github.com/d' /etc/hosts</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Проговори последовательность: имя → порт → рукопожатие TLS → ответ приложения → задержка, и назови команду для каждого шага. Отдельно: какие порты знаешь наизусть (22, 53, 80, 443, 3306, 5432, 6379, 9090, 6443).</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Останавливаться на «пинг не идёт, значит сеть». Правильный ответ на собеседовании начинается со слов «пинг мало о чём говорит, проверю порт и ответ приложения».</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q177">177</a><a href="qa-trainer.html#q178">178</a><a href="qa-trainer.html#q176">176</a><a href="qa-trainer.html#q192">192</a><a href="qa-trainer.html#q10">10</a><a href="qa-trainer.html#q31">31</a></div>
+</div></article>
+<article class="lesson" id="l8" data-n="8" data-grade="junior" data-min="45">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 8 пройденным">
+<div class="lt"><h3><span class="num">08</span> nginx как reverse proxy и TLS</h3>
+<p class="lwhy">Поставить перед приложением прокси с HTTPS — это половина типовых задач в вакансиях на инфраструктуру.</p>
+<div class="lmeta"><span class="grade" data-gr="junior">junior</span>
+<span class="time">45 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Reverse proxy принимает запрос от клиента и передаёт его наверх, к приложению: терминирует TLS, распределяет нагрузку, отдаёт статику, добавляет заголовки. Приложение при этом видит соединение от прокси, а не от клиента, — поэтому реальный IP и схему нужно передавать заголовками <code>X-Forwarded-For</code> и <code>X-Forwarded-Proto</code>, иначе приложение будет считать всех клиентов одним адресом и генерировать <code>http://</code> ссылки. Балансировка на L7 (nginx видит URL, метод, заголовки) отличается от L4 (виден только адрес и порт) ценой: L7 умнее, L4 быстрее.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code># приложение-заглушка, которое показывает полученные заголовки
+docker run -d --name app -p 8080:80 traefik/whoami
+
+sudo tee /etc/nginx/conf.d/lab.conf &gt;/dev/null &lt;&lt;'EOF'
+upstream app_backend {
+    server 127.0.0.1:8080;
+    keepalive 16;
+}
+
+server {
+    listen 80;
+    server_name lab.local;
+
+    location /healthz { return 200 "ok\n"; }
+
+    location / {
+        proxy_pass http://app_backend;
+        proxy_http_version 1.1;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_connect_timeout 2s;
+        proxy_read_timeout   10s;
+    }
+}
+EOF
+
+sudo nginx -t                     # проверять конфиг ДО перезагрузки — всегда
+sudo systemctl reload nginx       # reload, а не restart: без обрыва соединений
+curl -H 'Host: lab.local' localhost/healthz
+curl -H 'Host: lab.local' localhost/ | grep -i forwarded
+
+# TLS: сначала свой сертификат, чтобы понять механику
+sudo openssl req -x509 -nodes -days 30 -newkey rsa:2048 \
+  -keyout /etc/ssl/private/lab.key -out /etc/ssl/certs/lab.crt \
+  -subj "/CN=lab.local"
+openssl x509 -in /etc/ssl/certs/lab.crt -noout -subject -dates   # что внутри и до когда</code></pre></div>
+<p>Добавь в конфиг второй <code>server</code> на <code>listen 443 ssl;</code> с <code>ssl_certificate</code> и <code>ssl_certificate_key</code>, снова <code>nginx -t</code>, <code>reload</code>, и проверь <code>curl -k -H 'Host: lab.local' https://localhost/healthz</code>. В проде вместо самоподписанного — <code>certbot --nginx</code>, но механику надо понимать без него.</p>
+<div class="callout check"><span class="clabel">Проверка</span>Ты можешь объяснить, зачем <code>X-Forwarded-For</code>, чем <code>reload</code> отличается от <code>restart</code>, и как проверить срок действия сертификата одной командой.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Перезапускать nginx без <code>nginx -t</code>. Ошибка в конфиге — и сервис не поднимется, а ты об этом узнаешь от мониторинга. Второе по частоте: забыть <code>proxy_set_header Host</code>, после чего приложение с виртуальными хостами отдаёт не тот сайт.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q181">181</a><a href="qa-trainer.html#q182">182</a><a href="qa-trainer.html#q34">34</a></div>
+</div></article>
+<article class="lesson" id="l9" data-n="9" data-grade="junior" data-min="35">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 9 пройденным">
+<div class="lt"><h3><span class="num">09</span> SSH: ключи, конфиг, харденинг</h3>
+<p class="lwhy">Перестать вводить пароли и закрыть самый атакуемый порт в интернете.</p>
+<div class="lmeta"><span class="grade" data-gr="junior">junior</span>
+<span class="time">35 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Аутентификация по ключу — это асимметричная криптография: приватный ключ остаётся у тебя, публичный лежит на сервере в <code>authorized_keys</code>. Сервер отправляет челлендж, клиент подписывает его приватным ключом — пароль не передаётся вообще, поэтому его нельзя подобрать или подслушать. Тип ключа: <code>ed25519</code> короче и быстрее RSA при большей стойкости, RSA нужен только для совместимости со старым софтом. <code>~/.ssh/config</code> избавляет от простыней флагов и умеет прыгать через bastion одной строкой.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code># ключ
+ssh-keygen -t ed25519 -C "nurekella@laptop" -f ~/.ssh/id_lab
+ls -l ~/.ssh/id_lab*            # приватный обязан быть 600
+
+# положить публичный на сервер (в лабе — на localhost)
+ssh-copy-id -i ~/.ssh/id_lab.pub localhost
+cat ~/.ssh/authorized_keys
+
+# удобный конфиг
+cat &gt;&gt; ~/.ssh/config &lt;&lt;'EOF'
+Host lab
+    HostName localhost
+    User     nurekella
+    IdentityFile ~/.ssh/id_lab
+    IdentitiesOnly yes
+
+# доступ во внутреннюю сеть через бастион одной командой
+Host db-prod
+    HostName 10.0.5.20
+    User     nurekella
+    ProxyJump bastion.example.com
+EOF
+chmod 600 ~/.ssh/config
+ssh lab 'hostname; whoami'
+
+# харденинг сервера
+sudo tee /etc/ssh/sshd_config.d/99-lab.conf &gt;/dev/null &lt;&lt;'EOF'
+PermitRootLogin no
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+MaxAuthTries 3
+AllowGroups ssh-users
+ClientAliveInterval 300
+EOF
+sudo sshd -t                    # проверить конфиг, иначе можно потерять доступ
+sudo groupadd -f ssh-users &amp;&amp; sudo usermod -aG ssh-users "$USER"
+sudo systemctl reload ssh</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Ты заходишь по ключу без пароля, <code>ssh db-prod</code> работает через бастион, а вход по паролю и под root запрещён. Объясни вслух, почему запрет пароля важнее сложного пароля.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Применить харденинг и закрыть себе доступ. Правило: <strong>не закрывай текущую сессию, пока новым подключением не проверил, что вход работает.</strong> И всегда <code>sshd -t</code> перед reload.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q180">180</a><a href="qa-trainer.html#q189">189</a></div>
+</div></article>
+<article class="lesson" id="l10" data-n="10" data-grade="junior" data-min="40">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 10 пройденным">
+<div class="lt"><h3><span class="num">10</span> Git на каждый день</h3>
+<p class="lwhy">Уверенно отвечать на «как отменить изменения» — вопрос, на котором сыплется половина кандидатов.</p>
+<div class="lmeta"><span class="grade" data-gr="junior">junior</span>
+<span class="time">40 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Три области: рабочий каталог, индекс (staging) и история коммитов. <code>add</code> переносит из каталога в индекс, <code>commit</code> — из индекса в историю. Отмена зависит от того, где изменение: в каталоге — <code>restore</code>, в индексе — <code>restore --staged</code>, в истории — <code>revert</code> (новый коммит, безопасно для общих ветвей) или <code>reset</code> (сдвиг указателя, переписывает историю). <code>fetch</code> только скачивает состояние удалённого репозитория, <code>pull</code> — это <code>fetch</code> плюс слияние, поэтому <code>pull</code> может неожиданно создать merge-коммит.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>mkdir -p ~/lab/git &amp;&amp; cd ~/lab/git &amp;&amp; git init -b main
+git config user.email you@example.com &amp;&amp; git config user.name "You"
+
+echo "v1" &gt; app.txt &amp;&amp; git add app.txt &amp;&amp; git commit -m "первый коммит"
+echo "мусор" &gt;&gt; app.txt
+git diff                              # различия каталога и индекса
+git restore app.txt                   # откатить незакоммиченное
+cat app.txt
+
+echo "v2" &gt; app.txt &amp;&amp; git add app.txt
+git restore --staged app.txt          # убрать из индекса, оставив в файле
+git status
+
+# история
+git add app.txt &amp;&amp; git commit -m "v2"
+git log --oneline --graph
+git revert --no-edit HEAD             # безопасная отмена: новый коммит
+git log --oneline
+
+git reset --soft HEAD~1               # изменения остались в индексе
+git reset --hard HEAD~1               # изменения уничтожены — только для своей ветки
+
+# конфликт своими руками
+git switch -c feature
+echo "из feature" &gt; app.txt &amp;&amp; git commit -am "feature"
+git switch main
+echo "из main" &gt; app.txt &amp;&amp; git commit -am "main"
+git merge feature                     # CONFLICT
+git status                            # смотри, какие файлы
+vim app.txt                           # убрать маркеры &lt;&lt;&lt;&lt;&lt;&lt;&lt; ======= &gt;&gt;&gt;&gt;&gt;&gt;&gt;
+git add app.txt &amp;&amp; git commit --no-edit
+
+# страховка на все случаи
+git reflog                            # тут видно даже то, что "потеряно" после reset
+git stash &amp;&amp; git stash list &amp;&amp; git stash pop
+git log -S "из main" --oneline        # когда появилась строка
+git blame app.txt</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Не подсматривая, скажи разницу <code>reset --soft/--mixed/--hard</code>, когда уместен <code>revert</code> вместо <code>reset</code>, и как вернуть коммит после <code>reset --hard</code> (ответ: <code>git reflog</code>).</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span><code>git reset --hard</code> в общей ветке. Историю переписали, у коллег расхождение, и починка занимает вечер. В общих ветвях — только <code>revert</code>.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q193">193</a><a href="qa-trainer.html#q194">194</a><a href="qa-trainer.html#q41">41</a><a href="qa-trainer.html#q42">42</a><a href="qa-trainer.html#q38">38</a></div>
+</div></article>
+<article class="lesson" id="l11" data-n="11" data-grade="junior" data-min="50">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 11 пройденным">
+<div class="lt"><h3><span class="num">11</span> Docker: свой образ и compose</h3>
+<p class="lwhy">Собрать образ, который не стыдно показать, и поднять два связанных сервиса одной командой.</p>
+<div class="lmeta"><span class="grade" data-gr="junior">junior</span>
+<span class="time">50 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Образ состоит из слоёв, каждая инструкция Dockerfile добавляет слой, слои кэшируются. Отсюда правило порядка: сначала то, что меняется редко (установка зависимостей), потом то, что меняется каждый коммит (код) — иначе кэш будет сбрасываться на каждой сборке. <code>CMD</code> — аргументы по умолчанию, их легко заменить при запуске; <code>ENTRYPOINT</code> — сама команда, она остаётся. Данные внутри контейнера живут в его writable-слое и исчезают вместе с ним: чтобы сохранить, нужен volume.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>mkdir -p ~/lab/app &amp;&amp; cd ~/lab/app
+cat &gt; app.py &lt;&lt;'EOF'
+import os, http.server, socketserver
+class H(http.server.BaseHTTPRequestHandler):
+    def do_GET(s):
+        s.send_response(200); s.end_headers()
+        s.wfile.write(("привет из " + os.uname().nodename + "\n").encode())
+socketserver.TCPServer(("", 8000), H).serve_forever()
+EOF
+
+cat &gt; Dockerfile &lt;&lt;'EOF'
+FROM python:3.12-slim
+WORKDIR /app
+# зависимости отдельным слоем — кэш не сбросится при правке кода
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY app.py .
+# не root: если процесс скомпрометируют, он не будет всесильным
+RUN useradd -u 10001 -m appuser
+USER 10001
+EXPOSE 8000
+ENTRYPOINT ["python", "app.py"]
+EOF
+: &gt; requirements.txt
+
+docker build -t lab-app:1 .
+docker build -t lab-app:1 .          # второй раз — все слои из кэша
+echo "# правка" &gt;&gt; app.py &amp;&amp; docker build -t lab-app:2 .   # пересобрался только последний слой
+
+docker run -d --name web -p 8000:8000 lab-app:2
+curl localhost:8000
+docker exec web id                    # 10001, не root
+docker logs web | tail -3
+docker image history lab-app:2        # слои и их размер
+
+# данные и их потеря
+docker exec web sh -c 'echo данные &gt; /tmp/x' 2&gt;/dev/null
+docker rm -f web &amp;&amp; docker run -d --name web -p 8000:8000 lab-app:2
+docker exec web cat /tmp/x            # файла нет — writable-слой умер вместе с контейнером
+docker volume create labdata
+docker rm -f web
+docker run -d --name web -p 8000:8000 -v labdata:/data lab-app:2
+docker exec web sh -c 'echo данные &gt; /data/x' &amp;&amp; docker rm -f web
+docker run -d --name web -p 8000:8000 -v labdata:/data lab-app:2 &amp;&amp; docker exec web cat /data/x
+
+# два сервиса вместе
+cat &gt; compose.yaml &lt;&lt;'EOF'
+services:
+  web:
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      DB_HOST: db
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: labpass
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 5
+volumes:
+  pgdata:
+EOF
+docker compose up -d
+docker compose ps
+docker compose exec web getent hosts db     # сервисы видят друг друга по имени
+docker compose logs --tail 5 db
+docker compose down                        # без -v данные тома остаются</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Объясни, почему <code>COPY requirements.txt</code> идёт до <code>COPY app.py</code>, чем <code>CMD</code> отличается от <code>ENTRYPOINT</code>, и где живут данные, если тома нет. Проверь, что твой контейнер работает не от root.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span><code>COPY . .</code> первой строкой: любая правка любого файла сбрасывает кэш, и сборка каждый раз идёт с нуля. Вторая — тег <code>latest</code> в проде: невозможно понять, что именно запущено, и откат превращается в угадывание.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q195">195</a><a href="qa-trainer.html#q196">196</a><a href="qa-trainer.html#q45">45</a><a href="qa-trainer.html#q47">47</a><a href="qa-trainer.html#q49">49</a><a href="qa-trainer.html#q55">55</a></div>
+</div></article>
+<article class="lesson" id="l12" data-n="12" data-grade="junior" data-min="60">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 12 пройденным">
+<div class="lt"><h3><span class="num">12</span> Kubernetes: первый кластер и первое приложение</h3>
+<p class="lwhy">Пройти путь от пустого кластера до работающего приложения с конфигом, секретом и доступом снаружи.</p>
+<div class="lmeta"><span class="grade" data-gr="junior">junior</span>
+<span class="time">60 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Pod — минимальная единица планирования: один или несколько контейнеров с общими сетевым пространством и томами. Поды одноразовы, поэтому руками их не создают: Deployment описывает желаемое состояние («три реплики такого-то образа»), создаёт ReplicaSet, а тот следит за числом подов. Service даёт стабильное имя и адрес, потому что IP пода меняется при каждом пересоздании. ConfigMap и Secret отделяют конфигурацию от образа — один образ едет во все окружения, меняются только они.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code># кластер на ноутбуке
+k3d cluster create lab --agents 2
+kubectl get nodes -o wide
+kubectl cluster-info
+
+# первое приложение декларативно
+mkdir -p ~/lab/k8s &amp;&amp; cd ~/lab/k8s
+cat &gt; app.yaml &lt;&lt;'EOF'
+apiVersion: v1
+kind: ConfigMap
+metadata: { name: app-config }
+data:
+  GREETING: "привет из ConfigMap"
+---
+apiVersion: v1
+kind: Secret
+metadata: { name: app-secret }
+stringData:
+  TOKEN: "s3cr3t"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: web }
+spec:
+  replicas: 3
+  selector:
+    matchLabels: { app: web }
+  template:
+    metadata:
+      labels: { app: web }
+    spec:
+      containers:
+        - name: whoami
+          image: traefik/whoami:v1.10
+          ports: [{ containerPort: 80 }]
+          envFrom:
+            - configMapRef: { name: app-config }
+            - secretRef:    { name: app-secret }
+          resources:
+            requests: { cpu: 10m, memory: 16Mi }
+            limits:   { cpu: 200m, memory: 64Mi }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: web }
+spec:
+  selector: { app: web }
+  ports: [{ port: 80, targetPort: 80 }]
+EOF
+
+kubectl apply -f app.yaml
+kubectl get deploy,rs,pod,svc
+kubectl describe deploy web | head -25
+kubectl exec deploy/web -- env | grep -E 'GREETING|TOKEN'
+
+# команды, которыми живёшь каждый день
+kubectl get pods -o wide
+kubectl logs deploy/web --tail=5
+kubectl exec -it deploy/web -- sh -c 'wget -qO- localhost'
+kubectl port-forward svc/web 8080:80 &amp;
+curl -s localhost:8080 | head -3; kill %1
+
+# самоисцеление: удали под и смотри
+kubectl delete pod -l app=web --wait=false
+kubectl get pods -w --timeout=30s      # Ctrl+C — ReplicaSet поднял новый
+
+# обновление и откат
+kubectl set image deploy/web whoami=traefik/whoami:v1.9
+kubectl rollout status deploy/web
+kubectl rollout history deploy/web
+kubectl rollout undo deploy/web
+kubectl get rs                          # старый ReplicaSet остался для откатов
+
+# правда про Secret
+kubectl get secret app-secret -o jsonpath='{.data.TOKEN}' | base64 -d; echo</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Ты можешь поднять кластер и приложение с нуля за десять минут, объяснить связку Deployment → ReplicaSet → Pod, назвать, что произойдёт при удалении пода, и сказать, почему Secret в base64 — это не шифрование.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Создавать поды напрямую (<code>kubectl run</code>) и потом удивляться, что после падения узла приложение не вернулось. И <code>kubectl edit</code> в проде: изменение живёт до следующего <code>apply</code> из git, а потом бесследно исчезает.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q197">197</a><a href="qa-trainer.html#q198">198</a><a href="qa-trainer.html#q199">199</a><a href="qa-trainer.html#q200">200</a><a href="qa-trainer.html#q66">66</a><a href="qa-trainer.html#q75">75</a><a href="qa-trainer.html#q65">65</a></div>
+</div></article>
+</section>
+<section class="track" data-track="Грейд middle — эксплуатация">
+<h2>Грейд middle — эксплуатация</h2>
+<div class="lead">Четырнадцать уроков. Здесь начинается то, за что платят: не «поднять», а «эксплуатировать» — разбирать падения, обновлять без простоя, измерять надёжность.</div>
+<article class="lesson" id="l13" data-n="13" data-grade="middle" data-min="50">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 13 пройденным">
+<div class="lt"><h3><span class="num">13</span> Docker всерьёз: тонкий образ и сборка в CI</h3>
+<p class="lwhy">Уменьшить образ в разы и научиться отвечать на «почему у тебя образ 1.2 ГБ».</p>
+<div class="lmeta"><span class="grade" data-gr="middle">middle</span>
+<span class="time">50 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Multi-stage сборка разделяет окружение сборки и окружение запуска: в первой стадии есть компилятор, зависимости и кэш, в финальный образ переносится только артефакт. Это одновременно и размер, и безопасность: чем меньше в образе программ, тем меньше поверхность атаки и меньше CVE в отчёте сканера. Тег <code>latest</code> в проде ломает воспроизводимость — один и тот же манифест в разное время даст разные образы; фиксировать надо тег версии, а в критичных местах digest (<code>image@sha256:…</code>), потому что тег можно перезаписать, а digest — нет.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>mkdir -p ~/lab/thin &amp;&amp; cd ~/lab/thin
+cat &gt; main.go &lt;&lt;'EOF'
+package main
+import ("fmt"; "net/http")
+func main() {
+  http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { fmt.Fprintln(w, "ok") })
+  http.ListenAndServe(":8080", nil)
+}
+EOF
+
+# как делать не надо
+cat &gt; Dockerfile.fat &lt;&lt;'EOF'
+FROM golang:1.23
+WORKDIR /src
+COPY . .
+RUN go build -o app main.go
+CMD ["/src/app"]
+EOF
+
+# как надо
+cat &gt; Dockerfile &lt;&lt;'EOF'
+FROM golang:1.23 AS build
+WORKDIR /src
+COPY go.* ./
+RUN go mod download || true
+COPY . .
+RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o /out/app main.go
+
+FROM gcr.io/distroless/static:nonroot
+COPY --from=build /out/app /app
+USER 65532:65532
+EXPOSE 8080
+ENTRYPOINT ["/app"]
+EOF
+go mod init lab 2&gt;/dev/null || true
+
+docker build -f Dockerfile.fat -t lab:fat . &amp;&amp; docker build -t lab:thin .
+docker images | grep -E 'lab +(fat|thin)'        # разница обычно в 40-80 раз
+dive lab:thin 2&gt;/dev/null || docker image history lab:thin
+
+# запуск и проверка, что не root
+docker run -d --name thin -p 8081:8080 lab:thin &amp;&amp; curl -s localhost:8081
+docker inspect -f '{{.Config.User}}' thin
+
+# digest вместо тега
+docker pull nginx:1.27
+docker inspect --format='{{index .RepoDigests 0}}' nginx:1.27
+
+# сканер: посмотреть, что сокращение образа даёт по CVE
+trivy image --severity HIGH,CRITICAL lab:fat 2&gt;/dev/null | tail -5
+trivy image --severity HIGH,CRITICAL lab:thin 2&gt;/dev/null | tail -5</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Твой финальный образ меньше 20 МБ, работает не от root, и ты можешь объяснить, что попало в него, а что осталось в стадии сборки. Назови три способа уменьшить образ: multi-stage, минимальная база, <code>.dockerignore</code> и объединение слоёв с очисткой кэша пакетного менеджера.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span><code>RUN apt-get install</code> и <code>RUN apt-get clean</code> разными слоями: удалённые файлы остаются в предыдущем слое, размер не уменьшается. Чистить надо в той же инструкции, что и устанавливать.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q48">48</a><a href="qa-trainer.html#q54">54</a><a href="qa-trainer.html#q51">51</a><a href="qa-trainer.html#q57">57</a><a href="qa-trainer.html#q152">152</a></div>
+</div></article>
+<article class="lesson" id="l14" data-n="14" data-grade="middle" data-min="50">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 14 пройденным">
+<div class="lt"><h3><span class="num">14</span> Probes, requests, limits и QoS</h3>
+<p class="lwhy">Понять два механизма, которые чаще всего настраивают неправильно и потом получают падения под нагрузкой.</p>
+<div class="lmeta"><span class="grade" data-gr="middle">middle</span>
+<span class="time">50 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Три пробы отвечают на три разных вопроса. <code>startup</code> — «приложение ещё поднимается, не мешайте»: пока она не прошла, остальные не выполняются. <code>readiness</code> — «можно ли давать трафик»: провал убирает под из endpoints Service, но контейнер не перезапускается. <code>liveness</code> — «жив ли процесс»: провал ведёт к рестарту. Перепутать liveness и readiness — классическая авария: медленный ответ под нагрузкой валит liveness, kubelet перезапускает поды, нагрузка идёт на оставшиеся, они тоже перестают отвечать — каскад.</p>
+<p><code>requests</code> — то, по чему планировщик выбирает узел и что гарантировано поду. <code>limits</code> — жёсткий потолок: по CPU это throttling (процесс замедляется), по памяти — OOMKill (контейнер убивают). Отсюда QoS-классы: <code>Guaranteed</code> (requests == limits для всех контейнеров) вытесняется последним, <code>Burstable</code> (requests &lt; limits) — посередине, <code>BestEffort</code> (ничего не указано) — первым.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>cd ~/lab/k8s
+cat &gt; probes.yaml &lt;&lt;'EOF'
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: probed }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: probed } }
+  template:
+    metadata: { labels: { app: probed } }
+    spec:
+      containers:
+        - name: app
+          image: traefik/whoami:v1.10
+          ports: [{ containerPort: 80 }]
+          startupProbe:
+            httpGet: { path: /, port: 80 }
+            failureThreshold: 30
+            periodSeconds: 2
+          readinessProbe:
+            httpGet: { path: /, port: 80 }
+            periodSeconds: 5
+            failureThreshold: 2
+          livenessProbe:
+            httpGet: { path: /, port: 80 }
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:
+            requests: { cpu: 50m, memory: 32Mi }
+            limits:   { cpu: 50m, memory: 32Mi }   # == requests → Guaranteed
+EOF
+kubectl apply -f probes.yaml &amp;&amp; kubectl rollout status deploy/probed
+kubectl get pod -l app=probed -o jsonpath='{.items[0].status.qosClass}'; echo
+
+# readiness убирает под из трафика, не перезапуская его
+kubectl expose deploy probed --port 80 2&gt;/dev/null
+kubectl get endpoints probed
+POD=$(kubectl get pod -l app=probed -o name | head -1)
+kubectl exec $POD -- sh -c 'kill 1' 2&gt;/dev/null || true
+kubectl get pod -l app=probed          # RESTARTS вырос
+kubectl get endpoints probed           # на время рестарта адрес ушёл из endpoints
+
+# OOMKill вживую
+cat &gt; oom.yaml &lt;&lt;'EOF'
+apiVersion: v1
+kind: Pod
+metadata: { name: hungry }
+spec:
+  containers:
+    - name: eat
+      image: python:3.12-slim
+      command: ["python","-c","a=bytearray(200*1024*1024); import time; time.sleep(300)"]
+      resources:
+        limits: { memory: 64Mi }
+EOF
+kubectl apply -f oom.yaml
+sleep 12
+kubectl get pod hungry
+kubectl describe pod hungry | grep -A3 -E 'Last State|Reason'   # OOMKilled, exit 137
+
+# CPU throttling: контейнер не убивают, он просто медленный
+kubectl run cpu --image=busybox --restart=Never \
+  --overrides='{"spec":{"containers":[{"name":"cpu","image":"busybox","command":["sh","-c","time dd if=/dev/zero of=/dev/null bs=1M count=200000"],"resources":{"limits":{"cpu":"100m"}}}]}}'
+sleep 15 &amp;&amp; kubectl logs cpu
+kubectl delete pod hungry cpu --ignore-not-found</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Объясни на память: что будет, если liveness ссылается на эндпоинт, который зависит от базы (ответ: падение базы вызовет рестарт всех подов, хотя приложение живо). И почему <code>Guaranteed</code> важен для баз данных.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Ставить <code>limits</code> по памяти равным <code>requests</code> «для порядка» на JVM-приложениях без настройки heap — приложение видит память узла, а не лимит, и стабильно получает OOMKill.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q60">60</a><a href="qa-trainer.html#q61">61</a><a href="qa-trainer.html#q153">153</a></div>
+</div></article>
+<article class="lesson" id="l15" data-n="15" data-grade="middle" data-min="50">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 15 пройденным">
+<div class="lt"><h3><span class="num">15</span> Разбор падений: CrashLoopBackOff и Pending</h3>
+<p class="lwhy">Довести до автоматизма два самых частых состояния — их дают разбирать на живом кластере на собеседовании.</p>
+<div class="lmeta"><span class="grade" data-gr="middle">middle</span>
+<span class="time">50 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> <code>CrashLoopBackOff</code> — это не ошибка, а цикл: контейнер запустился, упал, kubelet ждёт с растущей задержкой (10с, 20с, 40с… до 5 минут) и пробует снова. Причина всегда внутри: код возврата и логи предыдущей попытки. <code>Pending</code> — под не назначен на узел: не хватает ресурсов, не подходят taints/affinity, нет PVC, или узлы не Ready. Разница принципиальна: <code>CrashLoopBackOff</code> — проблема приложения, <code>Pending</code> — проблема кластера или манифеста.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>cd ~/lab/k8s
+# 1. CrashLoopBackOff: неверная команда
+kubectl run crash --image=busybox --restart=Always -- sh -c 'echo стартую; exit 1'
+sleep 20
+kubectl get pod crash
+kubectl describe pod crash | grep -A5 'Last State'      # exit code
+kubectl logs crash --previous                            # логи упавшей попытки — главное
+kubectl get events --sort-by=.lastTimestamp | tail -5
+
+# 2. CrashLoopBackOff: нет конфига
+cat &gt; needcfg.yaml &lt;&lt;'EOF'
+apiVersion: v1
+kind: Pod
+metadata: { name: needcfg }
+spec:
+  containers:
+    - name: app
+      image: busybox
+      command: ["sh","-c","cat /etc/app/config.yaml"]
+      volumeMounts: [{ name: cfg, mountPath: /etc/app }]
+  volumes:
+    - name: cfg
+      configMap: { name: missing-config }
+EOF
+kubectl apply -f needcfg.yaml &amp;&amp; sleep 5
+kubectl get pod needcfg                                  # ContainerCreating, не Crash
+kubectl describe pod needcfg | tail -5                   # причина в Events: configmap not found
+kubectl create configmap missing-config --from-literal=config.yaml="ok: true"
+sleep 5 &amp;&amp; kubectl logs needcfg
+
+# 3. Pending: не хватает ресурсов
+kubectl run huge --image=nginx --restart=Never \
+  --overrides='{"spec":{"containers":[{"name":"huge","image":"nginx","resources":{"requests":{"cpu":"64","memory":"256Gi"}}}]}}'
+kubectl get pod huge
+kubectl describe pod huge | grep -A5 Events              # Insufficient cpu/memory
+kubectl describe node | grep -A6 'Allocated resources'   # сколько реально осталось
+
+# 4. Pending: taint без toleration
+NODE=$(kubectl get nodes -o name | tail -1)
+kubectl taint $NODE lab=only:NoSchedule
+kubectl run tainted --image=nginx --restart=Never --overrides='{"spec":{"nodeSelector":{"kubernetes.io/hostname":"'$(basename $NODE)'"}}}'
+kubectl describe pod tainted | grep -A3 Events           # had untolerated taint
+kubectl taint $NODE lab=only:NoSchedule-
+
+kubectl delete pod crash needcfg huge tainted --ignore-not-found</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Проговори алгоритм за 30 секунд: <code>kubectl get pod</code> → <code>describe</code> (Events и Last State) → <code>logs --previous</code> → код возврата → гипотеза. И назови, что означают коды 137 (SIGKILL, обычно OOM), 143 (SIGTERM), 1 (ошибка приложения), 203 (не смог запустить бинарник).</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Смотреть <code>kubectl logs</code> без <code>--previous</code> у падающего пода: текущая попытка ещё не успела ничего записать, и человек решает, что «логов нет».</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q62">62</a><a href="qa-trainer.html#q63">63</a><a href="qa-trainer.html#q56">56</a><a href="qa-trainer.html#q78">78</a></div>
+</div></article>
+<article class="lesson" id="l16" data-n="16" data-grade="middle" data-min="45">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 16 пройденным">
+<div class="lt"><h3><span class="num">16</span> Обновление без простоя и откат</h3>
+<p class="lwhy">Обновлять прод в рабочее время и уметь откатиться за одну команду.</p>
+<div class="lmeta"><span class="grade" data-gr="middle">middle</span>
+<span class="time">45 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Rolling update заменяет поды по частям: <code>maxUnavailable</code> — сколько можно потерять, <code>maxSurge</code> — сколько можно добавить сверх нормы. Простоя не будет, только если у пода есть readiness (иначе трафик пойдёт в неготовый под) и корректная обработка <code>SIGTERM</code> (иначе оборвутся текущие запросы). PodDisruptionBudget защищает от добровольных нарушений — дренажа узла при обновлении кластера: он не даёт вывести столько подов, чтобы сервис просел. Rolling не проверяет релиз на реальном трафике — для этого canary или blue-green.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>cd ~/lab/k8s
+cat &gt; rolling.yaml &lt;&lt;'EOF'
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: roll }
+spec:
+  replicas: 4
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxUnavailable: 1, maxSurge: 1 }
+  selector: { matchLabels: { app: roll } }
+  template:
+    metadata: { labels: { app: roll } }
+    spec:
+      terminationGracePeriodSeconds: 20
+      containers:
+        - name: app
+          image: traefik/whoami:v1.10
+          readinessProbe: { httpGet: { path: /, port: 80 }, periodSeconds: 2 }
+          lifecycle:
+            preStop:
+              exec: { command: ["sh","-c","sleep 5"] }   # дать балансировщику убрать нас из endpoints
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata: { name: roll }
+spec:
+  minAvailable: 3
+  selector: { matchLabels: { app: roll } }
+EOF
+kubectl apply -f rolling.yaml &amp;&amp; kubectl rollout status deploy/roll
+
+# наблюдать обновление
+kubectl set image deploy/roll app=traefik/whoami:v1.9 &amp;&amp; kubectl get pods -l app=roll -w --timeout=60s
+
+# история и откат
+kubectl rollout history deploy/roll
+kubectl rollout undo deploy/roll &amp;&amp; kubectl rollout status deploy/roll
+kubectl describe deploy roll | grep Image
+
+# сломанный релиз: rollout зависает, а не ломает прод
+kubectl set image deploy/roll app=traefik/whoami:НЕТ-ТАКОГО-ТЕГА
+sleep 15
+kubectl get pods -l app=roll                 # новый под в ImagePullBackOff, старые работают
+kubectl rollout status deploy/roll --timeout=10s ; echo "код возврата: $?"
+kubectl rollout undo deploy/roll
+
+# PDB в действии: дренаж узла
+kubectl get pdb roll
+kubectl drain $(kubectl get nodes -o name | tail -1 | cut -d/ -f2) --ignore-daemonsets --delete-emptydir-data --timeout=60s
+kubectl get pods -l app=roll -o wide
+kubectl uncordon $(kubectl get nodes -o name | tail -1 | cut -d/ -f2)</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Объясни, зачем <code>preStop</code> со сном, если есть readiness (ответ: удаление из endpoints и остановка контейнера происходят параллельно, сон даёт балансировщику успеть). И что делает PDB при <code>drain</code>.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Считать, что rolling update сам по себе даёт нулевой простой. Без readiness и без обработки SIGTERM он даёт ровно то же, что и <code>kubectl delete pod</code>, только медленнее.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q67">67</a><a href="qa-trainer.html#q94">94</a><a href="qa-trainer.html#q100">100</a><a href="qa-trainer.html#q84">84</a></div>
+</div></article>
+<article class="lesson" id="l17" data-n="17" data-grade="middle" data-min="45">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 17 пройденным">
+<div class="lt"><h3><span class="num">17</span> RBAC: выдать ровно столько прав, сколько нужно</h3>
+<p class="lwhy">Отвечать на «выдай приложению минимальные права» кодом, а не словами про best practices.</p>
+<div class="lmeta"><span class="grade" data-gr="middle">middle</span>
+<span class="time">45 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Четыре объекта: Role (права в namespace), ClusterRole (права на весь кластер), RoleBinding и ClusterRoleBinding (кому эти права). Субъект — ServiceAccount для приложений, User или Group для людей. Права аддитивны: запретить нельзя, можно только не дать. Проверять надо не глазами, а <code>kubectl auth can-i</code>, в том числе от имени сервис-аккаунта. <code>ServiceAccount</code> монтируется в под токеном, и приложение обращается к API с ним — поэтому «под с правами cluster-admin» означает «любой, кто выполнит код в этом поде, владеет кластером».</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>cd ~/lab/k8s
+cat &gt; rbac.yaml &lt;&lt;'EOF'
+apiVersion: v1
+kind: ServiceAccount
+metadata: { name: reader, namespace: default }
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: { name: pod-reader, namespace: default }
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames: ["app-config"]        # только один конкретный объект
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: { name: reader-can-read, namespace: default }
+subjects: [{ kind: ServiceAccount, name: reader, namespace: default }]
+roleRef: { kind: Role, name: pod-reader, apiGroup: rbac.authorization.k8s.io }
+EOF
+kubectl apply -f rbac.yaml
+
+# проверка правами, а не надеждой
+kubectl auth can-i list pods --as=system:serviceaccount:default:reader
+kubectl auth can-i delete pods --as=system:serviceaccount:default:reader
+kubectl auth can-i get configmap/app-config --as=system:serviceaccount:default:reader
+kubectl auth can-i get configmap/other --as=system:serviceaccount:default:reader
+kubectl auth can-i --list --as=system:serviceaccount:default:reader | head
+
+# приложение с этим аккаунтом обращается к API само
+kubectl run apiclient --image=curlimages/curl:8.10.1 --restart=Never \
+  --overrides='{"spec":{"serviceAccountName":"reader"}}' -- sleep 3600
+sleep 5
+kubectl exec apiclient -- sh -c '
+  T=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+  curl -s --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
+    -H "Authorization: Bearer $T" https://kubernetes.default/api/v1/namespaces/default/pods | head -c 120; echo
+  curl -s -o /dev/null -w "\nудаление: %{http_code}\n" -X DELETE --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
+    -H "Authorization: Bearer $T" https://kubernetes.default/api/v1/namespaces/default/pods/apiclient'
+
+# кто в кластере всесилен — полезная проверка на новом месте
+kubectl get clusterrolebindings -o json | \
+  jq -r '.items[] | select(.roleRef.name=="cluster-admin") | .metadata.name + " → " + ([.subjects[]?.name] | join(","))' 2&gt;/dev/null
+
+kubectl delete pod apiclient --ignore-not-found</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Ты можешь с нуля написать Role и RoleBinding, ограничить права одним конкретным ConfigMap через <code>resourceNames</code> и доказать результат через <code>auth can-i</code>. Объясни, чем Role отличается от ClusterRole и почему нет запрещающих правил.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Выдать <code>ClusterRole/edit</code> вместо Role в одном namespace, потому что «так быстрее заработало». На аудите это первое, что находят.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q68">68</a><a href="qa-trainer.html#q69">69</a><a href="qa-trainer.html#q163">163</a><a href="qa-trainer.html#q140">140</a></div>
+</div></article>
+<article class="lesson" id="l18" data-n="18" data-grade="middle" data-min="55">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 18 пройденным">
+<div class="lt"><h3><span class="num">18</span> Сеть кластера: Service, DNS и NetworkPolicy</h3>
+<p class="lwhy">Понимать, как запрос доходит до пода, и уметь закрыть namespace по умолчанию.</p>
+<div class="lmeta"><span class="grade" data-gr="middle">middle</span>
+<span class="time">55 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Service — это не прокси-процесс, а правило. kube-proxy (или eBPF в Cilium) программирует на каждом узле правила iptables/ipvs, которые подменяют адрес назначения на IP одного из готовых подов. Список готовых берётся из объекта EndpointSlice, который наполняется по селектору Service и readiness-пробам. Отсюда правило отладки: <strong>пустые endpoints — значит, селектор не совпал с метками или поды не готовы</strong>, и никакая настройка Service не поможет. DNS в кластере даёт имена вида <code>service.namespace.svc.cluster.local</code>. NetworkPolicy — это разрешающие правила: пока политик нет, разрешено всё; как только на под попала хотя бы одна политика, всё, что не разрешено, запрещено.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>cd ~/lab/k8s
+kubectl create ns shop 2&gt;/dev/null
+kubectl -n shop create deploy api --image=traefik/whoami:v1.10 --replicas=2
+kubectl -n shop expose deploy api --port 80
+kubectl -n shop run client --image=curlimages/curl:8.10.1 -- sleep 3600
+sleep 8
+
+# путь запроса
+kubectl -n shop get svc api -o wide
+kubectl -n shop get endpointslices -l kubernetes.io/service-name=api -o wide
+kubectl -n shop exec client -- curl -s api | head -2
+kubectl -n shop exec client -- nslookup api 2&gt;/dev/null | tail -4
+kubectl -n shop exec client -- curl -s api.shop.svc.cluster.local | head -2
+
+# сломать селектор и увидеть пустые endpoints — это и есть задача «Service не отдаёт трафик»
+kubectl -n shop patch svc api -p '{"spec":{"selector":{"app":"НЕВЕРНО"}}}'
+kubectl -n shop get endpoints api                       # &lt;none&gt;
+kubectl -n shop exec client -- curl -s -m 3 api ; echo "код: $?"
+kubectl -n shop patch svc api -p '{"spec":{"selector":{"app":"api"}}}'
+kubectl -n shop get endpoints api
+
+# default deny и точечные разрешения
+cat &gt; netpol.yaml &lt;&lt;'EOF'
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: default-deny, namespace: shop }
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: allow-dns, namespace: shop }
+spec:
+  podSelector: {}
+  policyTypes: [Egress]
+  egress:
+    - to: [{ namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: kube-system } } }]
+      ports: [{ protocol: UDP, port: 53 }, { protocol: TCP, port: 53 }]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: client-to-api, namespace: shop }
+spec:
+  podSelector: { matchLabels: { app: api } }
+  policyTypes: [Ingress]
+  ingress:
+    - from: [{ podSelector: { matchLabels: { run: client } } }]
+      ports: [{ protocol: TCP, port: 80 }]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: client-egress-api, namespace: shop }
+spec:
+  podSelector: { matchLabels: { run: client } }
+  policyTypes: [Egress]
+  egress:
+    - to: [{ podSelector: { matchLabels: { app: api } } }]
+      ports: [{ protocol: TCP, port: 80 }]
+EOF
+kubectl apply -f netpol.yaml
+kubectl -n shop exec client -- curl -s -m 5 api | head -2         # разрешено
+kubectl -n shop exec client -- curl -s -m 5 https://github.com ; echo "во внешний мир: $?"
+
+# отладка сети из пода со всеми инструментами
+kubectl -n shop run shoot --rm -it --image=nicolaka/netshoot -- \
+  sh -c 'dig +short api.shop.svc.cluster.local; nc -zv api 80; exit' 2&gt;/dev/null</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Объясни, где физически живёт «балансировщик» ClusterIP, назови первую команду при «Service не отвечает» (<code>kubectl get endpoints</code>), и напиши default deny по памяти. Отдельно: почему после default deny обязательно нужно разрешить DNS.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Применить default deny и забыть про DNS: приложение начинает падать с таймаутами на резолве, а в логах это выглядит как «база недоступна».</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q64">64</a><a href="qa-trainer.html#q73">73</a><a href="qa-trainer.html#q81">81</a><a href="qa-trainer.html#q159">159</a><a href="qa-trainer.html#q161">161</a></div>
+</div></article>
+<article class="lesson" id="l19" data-n="19" data-grade="middle" data-min="45">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 19 пройденным">
+<div class="lt"><h3><span class="num">19</span> Хранилище: PV, PVC и StatefulSet</h3>
+<p class="lwhy">Запускать в кластере то, что имеет состояние, и понимать, почему база — это не Deployment.</p>
+<div class="lmeta"><span class="grade" data-gr="middle">middle</span>
+<span class="time">45 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> PVC — заявка приложения («нужно 5 ГБ с такими режимами доступа»), PV — конкретный том, StorageClass — правило, по которому том создаётся автоматически, CSI — драйвер, который умеет это делать у конкретного провайдера. Режимы доступа: <code>ReadWriteOnce</code> (один узел), <code>ReadOnlyMany</code>, <code>ReadWriteMany</code> (нужна сетевая ФС). <code>reclaimPolicy: Delete</code> удалит данные вместе с PVC — для баз это <code>Retain</code>. StatefulSet отличается от Deployment тремя вещами: стабильные имена (<code>db-0</code>, <code>db-1</code>), персональный PVC на каждую реплику и упорядоченные запуск и остановка. Именно поэтому базы и кластеры с кворумом живут в StatefulSet.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>cd ~/lab/k8s
+kubectl get storageclass
+cat &gt; sts.yaml &lt;&lt;'EOF'
+apiVersion: v1
+kind: Service
+metadata: { name: pg }
+spec:
+  clusterIP: None            # headless: DNS отдаёт адреса подов, а не один VIP
+  selector: { app: pg }
+  ports: [{ port: 5432 }]
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata: { name: pg }
+spec:
+  serviceName: pg
+  replicas: 2
+  selector: { matchLabels: { app: pg } }
+  template:
+    metadata: { labels: { app: pg } }
+    spec:
+      containers:
+        - name: pg
+          image: postgres:16-alpine
+          env:
+            - { name: POSTGRES_PASSWORD, value: labpass }
+            - { name: PGDATA, value: /var/lib/postgresql/data/pgdata }
+          ports: [{ containerPort: 5432 }]
+          volumeMounts: [{ name: data, mountPath: /var/lib/postgresql/data }]
+          readinessProbe:
+            exec: { command: ["sh","-c","pg_isready -U postgres"] }
+            periodSeconds: 5
+  volumeClaimTemplates:
+    - metadata: { name: data }
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources: { requests: { storage: 1Gi } }
+EOF
+kubectl apply -f sts.yaml
+kubectl get pods -l app=pg -w --timeout=90s     # поднимаются по очереди: pg-0, потом pg-1
+kubectl get pvc,pv
+
+# стабильность имени и данных
+kubectl exec pg-0 -- psql -U postgres -c 'create table t(x int); insert into t values (42);'
+kubectl delete pod pg-0 &amp;&amp; kubectl wait --for=condition=ready pod/pg-0 --timeout=90s
+kubectl exec pg-0 -- psql -U postgres -c 'select * from t;'      # данные на месте
+kubectl exec pg-1 -- psql -U postgres -c '\dt' 2&gt;&amp;1 | tail -2    # у второй реплики свой том — таблицы нет
+
+# DNS у headless-сервиса
+kubectl run dnstest --rm -it --image=busybox --restart=Never -- nslookup pg 2&gt;/dev/null | tail -6
+
+# что останется после удаления
+kubectl delete statefulset pg
+kubectl get pvc                                  # PVC не удаляются вместе со StatefulSet — это защита
+kubectl delete pvc -l app=pg</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Объясни, почему у каждой реплики StatefulSet свой PVC и что это значит для репликации (её настраивает не Kubernetes, а само приложение или оператор). Скажи, что произойдёт с данными при <code>kubectl delete statefulset</code>.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Запустить Postgres как Deployment с одним PVC и двумя репликами: два процесса на одном каталоге данных повреждают его. Второй вариант той же ошибки — <code>reclaimPolicy: Delete</code> на проде.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q74">74</a><a href="qa-trainer.html#q66">66</a><a href="qa-trainer.html#q128">128</a></div>
+</div></article>
+<article class="lesson" id="l20" data-n="20" data-grade="middle" data-min="50">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 20 пройденным">
+<div class="lt"><h3><span class="num">20</span> Helm: свой чарт и окружения</h3>
+<p class="lwhy">Перестать копировать манифесты между dev, stage и prod.</p>
+<div class="lmeta"><span class="grade" data-gr="middle">middle</span>
+<span class="time">50 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Helm — шаблонизатор плюс менеджер релизов: он рендерит YAML из шаблонов и values, а результат хранит как релиз с номером ревизии, поэтому умеет <code>rollback</code>. Отличие от <code>kubectl apply</code> именно в этом: apply знает только текущее состояние объектов, Helm знает историю релизов целиком. Одно приложение — один чарт, окружения различаются только файлами values. Hooks позволяют выполнить работу до или после установки (миграция базы), но у них есть цена: неудачный hook блокирует релиз, а <code>helm rollback</code> не откатывает то, что hook уже сделал с данными.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>cd ~/lab &amp;&amp; helm create webapp &amp;&amp; cd webapp
+rm -rf templates/tests templates/hpa.yaml templates/ingress.yaml
+ls templates/
+
+# values по окружениям
+cat &gt; values-dev.yaml &lt;&lt;'EOF'
+replicaCount: 1
+image: { repository: traefik/whoami, tag: "v1.10" }
+resources:
+  requests: { cpu: 10m, memory: 16Mi }
+  limits:   { cpu: 100m, memory: 64Mi }
+EOF
+cat &gt; values-prod.yaml &lt;&lt;'EOF'
+replicaCount: 4
+image: { repository: traefik/whoami, tag: "v1.10" }
+resources:
+  requests: { cpu: 100m, memory: 128Mi }
+  limits:   { cpu: 500m, memory: 256Mi }
+EOF
+
+# что получится — до установки в кластер
+helm template webapp . -f values-prod.yaml | grep -E 'replicas|image:|cpu'
+helm lint . -f values-prod.yaml
+helm install webapp . -f values-dev.yaml --wait
+helm list
+kubectl get deploy webapp -o jsonpath='{.spec.replicas}'; echo
+
+# апгрейд и откат по ревизиям
+helm upgrade webapp . -f values-prod.yaml --wait
+helm history webapp
+kubectl get deploy webapp -o jsonpath='{.spec.replicas}'; echo
+helm rollback webapp 1 --wait
+kubectl get deploy webapp -o jsonpath='{.spec.replicas}'; echo
+
+# отладка чарта, который не работает
+helm upgrade webapp . --set replicaCount=НЕЧИСЛО 2&gt;&amp;1 | tail -3
+helm template . --set image.tag="" --debug 2&gt;&amp;1 | tail -5
+helm get manifest webapp | head -20
+helm get values webapp
+
+# hook: миграция перед апгрейдом
+cat &gt; templates/migrate.yaml &lt;&lt;'EOF'
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-migrate
+  annotations:
+    "helm.sh/hook": pre-upgrade
+    "helm.sh/hook-weight": "-1"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migrate
+          image: busybox
+          command: ["sh","-c","echo применяю миграции; sleep 3"]
+EOF
+helm upgrade webapp . -f values-dev.yaml --wait
+kubectl get jobs
+helm uninstall webapp</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Ты можешь объяснить разницу <code>helm upgrade</code> и <code>kubectl apply</code>, показать, как одно приложение едет в три окружения без копирования манифестов, и назвать опасность hooks при откате.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Отдельный чарт на каждое окружение. Через месяц они расходятся, и prod оказывается конфигурацией, которую никто не тестировал.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q87">87</a><a href="qa-trainer.html#q88">88</a><a href="qa-trainer.html#q89">89</a><a href="qa-trainer.html#q90">90</a><a href="qa-trainer.html#q91">91</a></div>
+</div></article>
+<article class="lesson" id="l21" data-n="21" data-grade="middle" data-min="55">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 21 пройденным">
+<div class="lt"><h3><span class="num">21</span> CI: от коммита до образа</h3>
+<p class="lwhy">Собрать пайплайн, который проверяет, собирает и публикует — и умеет запускаться локально.</p>
+<div class="lmeta"><span class="grade" data-gr="middle">middle</span>
+<span class="time">55 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Хороший пайплайн — это последовательность быстрых отказов: сначала линтеры и юнит-тесты (секунды), потом сборка образа, потом сканирование, и только потом деплой. Кэш ускоряет шаги и может быть невалидным; артефакт — результат сборки, который едет дальше по пайплайну и должен быть неизменяемым. Секреты в CI живут в переменных проекта или во внешнем хранилище, но никогда в коде; современный способ доступа к облаку — OIDC-токен на время выполнения задачи вместо долгоживущего ключа. Тег образа должен быть привязан к коммиту (<code>sha</code>), иначе нельзя понять, что запущено в проде.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>cd ~/lab/thin
+cat &gt; .gitlab-ci.yml &lt;&lt;'EOF'
+stages: [check, build, scan]
+
+variables:
+  IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+
+lint:
+  stage: check
+  image: golangci/golangci-lint:latest
+  script: [golangci-lint run ./... || true]
+
+hadolint:
+  stage: check
+  image: hadolint/hadolint:latest-debian
+  script: [hadolint Dockerfile]
+
+build:
+  stage: build
+  image: gcr.io/kaniko-project/executor:debug
+  script:
+    - /kaniko/executor --context "$CI_PROJECT_DIR" --dockerfile Dockerfile
+      --destination "$IMAGE" --destination "$CI_REGISTRY_IMAGE:latest"
+  rules: [{ if: '$CI_COMMIT_BRANCH == "main"' }]
+
+trivy:
+  stage: scan
+  image: aquasec/trivy:latest
+  script: [trivy image --exit-code 1 --severity CRITICAL "$IMAGE"]
+  allow_failure: true
+EOF
+
+# то же на GitHub Actions, чтобы запустить локально через act
+mkdir -p .github/workflows
+cat &gt; .github/workflows/ci.yml &lt;&lt;'EOF'
+name: ci
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Линтер Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with: { dockerfile: Dockerfile }
+      - name: Сборка
+        run: docker build -t lab:${{ github.sha }} .
+      - name: Проверка, что образ не от root
+        run: test "$(docker inspect -f '{{.Config.User}}' lab:${{ github.sha }})" != ""
+EOF
+
+# локальный прогон без пуша — экономит десятки коммитов «fix ci»
+act -l
+act push --container-architecture linux/amd64 2&gt;&amp;1 | tail -20
+
+# проверка синтаксиса GitLab CI локально
+gitlab-ci-local --list 2&gt;/dev/null || echo "поставь gitlab-ci-local для локального прогона"</code></pre></div>
+<p>Разбери, что не так с таким шагом, — это буквально задача с собеседования:</p>
+<div class="scroller"><pre><code>deploy:
+  script:
+    - docker build -t myapp:latest .
+    - docker push myapp:latest
+    - kubectl set image deploy/app app=myapp:latest</code></pre></div>
+<p>Ответ: тег <code>latest</code> не даёт понять, что задеплоено, и откат невозможен; <code>kubectl set image</code> из CI — императивный деплой мимо git; пароль реестра, скорее всего, лежит в переменной без маскирования; нет ни тестов, ни сканирования; нет проверки, что rollout прошёл.</p>
+<div class="callout check"><span class="clabel">Проверка</span>Ты можешь объяснить порядок стадий и зачем именно такой, разницу артефакта и кэша, когда нужен self-hosted runner (доступ во внутреннюю сеть,особое железо, лицензии) и почему тег по <code>sha</code> лучше <code>latest</code>.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Сборка образа в первом же шаге, до линтеров и тестов. Пайплайн честно тратит пять минут, чтобы потом упасть на опечатке в YAML.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q92">92</a><a href="qa-trainer.html#q93">93</a><a href="qa-trainer.html#q96">96</a><a href="qa-trainer.html#q98">98</a><a href="qa-trainer.html#q99">99</a><a href="qa-trainer.html#q160">160</a></div>
+</div></article>
+<article class="lesson" id="l22" data-n="22" data-grade="middle" data-min="55">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 22 пройденным">
+<div class="lt"><h3><span class="num">22</span> GitOps: Argo CD, дрейф и самоисцеление</h3>
+<p class="lwhy">Понять разницу между «CI делает kubectl apply» и GitOps — это спрашивают сразу после Kubernetes.</p>
+<div class="lmeta"><span class="grade" data-gr="middle">middle</span>
+<span class="time">55 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> В push-модели CI имеет доступ в кластер и применяет изменения; в pull-модели агент внутри кластера сам сравнивает желаемое состояние в git с фактическим и приводит их в соответствие. Отсюда три следствия: у CI больше нет прав в кластере (меньше поверхность атаки), git становится единственным источником правды и полным журналом изменений, а любое ручное изменение видно как дрейф и может быть автоматически отменено (self-heal). Откат превращается в <code>git revert</code>.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code># установка Argo CD в лабораторный кластер
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl -n argocd rollout status deploy/argocd-server --timeout=180s
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d; echo
+kubectl -n argocd port-forward svc/argocd-server 8443:443 &gt;/dev/null 2&gt;&amp;1 &amp;
+
+# приложение из публичного репозитория с автосинхронизацией
+cat &gt; appofapps.yaml &lt;&lt;'EOF'
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: guestbook
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/argoproj/argocd-example-apps.git
+    targetRevision: HEAD
+    path: guestbook
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: guestbook
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: [CreateNamespace=true]
+EOF
+kubectl apply -f appofapps.yaml
+kubectl -n argocd get application guestbook -w --timeout=120s
+
+# дрейф: меняем руками и смотрим, что будет
+kubectl -n guestbook scale deploy guestbook-ui --replicas=5
+kubectl -n guestbook get deploy guestbook-ui -o jsonpath='{.spec.replicas}'; echo
+sleep 20
+kubectl -n guestbook get deploy guestbook-ui -o jsonpath='{.spec.replicas}'; echo   # self-heal вернул как в git
+kubectl -n argocd get application guestbook -o jsonpath='{.status.sync.status} {.status.health.status}'; echo
+
+# удаление объекта тоже лечится
+kubectl -n guestbook delete svc guestbook-ui
+sleep 20 &amp;&amp; kubectl -n guestbook get svc</code></pre></div>
+<p>Сравни на словах два способа деплоя одного и того же приложения и назови, что теряется в push-модели: журнал изменений (он остаётся в логах CI, а не в git), контроль дрейфа, и то, что права в кластер выданы наружу.</p>
+<div class="callout check"><span class="clabel">Проверка</span>Ты можешь показать дрейф и самоисцеление на живом кластере и объяснить, почему GitOps — это про источник правды, а не про инструмент. Скажи, как в такой схеме делается откат.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Включить <code>selfHeal</code> и продолжать править кластер руками: изменения молча откатываются, и люди начинают считать, что «кластер глючит».</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q95">95</a><a href="qa-trainer.html#q103">103</a><a href="qa-trainer.html#q225">225</a><a href="qa-trainer.html#q100">100</a></div>
+</div></article>
+<article class="lesson" id="l23" data-n="23" data-grade="middle" data-min="60">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 23 пройденным">
+<div class="lt"><h3><span class="num">23</span> Terraform: state, модуль и дрейф</h3>
+<p class="lwhy">Работать с инфраструктурой в команде и не бояться слова state.</p>
+<div class="lmeta"><span class="grade" data-gr="middle">middle</span>
+<span class="time">60 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> State — это карта соответствия между кодом и реальными объектами: без неё Terraform не знает, что <code>aws_instance.web</code> — это конкретный сервер, и предложит создать его заново. Отсюда два требования в команде: state лежит в общем удалённом бэкенде и блокируется на время операции, иначе два <code>apply</code> одновременно приведут к рассинхронизации. Ручное изменение в консоли создаёт дрейф: <code>plan</code> покажет разницу, и следующий <code>apply</code> вернёт как в коде. <code>count</code> даёт список (удаление элемента из середины пересоздаёт всё, что после него), <code>for_each</code> — карту по ключам (удаление затрагивает только один элемент). Версии провайдеров фиксируются, иначе сборка «вчера работала».</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>mkdir -p ~/lab/tf &amp;&amp; cd ~/lab/tf
+cat &gt; main.tf &lt;&lt;'EOF'
+terraform {
+  required_version = "&gt;= 1.6"
+  required_providers {
+    local  = { source = "hashicorp/local",  version = "~&gt; 2.5" }
+    random = { source = "hashicorp/random", version = "~&gt; 3.6" }
+  }
+}
+
+variable "envs" {
+  type    = map(string)
+  default = { dev = "1", stage = "2", prod = "4" }
+}
+
+resource "random_pet" "id" { length = 2 }
+
+# for_each: ключи стабильны, удаление одного не трогает остальные
+resource "local_file" "env" {
+  for_each = var.envs
+  filename = "${path.module}/out/${each.key}.conf"
+  content  = "replicas=${each.value}\nid=${random_pet.id.id}\n"
+}
+
+output "files" { value = [for f in local_file.env : f.filename] }
+EOF
+
+terraform init
+terraform fmt -check || terraform fmt
+terraform validate
+terraform plan -out=tfplan
+terraform show -json tfplan | jq '.resource_changes[].change.actions' 2&gt;/dev/null | sort | uniq -c
+terraform apply tfplan
+ls out/ &amp;&amp; cat out/prod.conf
+
+# state: что там внутри
+terraform state list
+terraform state show 'local_file.env["prod"]' | head -8
+
+# дрейф: правим "руками" и смотрим plan
+echo "replicas=99" &gt; out/prod.conf
+terraform plan | tail -20            # Terraform видит расхождение и хочет вернуть как в коде
+terraform apply -auto-approve &amp;&amp; cat out/prod.conf
+
+# for_each против count: удалить stage
+terraform apply -auto-approve -var 'envs={dev="1",prod="4"}'
+ls out/                               # исчез только stage, dev и prod не пересоздавались
+
+# полезные операции со state
+terraform state mv 'local_file.env["dev"]' 'local_file.env["development"]' 2&gt;/dev/null || true
+terraform state list
+terraform state rm 'random_pet.id' &amp;&amp; terraform plan | head -12   # объект есть, в state его нет → хочет создать
+terraform import random_pet.id "$(cat out/prod.conf | sed -n 's/^id=//p')" 2&gt;/dev/null || terraform apply -auto-approve
+
+# проверка кода до применения
+terraform providers lock 2&gt;/dev/null | tail -2
+ls .terraform.lock.hcl                # именно он фиксирует версии в git</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Объясни, что случится, если потерять state (Terraform перестанет знать о существующих объектах и предложит создать их заново; лечится импортом), зачем блокировка, и в чём разница <code>count</code> и <code>for_each</code> при удалении элемента из середины.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span><code>terraform apply</code> без сохранённого плана в CI: между <code>plan</code> и <code>apply</code> состояние могло измениться, и применяется не то, что ревьюили. Правильно — <code>plan -out</code>, ревью, затем <code>apply tfplan</code>.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q101">101</a><a href="qa-trainer.html#q102">102</a><a href="qa-trainer.html#q104">104</a><a href="qa-trainer.html#q107">107</a><a href="qa-trainer.html#q108">108</a><a href="qa-trainer.html#q157">157</a></div>
+</div></article>
+<article class="lesson" id="l24" data-n="24" data-grade="middle" data-min="50">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 24 пройденным">
+<div class="lt"><h3><span class="num">24</span> Ansible: идемпотентность и роли</h3>
+<p class="lwhy">Писать плейбуки, которые можно запускать двадцать раз без последствий.</p>
+<div class="lmeta"><span class="grade" data-gr="middle">middle</span>
+<span class="time">50 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Идемпотентность — свойство операции давать одинаковый результат при повторе. В Ansible её обеспечивают модули: <code>apt</code>, <code>copy</code>, <code>lineinfile</code> сами проверяют текущее состояние и меняют только то, что отличается. Модуль <code>shell</code>/<code>command</code> идемпотентности не имеет — поэтому к нему нужны <code>creates</code>, <code>removes</code> или <code>changed_when</code>. Handlers выполняются один раз в конце, если что-то менялось, — так конфиг перечитывается только при реальном изменении. Для обновления парка серверов важны <code>serial</code> (партиями) и <code>max_fail_percentage</code> (остановиться, если падает слишком много).</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>mkdir -p ~/lab/ansible/roles/web/{tasks,handlers,templates,defaults} &amp;&amp; cd ~/lab/ansible
+printf 'localhost ansible_connection=local\n' &gt; inventory
+
+cat &gt; roles/web/defaults/main.yml &lt;&lt;'EOF'
+web_port: 8080
+web_message: "привет из Ansible"
+EOF
+cat &gt; roles/web/templates/site.conf.j2 &lt;&lt;'EOF'
+# управляется Ansible, правки руками будут перезаписаны
+listen {{ web_port }};
+message "{{ web_message }}";
+EOF
+cat &gt; roles/web/handlers/main.yml &lt;&lt;'EOF'
+- name: перечитать конфиг
+  ansible.builtin.debug: { msg: "reload выполнен, потому что конфиг изменился" }
+EOF
+cat &gt; roles/web/tasks/main.yml &lt;&lt;'EOF'
+- name: каталог конфигурации
+  ansible.builtin.file:
+    path: /tmp/labweb
+    state: directory
+    mode: "0755"
+
+- name: конфиг из шаблона
+  ansible.builtin.template:
+    src: site.conf.j2
+    dest: /tmp/labweb/site.conf
+    mode: "0644"
+  notify: перечитать конфиг
+
+- name: строка в файле — идемпотентно
+  ansible.builtin.lineinfile:
+    path: /tmp/labweb/hosts
+    line: "10.0.0.1 api.local"
+    create: true
+    mode: "0644"
+
+# так делать нельзя: команда выполняется всегда
+- name: плохой пример
+  ansible.builtin.shell: "echo инициализация &gt;&gt; /tmp/labweb/init.log"
+  changed_when: false          # хотя бы не врать в отчёте
+
+# так правильно: команда один раз, дальше пропускается
+- name: хороший пример
+  ansible.builtin.shell: "echo инициализация &gt; /tmp/labweb/init.marker"
+  args: { creates: /tmp/labweb/init.marker }
+EOF
+
+cat &gt; site.yml &lt;&lt;'EOF'
+- hosts: all
+  gather_facts: false
+  serial: "50%"                # обновлять парк партиями
+  max_fail_percentage: 20
+  roles: [web]
+EOF
+
+ansible-playbook -i inventory site.yml            # первый прогон: changed
+ansible-playbook -i inventory site.yml            # второй: ok, changed=0 — вот она, идемпотентность
+ansible-playbook -i inventory site.yml --check --diff -e web_port=9090   # что изменится, ничего не меняя
+ansible-playbook -i inventory site.yml -e web_port=9090   # handler сработал один раз
+
+# секреты
+ansible-vault create secrets.yml     # редактор откроется, впиши: db_password: s3cret
+ansible-vault view secrets.yml
+grep -c 'AES256' secrets.yml         # в git уезжает шифротекст, не пароль</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Прогони плейбук дважды и покажи <code>changed=0</code> во втором прогоне. Объясни, почему <code>shell</code> без <code>creates</code> ломает идемпотентность и что делают <code>serial</code> и <code>max_fail_percentage</code> при обновлении сотни серверов.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Использовать <code>shell: systemctl restart nginx</code> вместо handler: сервис перезапускается на каждом прогоне, то есть плейбук вызывает микро-простой каждый раз, когда его запускают.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q111">111</a><a href="qa-trainer.html#q112">112</a><a href="qa-trainer.html#q113">113</a><a href="qa-trainer.html#q114">114</a><a href="qa-trainer.html#q158">158</a></div>
+</div></article>
+<article class="lesson" id="l25" data-n="25" data-grade="middle" data-min="60">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 25 пройденным">
+<div class="lt"><h3><span class="num">25</span> Prometheus и PromQL</h3>
+<p class="lwhy">Писать запросы, а не тыкать в готовые дашборды: PromQL спрашивают почти на каждом собеседовании.</p>
+<div class="lmeta"><span class="grade" data-gr="middle">middle</span>
+<span class="time">60 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Prometheus работает по pull: сам опрашивает цели, поэтому знает, что цель недоступна (<code>up == 0</code>) — при push такая цель просто молчит, и это неотличимо от «всё хорошо». Типы метрик: counter только растёт (к нему всегда применяют <code>rate</code>), gauge — мгновенное значение, histogram — распределение по бакетам (из него считают квантили), summary — квантили, посчитанные на клиенте. Главное правило: <strong>никогда не строить графики по счётчику напрямую</strong>, только через <code>rate</code> или <code>increase</code>. Кардинальность — число уникальных комбинаций лейблов; лейбл с ID пользователя или URL с параметрами убивает Prometheus по памяти.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>mkdir -p ~/lab/prom &amp;&amp; cd ~/lab/prom
+cat &gt; prometheus.yml &lt;&lt;'EOF'
+global: { scrape_interval: 5s }
+scrape_configs:
+  - job_name: prometheus
+    static_configs: [{ targets: ["localhost:9090"] }]
+  - job_name: node
+    static_configs: [{ targets: ["node:9100"] }]
+EOF
+cat &gt; compose.yaml &lt;&lt;'EOF'
+services:
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    ports: ["9090:9090"]
+    volumes: ["./prometheus.yml:/etc/prometheus/prometheus.yml:ro"]
+  node:
+    image: prom/node-exporter:v1.8.2
+    pid: host
+EOF
+docker compose up -d &amp;&amp; sleep 15
+
+q() { curl -sG http://localhost:9090/api/v1/query --data-urlencode "query=$1" | jq -r '.data.result[0] | (.metric.instance // "-") + " → " + (.value[1] // "нет данных")'; }
+
+# 1. живы ли цели — самый первый запрос на новом кластере
+q 'up'
+q 'count(up == 0)'
+
+# 2. counter только через rate
+q 'prometheus_http_requests_total'                    # бессмысленное растущее число
+q 'sum(rate(prometheus_http_requests_total[1m]))'     # запросов в секунду — вот это имеет смысл
+
+# 3. доля ошибок 5xx (то, что просят написать на собеседовании)
+q 'sum(rate(prometheus_http_requests_total{code=~"5.."}[5m])) / sum(rate(prometheus_http_requests_total[5m]))'
+
+# 4. квантиль задержки из histogram
+q 'histogram_quantile(0.95, sum(rate(prometheus_http_request_duration_seconds_bucket[5m])) by (le))'
+
+# 5. CPU узла: почему именно так
+q '100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)'
+
+# 6. память и диск
+q '(1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100'
+q 'predict_linear(node_filesystem_avail_bytes{mountpoint="/"}[6h], 4*24*3600) &lt; 0'   # кончится ли диск за 4 дня
+
+# 7. кардинальность: смотреть до того, как Prometheus упадёт
+curl -s http://localhost:9090/api/v1/status/tsdb | jq '.data.seriesCountByMetricName[:5]'
+q 'topk(3, count by (__name__)({__name__=~".+"}))'</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Не подглядывая, напиши четыре запроса: доля 5xx за пять минут, 95-й перцентиль задержки, недоступные цели, рост занятого места на диске. Объясни, почему <code>rate</code> нужен counter и не нужен gauge.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Лейбл с высокой кардинальностью: <code>path="/api/user/12345"</code> вместо <code>path="/api/user/:id"</code>. Каждый уникальный путь — отдельный временной ряд; так Prometheus съедает память за сутки.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q116">116</a><a href="qa-trainer.html#q117">117</a><a href="qa-trainer.html#q118">118</a><a href="qa-trainer.html#q154">154</a><a href="qa-trainer.html#q122">122</a></div>
+</div></article>
+<article class="lesson" id="l26" data-n="26" data-grade="middle" data-min="50">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 26 пройденным">
+<div class="lt"><h3><span class="num">26</span> SLO, error budget и алерты без шума</h3>
+<p class="lwhy">Говорить о надёжности числами. Это тот словарь, который превращает «дежурил на поддержке» в «владел надёжностью с измеримым SLO».</p>
+<div class="lmeta"><span class="grade" data-gr="middle">middle</span>
+<span class="time">50 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> SLI — измеряемый показатель (доля успешных запросов, доля быстрых ответов). SLO — цель по этому показателю (99.9% успешных за 30 дней). SLA — внешнее обязательство с деньгами, и оно всегда слабее SLO, чтобы был запас. Error budget — допустимая доля ошибок: при 99.9% за 30 дней это 43 минуты 12 секунд недоступности. Бюджет — инструмент решений: пока он есть, катим релизы; кончился — останавливаем фичи и занимаемся надёжностью. Алертить надо на симптом, который видит пользователь (растёт доля ошибок, растёт задержка), а не на причину (загрузка CPU 90%), и делать это по скорости сжигания бюджета, а не по мгновенному значению.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>cd ~/lab/prom
+# посчитать бюджет руками — цифры надо знать наизусть
+python3 - &lt;&lt;'EOF'
+for slo in (99.0, 99.9, 99.95, 99.99):
+    for days, label in ((30, "30 дней"), (1, "сутки")):
+        m = (100 - slo) / 100 * days * 24 * 60
+        print(f"SLO {slo}% за {label}: бюджет {m:.1f} мин")
+EOF
+
+# правила: SLI, запись и алерты на сжигание бюджета
+cat &gt; rules.yml &lt;&lt;'EOF'
+groups:
+  - name: slo
+    interval: 15s
+    rules:
+      # SLI: доля успешных запросов
+      - record: job:availability:ratio_rate5m
+        expr: sum(rate(prometheus_http_requests_total{code!~"5.."}[5m]))
+              / sum(rate(prometheus_http_requests_total[5m]))
+
+      # быстрое сжигание: 14.4x за час → бюджет 30 дней сгорит за 2 дня
+      - alert: ErrorBudgetBurnFast
+        expr: (1 - job:availability:ratio_rate5m) &gt; 14.4 * 0.001
+        for: 2m
+        labels: { severity: critical, page: "yes" }
+        annotations:
+          summary: "Быстрое сжигание бюджета ошибок"
+          description: "Доля ошибок втрое выше допустимой. Бюджет 30 дней сгорит за двое суток."
+          runbook: "https://nurekella.github.io/AboutMe/qa-trainer.html#q162"
+
+      # медленное сжигание: не будит ночью, но создаёт задачу
+      - alert: ErrorBudgetBurnSlow
+        expr: (1 - job:availability:ratio_rate5m) &gt; 3 * 0.001
+        for: 1h
+        labels: { severity: warning, page: "no" }
+        annotations: { summary: "Медленное сжигание бюджета ошибок" }
+
+      # симптом, а не причина: цель недоступна
+      - alert: TargetDown
+        expr: up == 0
+        for: 2m
+        labels: { severity: critical }
+        annotations: { summary: "Цель {{ $labels.instance }} не отвечает" }
+EOF
+sed -i 's|^scrape_configs:|rule_files: ["/etc/prometheus/rules.yml"]\n\nscrape_configs:|' prometheus.yml
+sed -i 's|- "./prometheus.yml:/etc/prometheus/prometheus.yml:ro"|- "./prometheus.yml:/etc/prometheus/prometheus.yml:ro"\n      - "./rules.yml:/etc/prometheus/rules.yml:ro"|' compose.yaml
+docker compose up -d &amp;&amp; sleep 20
+
+curl -s 'http://localhost:9090/api/v1/rules' | jq -r '.data.groups[].rules[] | .name + " → " + (.type // "-")'
+curl -sG http://localhost:9090/api/v1/query --data-urlencode 'query=job:availability:ratio_rate5m' | jq -r '.data.result[0].value[1]'
+promtool check rules rules.yml 2&gt;/dev/null || docker run --rm -v "$PWD:/w" prom/prometheus:v3.1.0 promtool check rules /w/rules.yml</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Посчитай в уме бюджет для 99.9% за 30 дней и скажи, что делать, когда он кончился. Объясни, почему алерт «CPU выше 90%» плохой, а «доля 5xx выше порога десять минут» хороший.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Алерты на каждую метрику и всем в один канал. Через месяц их игнорируют, и настоящая авария проходит незамеченной. Правило: если на алерт не нужно реагировать ночью — он не должен будить, а если по нему нет действия — он не нужен.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q119">119</a><a href="qa-trainer.html#q120">120</a><a href="qa-trainer.html#q162">162</a><a href="qa-trainer.html#q126">126</a><a href="qa-trainer.html#q124">124</a></div>
+</div></article>
+</section>
+<section class="track" data-track="Грейд senior — масштаб и решения">
+<h2>Грейд senior — масштаб и решения</h2>
+<div class="lead">Восемь уроков. Здесь спрашивают не команды, а решения: что делать, когда систем много, денег мало, а простой стоит дорого. Практика тоже другая — не «настрой», а «сломай, восстанови и посчитай».</div>
+<article class="lesson" id="l27" data-n="27" data-grade="senior" data-min="50">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 27 пройденным">
+<div class="lt"><h3><span class="num">27</span> Что происходит при kubectl apply</h3>
+<p class="lwhy">Отвечать на самый частый senior-вопрос по Kubernetes так, чтобы было видно понимание, а не заученный список.</p>
+<div class="lmeta"><span class="grade" data-gr="senior">senior</span>
+<span class="time">50 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Путь запроса: <code>kubectl</code> собирает манифест и отправляет его в kube-apiserver. Там последовательно происходит аутентификация (кто ты), авторизация через RBAC (можно ли тебе), затем admission-контроллеры: сначала mutating (могут менять объект — например, добавить sidecar или дефолтные значения), потом валидация схемы, потом validating (могут запретить — Kyverno, OPA). Только после этого объект пишется в etcd, и на этом <code>apply</code> заканчивается: <strong>ответ «created» означает запись желаемого состояния, а не запущенное приложение</strong>. Дальше асинхронно: deployment-controller видит новый объект и создаёт ReplicaSet, replicaset-controller создаёт поды, scheduler выбирает узлы и записывает <code>nodeName</code>, kubelet на узле видит «свой» под, просит CRI скачать образ и запустить контейнеры, CNI выдаёт адрес, kubelet шлёт статусы обратно. Всё это — контроллеры, крутящие один цикл: сравнить желаемое с фактическим, сделать шаг.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code># 1. увидеть все стадии своими глазами
+kubectl create deploy trace --image=traefik/whoami:v1.10 --replicas=2 -v=8 2&gt;&amp;1 | grep -E 'POST|Response Status' | head
+kubectl get events --sort-by=.lastTimestamp | tail -12   # Scheduled → Pulling → Created → Started
+
+# 2. что реально дописали admission-контроллеры
+kubectl get pod -l app=trace -o yaml | grep -E 'serviceAccountName|imagePullPolicy|terminationGrace|dnsPolicy' | head
+kubectl api-resources --namespaced=false | grep -i -E 'admission|policy'
+
+# 3. кто принял решение о размещении
+kubectl get pod -l app=trace -o custom-columns='POD:.metadata.name,NODE:.spec.nodeName,QOS:.status.qosClass'
+kubectl get events --field-selector reason=Scheduled | tail -3
+
+# 4. apply против create и replace
+kubectl create deploy trace --image=nginx 2&gt;&amp;1 | tail -1        # AlreadyExists
+kubectl apply -f - &lt;&lt;'EOF' 2&gt;&amp;1 | tail -2
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: trace }
+spec:
+  replicas: 3
+  selector: { matchLabels: { app: trace } }
+  template:
+    metadata: { labels: { app: trace } }
+    spec: { containers: [{ name: whoami, image: traefik/whoami:v1.10 }] }
+EOF
+kubectl get deploy trace -o jsonpath='{.metadata.annotations}' | head -c 200; echo
+# ↑ last-applied-configuration: именно по ней apply понимает, какие поля удалить
+
+# 5. цикл контроллера: удалить ReplicaSet и посмотреть, кто его вернёт
+kubectl delete rs -l app=trace --wait=false
+sleep 5 &amp;&amp; kubectl get rs -l app=trace
+kubectl delete deploy trace</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Расскажи путь вслух за две минуты, обязательно упомянув: apply возвращается до запуска приложения; между записью в etcd и работающим подом — цепочка независимых контроллеров; scheduler только записывает <code>nodeName</code>, запускает kubelet. Объясни, почему <code>kubectl apply</code> знает, какие поля удалять, а <code>create</code> — нет.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Рассказывать список компонентов («apiserver, etcd, scheduler, kubelet») вместо цепочки событий. Список знают все, ценность в понимании асинхронности и того, что каждый контроллер делает один шаг к желаемому состоянию.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q59">59</a><a href="qa-trainer.html#q82">82</a><a href="qa-trainer.html#q86">86</a><a href="qa-trainer.html#q58">58</a></div>
+</div></article>
+<article class="lesson" id="l28" data-n="28" data-grade="senior" data-min="55">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 28 пройденным">
+<div class="lt"><h3><span class="num">28</span> etcd: кворум, бэкап и восстановление кластера</h3>
+<p class="lwhy">Уметь ответить «а если etcd потеряли» не теорией, а описанием того, как ты это делал.</p>
+<div class="lmeta"><span class="grade" data-gr="senior">senior</span>
+<span class="time">55 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> etcd — распределённое key-value хранилище на алгоритме Raft, единственный источник состояния кластера. Кворум — большинство узлов: из 3 переживает потерю 1, из 5 — потерю 2. Чётное число не даёт выигрыша: из 4 переживает тоже 1, но узлов больше и записи медленнее — поэтому 3 или 5. Потеря кворума означает, что кластер переходит в read-only: работающие приложения продолжают работать (kubelet и kube-proxy держат локальное состояние), но никакие изменения невозможны. Бэкапить нужно snapshot etcd плюс сертификаты PKI; манифесты приложений в бэкап кластера не входят, если у тебя GitOps, — они в git. Восстановление проверяется только репетицией.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code># в k3d вместо etcd sqlite, поэтому берём отдельный контейнер etcd для практики
+docker run -d --name etcd -p 2379:2379 \
+  -e ALLOW_NONE_AUTHENTICATION=yes -e ETCD_ADVERTISE_CLIENT_URLS=http://0.0.0.0:2379 \
+  bitnami/etcd:3.5
+sleep 5
+alias e='docker exec etcd etcdctl --endpoints=http://127.0.0.1:2379'
+
+e put /registry/test "состояние кластера"
+e get /registry/test
+e endpoint status --write-out=table
+e endpoint health
+e member list --write-out=table
+
+# снимок и что в нём
+e snapshot save /tmp/snap.db
+docker exec etcd etcdutl snapshot status /tmp/snap.db --write-out=table 2&gt;/dev/null || \
+  e snapshot status /tmp/snap.db --write-out=table
+docker cp etcd:/tmp/snap.db ./etcd-snap.db &amp;&amp; ls -lh etcd-snap.db
+
+# катастрофа: потеряли данные
+e del /registry/test
+e get /registry/test                    # пусто
+
+# восстановление из снимка
+docker exec etcd sh -c 'etcdutl snapshot restore /tmp/snap.db --data-dir=/tmp/restored' 2&gt;/dev/null || \
+  docker exec etcd sh -c 'ETCDCTL_API=3 etcdctl snapshot restore /tmp/snap.db --data-dir=/tmp/restored'
+docker exec etcd ls /tmp/restored/member/snap | head -3
+echo "дальше в проде: остановить etcd на всех узлах, подложить восстановленный data-dir, поднять по одному"
+
+# в реальном кластере команда выглядит так (kubeadm)
+cat &lt;&lt;'EOF'
+ETCDCTL_API=3 etcdctl \
+  --endpoints=https://127.0.0.1:2379 \
+  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+  --cert=/etc/kubernetes/pki/etcd/server.crt \
+  --key=/etc/kubernetes/pki/etcd/server.key \
+  snapshot save /backup/etcd-$(date +%F-%H%M).db
+EOF
+
+# что ещё нужно в бэкапе кластера, кроме etcd
+cat &lt;&lt;'EOF'
+1. snapshot etcd (состояние всех объектов)
+2. /etc/kubernetes/pki — без сертификатов кластер не поднять
+3. PV с данными приложений — отдельно, инструментом вроде Velero
+4. манифесты — в git, если GitOps; иначе тоже в бэкап
+EOF
+docker rm -f etcd</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Объясни, почему узлов 3 или 5, что происходит с работающими приложениями при потере кворума, и назови четыре части бэкапа кластера. Скажи вслух, что бэкап без проверенного восстановления бэкапом не является.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Считать, что snapshot etcd достаточно для восстановления. Без PKI кластер не поднимется, а без бэкапа PV приложения поднимутся пустыми.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q79">79</a><a href="qa-trainer.html#q77">77</a><a href="qa-trainer.html#q78">78</a></div>
+</div></article>
+<article class="lesson" id="l29" data-n="29" data-grade="senior" data-min="50">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 29 пройденным">
+<div class="lt"><h3><span class="num">29</span> Отладка сети между подами</h3>
+<p class="lwhy">Это самая частая живая задача на техническом интервью: «поды не видят друг друга, разберись».</p>
+<div class="lmeta"><span class="grade" data-gr="senior">senior</span>
+<span class="time">50 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Порядок проверки идёт снизу вверх и на каждом шаге даёт однозначный ответ: DNS резолвится? адрес пода пингуется? порт открыт? приложение слушает на нужном интерфейсе (<code>0.0.0.0</code>, а не <code>127.0.0.1</code>)? есть ли endpoints у Service? не режет ли NetworkPolicy? Половина случаев — не сеть: приложение слушает только localhost, или селектор Service не совпал с метками, или readiness не проходит и адрес не попал в endpoints.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>kubectl create ns netlab 2&gt;/dev/null
+kubectl -n netlab run server --image=python:3.12-slim --labels=app=server \
+  -- python3 -m http.server 8000 --bind 127.0.0.1      # намеренная ошибка: только localhost
+kubectl -n netlab expose pod server --port 8000
+kubectl -n netlab run client --image=nicolaka/netshoot --labels=app=client -- sleep 3600
+kubectl -n netlab wait --for=condition=ready pod/client --timeout=60s
+
+# шаг 1: DNS
+kubectl -n netlab exec client -- dig +short server.netlab.svc.cluster.local
+# шаг 2: адрес пода
+IP=$(kubectl -n netlab get pod server -o jsonpath='{.status.podIP}')
+kubectl -n netlab exec client -- ping -c1 -W2 $IP
+# шаг 3: порт
+kubectl -n netlab exec client -- nc -zv -w2 $IP 8000 ; echo "результат: $?"
+# шаг 4: где слушает приложение — вот причина
+kubectl -n netlab exec server -- sh -c 'apt-get -qq update &gt;/dev/null 2&gt;&amp;1; apt-get -qq install -y iproute2 &gt;/dev/null 2&gt;&amp;1; ss -tlnp' 2&gt;/dev/null | tail -3
+# шаг 5: endpoints
+kubectl -n netlab get endpoints server
+
+# починить: слушать на всех интерфейсах
+kubectl -n netlab delete pod server --wait=true
+kubectl -n netlab run server --image=python:3.12-slim --labels=app=server -- python3 -m http.server 8000 --bind 0.0.0.0
+kubectl -n netlab expose pod server --port 8000 2&gt;/dev/null
+kubectl -n netlab wait --for=condition=ready pod/server --timeout=60s
+kubectl -n netlab exec client -- curl -s -m3 -o /dev/null -w 'код %{http_code}\n' http://server:8000
+
+# вторая причина: селектор не совпал
+kubectl -n netlab patch svc server -p '{"spec":{"selector":{"app":"НЕВЕРНО"}}}'
+kubectl -n netlab get endpoints server
+kubectl -n netlab exec client -- curl -s -m3 http://server:8000 ; echo "код: $?"
+kubectl -n netlab patch svc server -p '{"spec":{"selector":{"app":"server"}}}'
+
+# третья: политика режет трафик
+kubectl -n netlab apply -f - &lt;&lt;'EOF'
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: deny-all }
+spec: { podSelector: {}, policyTypes: [Ingress] }
+EOF
+kubectl -n netlab exec client -- curl -s -m3 http://server:8000 ; echo "с политикой код: $?"
+kubectl -n netlab get networkpolicy
+kubectl -n netlab delete networkpolicy deny-all
+
+# смотреть трафик внутри пода
+kubectl -n netlab exec client -- sh -c 'timeout 5 tcpdump -ni any port 8000 -c 3 &amp; sleep 1; curl -s -m3 http://server:8000 &gt;/dev/null; wait' 2&gt;/dev/null | tail -5
+kubectl delete ns netlab --wait=false</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Проговори шесть проверок по порядку и назови три причины, которые выглядят как сетевая проблема, но ею не являются: приложение слушает localhost, селектор Service не совпал, readiness не проходит.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Начинать с NetworkPolicy и CNI. В девяти случаях из десяти дело в метках, готовности или интерфейсе прослушивания — и это проверяется тремя командами.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q81">81</a><a href="qa-trainer.html#q64">64</a><a href="qa-trainer.html#q159">159</a><a href="qa-trainer.html#q33">33</a></div>
+</div></article>
+<article class="lesson" id="l30" data-n="30" data-grade="senior" data-min="55">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 30 пройденным">
+<div class="lt"><h3><span class="num">30</span> Disaster recovery: RTO, RPO и репетиция</h3>
+<p class="lwhy">Отвечать на «а если ЦОД сгорит» числами и планом, а не «у нас есть бэкапы».</p>
+<div class="lmeta"><span class="grade" data-gr="senior">senior</span>
+<span class="time">55 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> RTO — сколько времени допустимо восстанавливаться. RPO — сколько данных допустимо потерять. Это бизнес-решения, а не технические: их называет владелец сервиса, а инженер говорит, сколько стоит каждый вариант. RPO задаёт схему репликации: RPO в часах — периодические бэкапы, в минутах — WAL-архив и PITR, близкий к нулю — синхронная репликация со своей ценой в задержке записи. RTO задаёт схему резерва: холодный (восстановление из бэкапа, часы), тёплый (реплика, которую надо повысить, минуты), горячий (активный резерв, секунды). Главное: <strong>план восстановления, который не репетировали, не работает</strong> — по опыту первая репетиция всегда обнаруживает отсутствующие сертификаты, забытые DNS-записи и бэкапы, которые не читаются.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>mkdir -p ~/lab/dr &amp;&amp; cd ~/lab/dr
+# 1. база с данными и настоящий PITR
+docker run -d --name pg -e POSTGRES_PASSWORD=labpass -p 5433:5432 postgres:16
+sleep 8
+docker exec pg psql -U postgres -c 'create table payments(id serial, amount int, created timestamptz default now());'
+docker exec pg psql -U postgres -c 'insert into payments(amount) select generate_series(1,1000);'
+docker exec pg psql -U postgres -c 'select count(*), max(created) from payments;'
+
+# 2. бэкап с замером времени — RPO и RTO измеряются, а не оцениваются
+time docker exec pg pg_dump -U postgres -Fc postgres &gt; dump.pgc
+ls -lh dump.pgc
+
+# 3. авария: потеряли данные после бэкапа
+docker exec pg psql -U postgres -c 'insert into payments(amount) values (99999);'
+docker exec pg psql -U postgres -c 'drop table payments;'
+
+# 4. восстановление с замером — это и есть твой RTO
+START=$(date +%s)
+docker exec -i pg pg_restore -U postgres -d postgres --clean --if-exists &lt; dump.pgc 2&gt;/dev/null
+docker exec pg psql -U postgres -c 'select count(*) from payments;'
+END=$(date +%s); echo "RTO этого сценария: $((END-START)) секунд"
+echo "RPO: всё, что записано после снимка — строка 99999 потеряна навсегда"
+
+# 5. посчитать, что обещать бизнесу
+python3 - &lt;&lt;'EOF'
+plans = [
+    ("бэкап раз в сутки",        24*60, 60,  "дёшево, теряем до суток данных"),
+    ("бэкап + WAL-архив (PITR)",     5, 45,  "потеря минуты, восстановление под час"),
+    ("тёплая реплика",               1, 10,  "промоут реплики, нужен второй сервер"),
+    ("синхронная реплика",           0,  2,  "нулевая потеря, платим задержкой записи"),
+]
+print(f"{'схема':&lt;28}{'RPO':&gt;8}{'RTO':&gt;8}  примечание")
+for name, rpo, rto, note in plans:
+    print(f"{name:&lt;28}{rpo:&gt;6} мин{rto:&gt;6} мин  {note}")
+EOF
+
+# 6. чеклист репетиции — то, что отличает план от разговоров
+cat &gt; runbook.md &lt;&lt;'EOF'
+# Репетиция восстановления, раз в квартал
+1. Поднять чистое окружение (не прод!)
+2. Восстановить последний бэкап, зафиксировать реальное время → это RTO
+3. Проверить целостность: количество строк, последняя транзакция, контрольные запросы
+4. Проверить, что есть сертификаты и секреты для запуска приложений
+5. Переключить DNS/балансировщик на резерв, замерить время распространения
+6. Записать, что не сработало, и исправить до следующей репетиции
+EOF
+docker rm -f pg</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Назови свои RTO и RPO для учебного сценария в секундах — измеренные, а не предположенные. Объясни разницу RTO и RPO на примере и скажи, почему нельзя обещать RPO=0 без синхронной репликации.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Отвечать «у нас настроены бэкапы Veeam». Правильный ответ включает числа, схему и дату последней успешной репетиции восстановления.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q226">226</a><a href="qa-trainer.html#q128">128</a><a href="qa-trainer.html#q238">238</a><a href="qa-trainer.html#q77">77</a></div>
+</div></article>
+<article class="lesson" id="l31" data-n="31" data-grade="senior" data-min="50">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 31 пройденным">
+<div class="lt"><h3><span class="num">31</span> Мультитенантность: один кластер на несколько команд</h3>
+<p class="lwhy">Это типовая senior-задача: дать десяти командам общий кластер так, чтобы они не мешали друг другу.</p>
+<div class="lmeta"><span class="grade" data-gr="senior">senior</span>
+<span class="time">50 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Namespace изолирует <strong>имена и права</strong>, но не изолирует сеть (по умолчанию любой под ходит куда угодно), не изолирует узлы (соседняя команда может занять весь CPU) и не даёт квоты по умолчанию. Поэтому мультитенантность собирается из слоёв: namespace + RBAC (кто), ResourceQuota и LimitRange (сколько), NetworkPolicy default deny (с кем говорить), политики Kyverno или OPA (что запрещено — root, hostPath, <code>latest</code>), и при жёстких требованиях — отдельные узлы через taints или вообще отдельный кластер. Ключевой вопрос на собеседовании: где граница между «жёсткая изоляция в одном кластере» и «дешевле дать отдельный кластер» — ответ обычно в требованиях регулятора и в том, нужен ли командам собственный набор CRD и версий.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>kubectl create ns team-a 2&gt;/dev/null; kubectl create ns team-b 2&gt;/dev/null
+kubectl label ns team-a team=a --overwrite; kubectl label ns team-b team=b --overwrite
+
+# 1. квоты: сколько команда может взять
+kubectl apply -f - &lt;&lt;'EOF'
+apiVersion: v1
+kind: ResourceQuota
+metadata: { name: quota, namespace: team-a }
+spec:
+  hard:
+    requests.cpu: "1"
+    requests.memory: 1Gi
+    limits.cpu: "2"
+    limits.memory: 2Gi
+    pods: "10"
+    persistentvolumeclaims: "3"
+    services.loadbalancers: "0"      # чтобы не выставляли сервисы в интернет сами
+---
+apiVersion: v1
+kind: LimitRange
+metadata: { name: defaults, namespace: team-a }
+spec:
+  limits:
+    - type: Container
+      default:        { cpu: 100m, memory: 128Mi }   # если забыли указать limits
+      defaultRequest: { cpu: 50m,  memory: 64Mi }
+      max:            { cpu: "1",  memory: 1Gi }
+EOF
+
+# LimitRange дописывает ресурсы за того, кто их не указал
+kubectl -n team-a run nolimits --image=traefik/whoami:v1.10
+sleep 3
+kubectl -n team-a get pod nolimits -o jsonpath='{.spec.containers[0].resources}'; echo
+
+# квота реально останавливает
+kubectl -n team-a create deploy greedy --image=nginx --replicas=1
+kubectl -n team-a patch deploy greedy --type=json -p='[{"op":"add","path":"/spec/template/spec/containers/0/resources","value":{"requests":{"cpu":"900m","memory":"900Mi"}}}]'
+kubectl -n team-a scale deploy greedy --replicas=3
+sleep 5
+kubectl -n team-a get events --field-selector reason=FailedCreate | tail -2   # exceeded quota
+kubectl -n team-a describe quota quota | tail -12
+
+# 2. сеть: команды не видят друг друга
+kubectl apply -f - &lt;&lt;'EOF'
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: isolate, namespace: team-a }
+spec:
+  podSelector: {}
+  policyTypes: [Ingress]
+  ingress:
+    - from: [{ namespaceSelector: { matchLabels: { team: a } } }]
+EOF
+
+# 3. права: команда видит только свой namespace
+kubectl create serviceaccount dev-a -n team-a 2&gt;/dev/null
+kubectl create rolebinding dev-a-edit --clusterrole=edit --serviceaccount=team-a:dev-a -n team-a
+kubectl auth can-i get pods -n team-a --as=system:serviceaccount:team-a:dev-a
+kubectl auth can-i get pods -n team-b --as=system:serviceaccount:team-a:dev-a
+kubectl auth can-i get nodes --as=system:serviceaccount:team-a:dev-a
+
+# 4. узлы только для команды — когда нужна изоляция по железу
+NODE=$(kubectl get nodes -o name | tail -1 | cut -d/ -f2)
+kubectl taint node $NODE tenant=team-a:NoSchedule --overwrite
+kubectl label node $NODE tenant=team-a --overwrite
+echo "теперь поды team-a с toleration поедут только сюда, чужие — не поедут вообще"
+kubectl taint node $NODE tenant=team-a:NoSchedule-
+
+kubectl delete ns team-a team-b --wait=false</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Назови по памяти четыре слоя изоляции и что именно каждый закрывает. Ответь на вопрос «namespace изолирует?» правильно: имена и права — да, сеть, ресурсы и узлы — нет, пока не настроишь.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Считать namespace изоляцией. Без квот одна команда съедает кластер, без политик ходит в чужие сервисы, без LimitRange запускает поды без лимитов, и первый же OOM на узле убивает чужие поды.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q228">228</a><a href="qa-trainer.html#q80">80</a><a href="qa-trainer.html#q72">72</a><a href="qa-trainer.html#q73">73</a></div>
+</div></article>
+<article class="lesson" id="l32" data-n="32" data-grade="senior" data-min="50">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 32 пройденным">
+<div class="lt"><h3><span class="num">32</span> Наблюдаемость на масштабе</h3>
+<p class="lwhy">Отвечать на «как построить мониторинг для сорока сервисов» так, чтобы это не превратилось в сорок дашбордов и счёт на десятки тысяч.</p>
+<div class="lmeta"><span class="grade" data-gr="senior">senior</span>
+<span class="time">50 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Один сервис мониторят как хотят; сорок — только по единому контракту. Контракт: каждый сервис отдаёт одни и те же четыре сигнала (частота запросов, доля ошибок, задержка, насыщенность) с одинаковыми именами метрик и одинаковым набором лейблов, дашборд один и параметризуется переменной сервиса, алерты генерируются из шаблона, а не пишутся руками. Три источника данных не заменяют друг друга: метрики отвечают «что-то не так и насколько», логи — «что именно случилось в этом запросе», трейсы — «в каком из десяти сервисов задержка». Стоимость растёт не от числа сервисов, а от кардинальности и от сроков хранения — поэтому сэмплирование трейсов, ограничение лейблов и разные сроки для сырых и агрегированных данных.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>cd ~/lab/prom
+# 1. найти, что съедает хранилище — первое, что делают на масштабе
+curl -s http://localhost:9090/api/v1/status/tsdb | jq '{
+  ряды: .data.headStats.numSeries,
+  топ_метрик: (.data.seriesCountByMetricName[:5] | map({(.name): .value}) | add),
+  топ_лейблов: (.data.labelValueCountByLabelName[:5] | map({(.name): .value}) | add)
+}'
+
+# 2. посчитать кардинальность и цену конкретного лейбла
+curl -sG http://localhost:9090/api/v1/query --data-urlencode \
+  'query=topk(5, count by (__name__)({__name__=~".+"}))' | jq -r '.data.result[] | .metric.__name__ + " → " + .value[1]'
+python3 - &lt;&lt;'EOF'
+# грубая, но полезная оценка: сколько стоит один лейбл с высокой кардинальностью
+bytes_per_sample = 2          # после сжатия
+scrape = 15                   # секунд
+for series in (10_000, 100_000, 1_000_000):
+    per_day = series * (86400/scrape) * bytes_per_sample / 1e9
+    print(f"{series:&gt;9} рядов → {per_day:6.1f} ГБ/сутки → {per_day*30:7.0f} ГБ за месяц")
+EOF
+
+# 3. единый контракт: правила генерируются из шаблона, а не пишутся руками
+cat &gt; gen-rules.py &lt;&lt;'PY'
+services = ["api", "billing", "search", "auth"]
+tpl = """      - alert: {svc}HighErrorRate
+        expr: |
+          sum(rate(http_requests_total{{service="{svc}",code=~"5.."}}[5m]))
+          / sum(rate(http_requests_total{{service="{svc}"}}[5m])) &gt; 0.01
+        for: 10m
+        labels: {{ severity: critical, service: {svc} }}
+        annotations: {{ summary: "{svc}: доля 5xx выше 1%" }}
+"""
+print("groups:\n  - name: generated\n    rules:")
+for s in services:
+    print(tpl.format(svc=s), end="")
+PY
+python3 gen-rules.py &gt; generated-rules.yml &amp;&amp; head -12 generated-rules.yml
+docker run --rm -v "$PWD:/w" prom/prometheus:v3.1.0 promtool check rules /w/generated-rules.yml
+
+# 4. сроки хранения: сырое коротко, агрегаты долго
+cat &lt;&lt;'EOF'
+Recording rule агрегирует до дешёвого ряда:
+  record: service:http_errors:ratio_rate5m
+  expr:   sum by (service) (rate(http_requests_total{code=~"5.."}[5m]))
+          / sum by (service) (rate(http_requests_total[5m]))
+Сырые метрики держим 15 дней, агрегаты — год. Отчёт за прошлый квартал строится
+по агрегатам и стоит копейки.
+EOF
+
+# 5. сколько стоит хранение логов против метрик — аргумент в разговоре о бюджете
+python3 - &lt;&lt;'EOF'
+rps, days = 2000, 30
+log_bytes = 400
+raw = rps * 86400 * days * log_bytes / 1e12
+print(f"логи: {rps} rps × {days} дней × {log_bytes} Б = {raw:.2f} ТБ")
+print(f"метрики того же сервиса при 200 рядах: {200*(86400/15)*2*days/1e9:.2f} ГБ")
+print("вывод: логи сэмплировать и хранить коротко, агрегаты и метрики — долго")
+EOF</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Объясни, зачем нужны все три источника данных и что именно теряется, если оставить только логи. Назови два способа снизить стоимость наблюдаемости, не теряя диагностическую ценность (агрегаты плюс короткое хранение сырых, сэмплирование трейсов с сохранением всех ошибочных).</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Строить отдельный дашборд под каждый сервис. Через год их сто, половина сломана, и никто не знает, какой из них правильный.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q239">239</a><a href="qa-trainer.html#q122">122</a><a href="qa-trainer.html#q125">125</a><a href="qa-trainer.html#q121">121</a></div>
+</div></article>
+<article class="lesson" id="l33" data-n="33" data-grade="senior" data-min="45">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 33 пройденным">
+<div class="lt"><h3><span class="num">33</span> Деньги: стоимость сервиса и обоснование надёжности</h3>
+<p class="lwhy">Senior отличается от middle умением говорить с бизнесом в его единицах. Это же напрямую влияет на твою вилку.</p>
+<div class="lmeta"><span class="grade" data-gr="senior">senior</span>
+<span class="time">45 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Стоимость сервиса складывается из инфраструктуры (вычисления, память, диск, трафик), лицензий, и того, что обычно забывают: времени людей на эксплуатацию. В Kubernetes инфраструктурную часть считают через долю requests пода в ресурсах узла, плюс общие сервисы (мониторинг, логи, ingress) распределяются по потребителям. Главный источник экономии — не скидки у провайдера, а разница между requests и фактическим потреблением: если запрошено вдвое больше, чем используется, половина счёта — воздух. Разговор о надёжности переводится в деньги так: стоимость минуты простоя × ожидаемое время простоя за год против стоимости резерва. Если резерв дороже ожидаемых потерь, его не надо делать — и это тоже правильный инженерный ответ.</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code># 1. сколько запрошено против того, сколько используется
+kubectl get pods -A -o custom-columns='NS:.metadata.namespace,POD:.metadata.name,CPU_REQ:.spec.containers[*].resources.requests.cpu,MEM_REQ:.spec.containers[*].resources.requests.memory' | head -15
+kubectl top pods -A 2&gt;/dev/null | head -10 || echo "нужен metrics-server: kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml"
+kubectl describe nodes | grep -A5 'Allocated resources' | head -20
+
+# 2. посчитать стоимость сервиса
+python3 - &lt;&lt;'EOF'
+node_month_usd = 120          # цена узла в месяц
+node_cpu, node_mem = 8, 32    # ядер и ГБ
+
+services = [
+    # имя,      реплик, requests CPU, requests ГБ, фактическое потребление CPU
+    ("api",         6, 0.5, 1.0, 0.12),
+    ("billing",     3, 1.0, 2.0, 0.30),
+    ("search",      4, 0.5, 4.0, 0.45),
+]
+cpu_price = node_month_usd / 2 / node_cpu      # половину цены узла относим на CPU
+mem_price = node_month_usd / 2 / node_mem      # половину на память
+
+print(f"{'сервис':&lt;10}{'запрошено':&gt;12}{'использует':&gt;12}{'переплата':&gt;12}")
+total = waste = 0
+for name, rep, cpu, mem, used in services:
+    booked = rep * (cpu*cpu_price + mem*mem_price)
+    real   = rep * (used*cpu_price + mem*mem_price)
+    total += booked; waste += booked - real
+    print(f"{name:&lt;10}{booked:&gt;10.0f} $ {real:&gt;10.0f} $ {booked-real:&gt;10.0f} $")
+print(f"\nвсего в месяц: {total:.0f} $, из них воздух: {waste:.0f} $ ({waste/total*100:.0f}%)")
+print(f"плюс общие сервисы (мониторинг, ingress, логи) — обычно 15-25% сверху")
+EOF
+
+# 3. обосновать резерв: считаем ожидаемые потери против цены
+python3 - &lt;&lt;'EOF'
+revenue_per_min = 3000        # выручка в минуту в рабочее время
+current_slo, target_slo = 99.5, 99.95
+minutes_year = 365*24*60
+for slo in (current_slo, target_slo):
+    down = (100-slo)/100 * minutes_year
+    print(f"SLO {slo}%: простой {down:.0f} мин/год, потери {down*revenue_per_min/1e6:.2f} млн")
+saved = ((100-current_slo)-(100-target_slo))/100 * minutes_year * revenue_per_min
+print(f"\nэкономия от перехода: {saved/1e6:.2f} млн в год")
+print("стоимость: второй ЦОД + синхронная репликация ≈ 0.9 млн в год")
+print("вывод для бизнеса: вложение окупается втрое — это и есть обоснование")
+EOF
+
+# 4. быстрые источники экономии, которые видно за час
+kubectl get pvc -A --no-headers 2&gt;/dev/null | wc -l    # сколько дисков, все ли нужны
+kubectl get pv --no-headers 2&gt;/dev/null | awk '$5=="Released"' | wc -l   # брошенные тома, за которые платят
+kubectl get svc -A --field-selector spec.type=LoadBalancer --no-headers 2&gt;/dev/null | wc -l   # каждый LB — отдельный счёт</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>Посчитай на своих числах, сколько стоит один сервис в месяц, и назови три источника экономии, которые не требуют переписывания приложения (привести requests к фактическому потреблению, убрать брошенные тома и лишние LoadBalancer, разные сроки хранения телеметрии). Сформулируй одним предложением, почему надёжность стоит своих денег в твоём случае.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Обосновывать надёжность словами «это best practice». Бизнес слышит «инженер хочет игрушку». Единица разговора — деньги: стоимость минуты простоя, ожидаемое число минут, цена резерва.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q224">224</a><a href="qa-trainer.html#q136">136</a><a href="qa-trainer.html#q247">247</a><a href="qa-trainer.html#q219">219</a></div>
+</div></article>
+<article class="lesson" id="l34" data-n="34" data-grade="senior" data-min="60">
+<div class="lhead">
+<input class="tick" type="checkbox" aria-label="Отметить урок 34 пройденным">
+<div class="lt"><h3><span class="num">34</span> Chaos engineering и процесс инцидентов</h3>
+<p class="lwhy">Проверить, что система и процесс выдерживают отказ, до того как это проверит прод. И потренировать первые пять минут аварии вслух.</p>
+<div class="lmeta"><span class="grade" data-gr="senior">senior</span>
+<span class="time">60 минут</span>
+</div></div>
+<button class="toggle" type="button">открыть урок</button>
+</div>
+<div class="lbody" hidden>
+<p><strong>Теория.</strong> Chaos engineering — не «сломать прод», а эксперимент с гипотезой: формулируем ожидание («при потере одного пода доля ошибок не превысит 0.1%»), задаём радиус поражения, включаем наблюдение, ломаем, сравниваем с гипотезой, откатываем. Начинают в тестовом окружении и с самого дешёвого сценария — убийства пода. Процесс инцидентов на масштабе — про роли, а не про героизм: incident commander координирует и сам не чинит, communications lead общается с бизнесом, остальные работают по гипотезам, кто-то ведёт таймлайн. Постмортем blameless и отвечает не на «что сломалось», а на «что позволило этому дойти до прода и какой проверки не хватало».</p>
+<p class="step do">Практика</p>
+<div class="scroller"><pre><code>cd ~/lab/k8s
+# подопытный сервис с честной readiness и антиаффинити
+kubectl apply -f - &lt;&lt;'EOF'
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: chaos-app }
+spec:
+  replicas: 4
+  selector: { matchLabels: { app: chaos-app } }
+  template:
+    metadata: { labels: { app: chaos-app } }
+    spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector: { matchLabels: { app: chaos-app } }
+      containers:
+        - name: app
+          image: traefik/whoami:v1.10
+          readinessProbe: { httpGet: { path: /, port: 80 }, periodSeconds: 2 }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: chaos-app }
+spec:
+  selector: { app: chaos-app }
+  ports: [{ port: 80 }]
+EOF
+kubectl rollout status deploy/chaos-app
+
+# эксперимент 1: гипотеза — потеря одного пода не даёт ошибок клиенту
+kubectl run load --image=curlimages/curl:8.10.1 -- sh -c '
+  ok=0; err=0
+  for i in $(seq 1 200); do
+    if curl -s -m 2 -o /dev/null http://chaos-app; then ok=$((ok+1)); else err=$((err+1)); fi
+    sleep 0.2
+  done
+  echo "успешных: $ok, ошибок: $err"' &gt;/dev/null
+sleep 5
+kubectl delete pod -l app=chaos-app --field-selector=status.phase=Running --wait=false 2&gt;/dev/null | head -1
+sleep 45 &amp;&amp; kubectl logs load
+
+# эксперимент 2: гипотеза — потеря узла восстанавливается автоматически
+kubectl get pods -l app=chaos-app -o wide
+NODE=$(kubectl get pods -l app=chaos-app -o jsonpath='{.items[0].spec.nodeName}')
+kubectl drain $NODE --ignore-daemonsets --delete-emptydir-data --force --timeout=90s
+kubectl get pods -l app=chaos-app -o wide          # переехали на живые узлы
+kubectl uncordon $NODE
+
+# эксперимент 3: гипотеза — зависимость отвечает медленно, а не падает
+kubectl run slow --image=nicolaka/netshoot --rm -it --restart=Never -- \
+  sh -c 'tc qdisc add dev eth0 root netem delay 300ms 2&gt;/dev/null; time curl -s -o /dev/null http://chaos-app; exit' 2&gt;/dev/null
+
+kubectl delete pod load --ignore-not-found; kubectl delete deploy chaos-app; kubectl delete svc chaos-app</code></pre></div>
+<p>Теперь тренировка речи. Возьми таймер на две минуты и расскажи вслух первые пять минут аварии: подтвердить и объявить (не молчать), оценить масштаб по симптомам, вспомнить что менялось за последний час, локализовать по границам, действовать по одной гипотезе с фиксацией таймлайна. Затем запиши постмортем по шаблону:</p>
+<div class="scroller"><pre><code>cat &gt; ~/lab/postmortem.md &lt;&lt;'EOF'
+# Постмортем: &lt;короткое описание&gt;
+
+**Влияние.** Что видел пользователь, сколько времени, сколько запросов и денег.
+**Обнаружение.** Как узнали: мониторинг или клиент? Если клиент — это пункт №1 в выводах.
+**Таймлайн.** Время → что увидели → что сделали → эффект.
+**Первопричина.** Техническая причина и то, что позволило ей дойти до прода.
+**Что сработало.** Не только плохое: что помогло быстро восстановиться.
+**Action items.** Каждый пункт убирает класс проблемы, а не конкретный случай.
+  Владелец и срок обязательны, иначе это не пункт, а пожелание.
+EOF
+cat ~/lab/postmortem.md</code></pre></div>
+<div class="callout check"><span class="clabel">Проверка</span>У тебя есть три проведённых эксперимента с записанными гипотезами и результатами, и ты можешь рассказать первые пять минут аварии за две минуты, не задумываясь. Объясни, почему incident commander не чинит руками.</div>
+<div class="callout trap"><span class="clabel">Типичная ошибка</span>Начинать хаос-эксперименты с прода и без наблюдения: тогда это не эксперимент, а авария, устроенная своими руками. И постмортем, в котором первопричина — «человеческая ошибка»: это означает, что настоящую причину — отсутствие проверки, которая эту ошибку бы поймала, — не нашли.</div>
+<div class="qlinks"><span class="ql">Закрывает вопросы</span><a href="qa-trainer.html#q236">236</a><a href="qa-trainer.html#q243">243</a><a href="qa-trainer.html#q165">165</a><a href="qa-trainer.html#q124">124</a><a href="qa-trainer.html#q229">229</a></div>
+</div></article>
+</section>
+  <p class="empty" id="empty" hidden>В этом фильтре уроков нет.</p>
+
+  <footer class="site">
+    <p>Уроки написаны под <a href="qa-trainer.html">тренажёр</a>: каждый закрывает конкретные вопросы, их номера стоят в конце урока. Порядок прохождения — как в <a href="roadmap.html">roadmap</a>. Ссылки на внешние курсы и репозитории — на страницах <a href="resources.html">материалов</a> и <a href="repos.html">репозиториев</a>.</p>
+  </footer>
+</div>
+<script>
+(function(){
+  var KEY="qa-course-v1";
+  var el=function(id){return document.getElementById(id)};
+  var GRADES=["junior","middle","senior"];
+  var GNOTE={
+    junior:"Собрать руками то, что спрашивают в первые пять минут собеседования.",
+    middle:"Эксплуатация: то, за что платят на целевых вакансиях.",
+    senior:"Масштаб, отказоустойчивость, деньги и процессы."
+  };
+
+  var state={};
+  try{ state=JSON.parse(localStorage.getItem(KEY))||{} }catch(e){ state={} }
+  function save(){ try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){} }
+
+  var lessons=Array.prototype.slice.call(document.querySelectorAll(".lesson"));
+  var gfilter="all", todoOnly=false;
+
+  function isDone(n){ return !!state[n] }
+
+  function paint(l){
+    var n=l.getAttribute("data-n"), on=isDone(n);
+    l.classList.toggle("done",on);
+    var t=l.querySelector(".tick"); if(t) t.checked=on;
+  }
+
+  function openLesson(l,on){
+    var b=l.querySelector(".lbody");
+    if(!b) return;
+    b.hidden=!on;
+    l.classList.toggle("open",on);
+    var t=l.querySelector(".toggle");
+    if(t) t.textContent=on?"свернуть":"открыть урок";
+  }
+
+  function apply(){
+    var shown=0;
+    lessons.forEach(function(l){
+      var ok=true;
+      if(gfilter!=="all" && l.getAttribute("data-grade")!==gfilter) ok=false;
+      if(ok&&todoOnly&&isDone(l.getAttribute("data-n"))) ok=false;
+      l.hidden=!ok;
+      if(ok) shown++;
+    });
+    document.querySelectorAll("[data-track]").forEach(function(tr){
+      var any=Array.prototype.some.call(tr.querySelectorAll(".lesson"),function(l){return !l.hidden});
+      tr.hidden=!any;
+    });
+    el("empty").hidden=shown>0;
+  }
+
+  function stats(){
+    var g={};
+    GRADES.forEach(function(k){ g[k]={done:0,tot:0,min:0,left:0} });
+    lessons.forEach(function(l){
+      var k=l.getAttribute("data-grade"); if(!g[k]) return;
+      var m=+l.getAttribute("data-min")||0;
+      g[k].tot++; g[k].min+=m;
+      if(isDone(l.getAttribute("data-n"))) g[k].done++; else g[k].left+=m;
+    });
+    return g;
+  }
+
+  function hours(m){
+    if(m<60) return m+" мин";
+    var h=Math.floor(m/60), r=m%60;
+    return h+" ч"+(r?" "+r+" мин":"");
+  }
+
+  function recount(){
+    var g=stats(), done=0, tot=0, left=0, current=null;
+    GRADES.forEach(function(k){
+      var x=g[k], r=x.tot?x.done/x.tot:0, full=(x.tot>0&&x.done===x.tot);
+      done+=x.done; tot+=x.tot; left+=x.left;
+      var lb=document.querySelector('[data-glabel="'+k+'"]');
+      if(lb) lb.textContent=x.done+" / "+x.tot+" · "+hours(x.min);
+      var f=document.querySelector('[data-gfill="'+k+'"]'); if(f) f.style.width=(r*100)+"%";
+      var card=document.querySelector('[data-gcard="'+k+'"]');
+      if(card) card.classList.toggle("done",full);
+      var st=document.querySelector('[data-gstate="'+k+'"]');
+      if(st) st.textContent = full ? "пройден целиком"
+        : (x.done===0 ? GNOTE[k] : "осталось "+(x.tot-x.done)+" уроков, "+hours(x.left));
+      if(!full && current===null) current=k;
+    });
+    var pct=tot?Math.round(done/tot*100):0;
+    el("pct").textContent=pct+"%";
+    el("mfill").style.width=pct+"%";
+    el("score").textContent=done+" из "+tot+" уроков · осталось "+hours(left);
+    var v=el("gverdict");
+    if(v){
+      v.textContent = current===null
+        ? "Курс пройден целиком. Дальше учит только прод и собеседования — иди откликайся."
+        : done===0
+          ? "Начни с первого урока junior. Один урок в день — это "+Math.ceil(tot/7)+" недель до конца курса, и почти всё время уходит на практику, а не на чтение."
+          : "Сейчас идёшь по "+current+". Урок считается пройденным, когда сделана практика, а не когда прочитан текст.";
+    }
+  }
+
+  // ── события ──
+  document.addEventListener("click",function(e){
+    if(e.target.closest(".tick")) return;          // галочку обрабатывает change
+    if(e.target.closest(".lbody")) return;         // клики внутри урока не сворачивают его
+    var h=e.target.closest(".lhead");
+    if(h){
+      var l=h.closest(".lesson");
+      openLesson(l, l.querySelector(".lbody").hidden);
+      return;
+    }
+    var g=e.target.closest("[data-gcard]");
+    if(g){
+      var k=g.getAttribute("data-gcard");
+      var btn=document.querySelector('[data-gf="'+(gfilter===k?"all":k)+'"]');
+      if(btn) btn.click();
+    }
+  });
+
+  document.addEventListener("change",function(e){
+    var t=e.target.closest(".tick");
+    if(!t) return;
+    var l=t.closest(".lesson"), n=l.getAttribute("data-n");
+    if(t.checked) state[n]=1; else delete state[n];
+    save(); paint(l); recount(); if(todoOnly) apply();
+  });
+
+  document.querySelectorAll("[data-gf]").forEach(function(b){
+    b.addEventListener("click",function(){
+      document.querySelectorAll("[data-gf]").forEach(function(x){x.classList.remove("on")});
+      b.classList.add("on"); gfilter=b.getAttribute("data-gf"); apply();
+      document.querySelectorAll("[data-gcard]").forEach(function(c){
+        c.classList.toggle("picked",gfilter!=="all"&&c.getAttribute("data-gcard")===gfilter);
+      });
+    });
+  });
+
+  el("onlyTodo").addEventListener("click",function(){
+    todoOnly=!todoOnly;
+    el("onlyTodo").classList.toggle("on",todoOnly);
+    apply();
+  });
+
+  el("expandAll").addEventListener("click",function(){
+    var anyClosed=lessons.some(function(l){return !l.hidden && l.querySelector(".lbody").hidden});
+    lessons.forEach(function(l){ if(!l.hidden) openLesson(l,anyClosed) });
+    el("expandAll").textContent=anyClosed?"свернуть все":"раскрыть все";
+  });
+
+  el("next").addEventListener("click",function(){
+    for(var i=0;i<lessons.length;i++){
+      var l=lessons[i];
+      if(!isDone(l.getAttribute("data-n"))){
+        document.querySelector('[data-gf="all"]').click();
+        openLesson(l,true);
+        l.scrollIntoView({block:"start",behavior:"smooth"});
+        return;
+      }
+    }
+    alert("Все уроки отмечены как пройденные.");
+  });
+
+  el("reset").addEventListener("click",function(){
+    if(!confirm("Снять отметки со всех уроков?")) return;
+    state={}; save(); lessons.forEach(paint); recount(); apply();
+  });
+
+  lessons.forEach(paint);
+  recount(); apply();
+})();
+</script>
+</body>
+</html>

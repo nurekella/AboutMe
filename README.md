@@ -29,6 +29,7 @@
 | Материал | Описание |
 |---|---|
 | [**Тренажёр DevOps-собеседования**](https://nurekella.github.io/AboutMe/qa-trainer.html) · [`INTERVIEW_QA.md`](INTERVIEW_QA.md) | 250 вопросов в трёх грейдах (65 junior, 126 middle, 59 senior) с ответами и объяснениями, включая 14 практических задач: Linux, сети, Docker, Kubernetes, Helm, CI/CD, Terraform, Ansible, мониторинг и SRE, базы данных, облака, безопасность, архитектура, поведенческие |
+| [**Курсы: уроки с практикой**](https://nurekella.github.io/AboutMe/course.html) · [`COURSE.md`](COURSE.md) | 34 урока по грейдам junior/middle/senior, 28 часов: теория коротко, практика с командами руками, проверка результата, типичная ошибка и номера вопросов тренажёра, которые урок закрывает |
 | [**Резюме**](https://nurekella.github.io/AboutMe/resume.html) | Опыт по местам работы, образование, курсы |
 | [**План подготовки**](https://nurekella.github.io/AboutMe/devops-plan.html) · [`DEVOPS_PLAN.md`](DEVOPS_PLAN.md) | Восемь недель: эксплуатация Kubernetes, GitOps, SRE, Terraform, платформенная инженерия, портфолио, CKA |
 | [**Roadmap**](https://nurekella.github.io/AboutMe/roadmap.html) | Три грейда и 25 этапов от junior до senior с живым прогрессом из оценок тренажёра |
