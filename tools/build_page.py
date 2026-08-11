@@ -15,6 +15,7 @@ NAV_ITEMS = [
     ("index.html", "главная"),
     ("resume.html", "резюме"),
     ("qa-trainer.html", "тренажёр"),
+    ("checklist.html", "чеклист"),
     ("devops-plan.html", "план"),
     ("diary.html", "дневник"),
     ("cv-review.html", "разбор резюме"),
@@ -30,6 +31,7 @@ DOC = """<!doctype html>
 <title>%(title)s</title>
 <link rel="stylesheet" href="style.css">
 <link rel="manifest" href="manifest.webmanifest">
+<script src="theme.js"></script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#9096;</text></svg>">
 <style>
 .doc h2{margin-top:38px}
