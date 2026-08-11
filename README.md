@@ -31,6 +31,10 @@
 | [**Тренажёр DevOps-собеседования**](https://nurekella.github.io/AboutMe/qa-trainer.html) · [`INTERVIEW_QA.md`](INTERVIEW_QA.md) | 165 вопросов с ответами и объяснениями, включая 14 практических задач: Linux, сети, Docker, Kubernetes, Helm, CI/CD, Terraform, Ansible, мониторинг и SRE, базы данных, облака, безопасность, архитектура, поведенческие |
 | [**Резюме**](https://nurekella.github.io/AboutMe/resume.html) | Опыт по местам работы, образование, курсы |
 | [**План подготовки**](https://nurekella.github.io/AboutMe/devops-plan.html) · [`DEVOPS_PLAN.md`](DEVOPS_PLAN.md) | Восемь недель: эксплуатация Kubernetes, GitOps, SRE, Terraform, платформенная инженерия, портфолио, CKA |
+| [**Roadmap**](https://nurekella.github.io/AboutMe/roadmap.html) | Одиннадцать этапов от базы до middle+ с живым прогрессом из оценок тренажёра |
+| [**Материалы**](https://nurekella.github.io/AboutMe/resources.html) · [`RESOURCES.md`](RESOURCES.md) | Курсы, книги, видео, интерактивные лабы — с порядком прохождения и разделом «чего не надо» |
+| [**Чеклист**](https://nurekella.github.io/AboutMe/checklist.html) | 41 пункт подготовки: за две недели, за неделю, за три дня, за день, за 15 минут |
+| [**Дневник собеседований**](https://nurekella.github.io/AboutMe/diary.html) | Что спрашивали, где поплыл, какую вилку называли, чем закончилось |
 | [**Разбор резюме**](https://nurekella.github.io/AboutMe/cv-review.html) · [`CV_REVIEW.md`](CV_REVIEW.md) | Что поправить в резюме и переписанный вариант |
 
 ### Про тренажёр
