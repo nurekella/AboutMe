@@ -21,3 +21,12 @@ cd tools && python3 build_page.py ../CV_REVIEW.md ../docs/cv-review.html \
 python3 tools/build_qa.py                       # полный документ → docs/qa-trainer.html
 python3 tools/build_qa.py --fragment -o out.html  # фрагмент без <head>, для встраивания
 ```
+
+Страница материалов собирается так же:
+
+```bash
+cd tools && python3 build_page.py ../RESOURCES.md ../docs/resources.html \
+  "Материалы: курсы, книги, видео, лабы" resources.html && cd ..
+```
+
+`roadmap.html`, `checklist.html`, `diary.html` и `theme.js` написаны руками.

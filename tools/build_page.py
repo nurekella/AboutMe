@@ -15,6 +15,8 @@ NAV_ITEMS = [
     ("index.html", "главная"),
     ("resume.html", "резюме"),
     ("qa-trainer.html", "тренажёр"),
+    ("roadmap.html", "roadmap"),
+    ("resources.html", "материалы"),
     ("checklist.html", "чеклист"),
     ("devops-plan.html", "план"),
     ("diary.html", "дневник"),

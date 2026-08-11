@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#EFF1F3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1319" media="(prefers-color-scheme: dark)">
+<title>Материалы: курсы, книги, видео, лабы</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="theme.js"></script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#9096;</text></svg>">
+<style>
+.doc h2{margin-top:38px}
+.doc h3{margin-top:26px;font-size:1.06rem}
+.doc h4{margin-top:20px}
+.doc hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+.doc pre{margin:0 0 14px;background:var(--surface-2);border:1px solid var(--line-soft);
+  border-radius:8px;padding:14px 16px;overflow-x:auto}
+.doc pre code{background:none;border:0;padding:0;font-size:.83rem;line-height:1.55}
+.doc blockquote{border-left:2px solid var(--accent);background:var(--accent-soft);
+  padding:12px 16px;border-radius:0 7px 7px 0;margin:0 0 16px;max-width:var(--measure)}
+.doc blockquote>:last-child{margin-bottom:0}
+.doc .callout{border-left:2px solid var(--line);background:var(--surface-2);
+  padding:10px 15px;border-radius:0 6px 6px 0;margin:0 0 12px;max-width:var(--measure);font-size:.94rem}
+.doc .callout .clabel{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;margin-bottom:5px;color:var(--muted)}
+.doc .sub-list{margin:6px 0 0;padding-left:1.15em}
+.doc table{margin-bottom:0}
+.toc{background:var(--surface);border:1px solid var(--line);border-radius:10px;
+  padding:16px 20px;margin:0 0 30px;box-shadow:var(--shadow)}
+.toc .tl{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 8px}
+.toc ol{margin:0;padding-left:1.3em;max-width:none}
+.toc li{margin-bottom:3px;font-size:.95rem}
+</style>
+</head>
+<body>
+<nav class="topnav"><div class="topnav-in">
+<a class="brand" href="index.html">nurekella<b>/</b>devops</a>
+<a class="nl" href="index.html">главная</a>
+<a class="nl" href="resume.html">резюме</a>
+<a class="nl" href="qa-trainer.html">тренажёр</a>
+<a class="nl" href="roadmap.html">roadmap</a>
+<a class="nl" href="resources.html" aria-current="page">материалы</a>
+<a class="nl" href="checklist.html">чеклист</a>
+<a class="nl" href="devops-plan.html">план</a>
+<a class="nl" href="diary.html">дневник</a>
+<a class="nl" href="cv-review.html">разбор резюме</a>
+<a class="nl" href="https://github.com/nurekella">github</a>
+</div></nav>
+<div class="wrap">
+<div class="doc">
+<header class="masthead"><h1>Материалы: курсы, книги, видео, лабы</h1></header>
+<div class="toc"><p class="tl">Содержание</p><ol><li><a href="#порядок">Порядок</a></li><li><a href="#интерактивные-лабы-учиться-руками">Интерактивные лабы: учиться руками</a></li><li><a href="#курсы">Курсы</a></li><li><a href="#видео-на-youtube">Видео на YouTube</a></li><li><a href="#книги">Книги</a></li><li><a href="#документацию-всё-таки-читать">Документацию всё-таки читать</a></li><li><a href="#рассылки-держать-актуальность-без-усилий">Рассылки: держать актуальность без усилий</a></li><li><a href="#сертификация">Сертификация</a></li><li><a href="#чего-не-надо">Чего не надо</a></li></ol></div>
+<p>Отобранное, а не собранное. На каждую тему — один основной источник и один справочный; остальное в конце, в разделе «чего не надо».</p>
+<p>Правило, которое важнее списка: <strong>источников в работе не больше двух одновременно.</strong> Переключение курсов — самая приятная форма прокрастинации: ощущается как работа, результата не даёт.</p>
+<h2 id="порядок">Порядок</h2>
+<p>Если начинать сегодня, порядок такой:</p>
+<ol><li><strong>Руками в браузере</strong> — <a href="https://www.escbash.com/" target="_blank" rel="noopener">escbash</a> или Killercoda, чтобы сразу трогать, а не смотреть.</li><li><strong>Рамка</strong> — Kubernetes-курс Nana на YouTube, бесплатно, чтобы понять «зачем».</li><li><strong>Как это на работе</strong> — Abhishek Veeramalla, разборы реальных задач и собеседований.</li><li><strong>Глубина</strong> — документация Kubernetes и одна книга.</li><li><strong>Проверка</strong> — <a href="qa-trainer.html" target="_blank" rel="noopener">тренажёр</a> и мок-экзамены CKA.</li></ol>
+<p>Дальше по разделам — что именно брать.</p>
+<h2 id="интерактивные-лабы-учиться-руками">Интерактивные лабы: учиться руками</h2>
+<p>Просмотренное видео не равно навыку. Это единственная категория, где навык появляется сразу, поэтому она первая.</p>
+<h3>escbash</h3>
+<p><a href="https://www.escbash.com/" target="_blank" rel="noopener">escbash.com</a> — браузерные лабы <strong>на настоящих машинах</strong>, а не в симуляторе: свежая Linux-машина под каждую задачу, реальные команды, проверка отправленного решения с оценкой. Для облачных лаб выдаётся живой AWS-аккаунт.</p>
+<p>Есть готовые роадмапы (DevOps Engineer — 7+ навыков, около 113 часов) и отдельные навыки: Linux, Shell, Docker, Kubernetes, Python для DevOps, Go, AWS.</p>
+<p>Чем ценно именно тебе: ты жалуешься, что бросаешь. Формат «задача → выполнил → получил оценку» держит внимание лучше, чем видеокурс, где прогресс измеряется просмотренными минутами.</p>
+<h3>Killercoda</h3>
+<p><a href="https://killercoda.com/" target="_blank" rel="noopener">killercoda.com</a> — бесплатные сценарии в браузере, включая полные наборы под <strong>CKA, CKAD, CKS</strong>. Лучшее место тренировать скорость с <code>kubectl</code>: на экзамене и на техническом собеседовании с живым кластером решает не знание, а скорость.</p>
+<h3>KodeKloud</h3>
+<p><a href="https://kodekloud.com/" target="_blank" rel="noopener">kodekloud.com</a> — курсы Mumshad Mannambeth с лабами. Его курс по CKA считается эталонным для подготовки к экзамену. Есть бесплатный уровень.</p>
+<h3>iximiuz Labs</h3>
+<p><a href="https://labs.iximiuz.com/" target="_blank" rel="noopener">labs.iximiuz.com</a> — Иван Величко, глубоко про внутренности контейнеров и Kubernetes. Сюда идти, когда захочется понять, что под капотом, а не как пользоваться.</p>
+<h3>Своя песочница</h3>
+<p>Отдельно и бесплатно: <strong>сломай свой кластер специально.</strong> Убей etcd. Заполни диск на узле. Поставь <code>memory limit</code> в 10Mi. Сломай CoreDNS. Испорти RBAC так, чтобы под не смог читать Secret. Каждая поломка — это вопрос из тренажёра, прожитый руками, и он больше не забудется.</p>
+<h2 id="курсы">Курсы</h2>
+<h3>TechWorld with Nana</h3>
+<p><a href="https://www.techworld-with-nana.com/" target="_blank" rel="noopener">techworld-with-nana.com</a> — сильная сторона в том, что объясняется <strong>зачем</strong> технология существует и как встраивается в картину, а не только какие команды нажимать. Именно этого не хватает при переходе из администраторов: детали есть, нужна рамка.</p>
+<div class="scroller"><table><thead><tr><th>Что</th><th>Формат</th><th>Кому</th></tr></thead><tbody><tr><td><strong>DevOps Bootcamp</strong></td><td>6 месяцев, уровень с нуля, с проектами</td><td>Основной продукт. Брать, если нужен внешний дедлайн и структура</td></tr><tr><td><strong>DevSecOps Bootcamp</strong></td><td>4 месяца, продвинутый</td><td>Логичное продолжение при банковском бэкграунде — security становится преимуществом</td></tr><tr><td><strong>GitLab CI/CD</strong></td><td>отдельный курс</td><td>Точечно, если GitLab CI твой основной инструмент</td></tr><tr><td><strong>IT Fundamentals</strong></td><td>мини-буткамп</td><td>Пропустить: это про жизненный цикл разработки для новичков</td></tr><tr><td><strong>Роадмапы</strong></td><td>бесплатно на сайте</td><td>Скачать, сверить со своим планом</td></tr></tbody></table></div>
+<p>Честно про платное: буткамп на шесть месяцев имеет смысл, только если ты доводишь его до конца. При привычке бросать деньги и группа держат лучше, чем сила воли — но одно, а не коллекция курсов.</p>
+<h3>Abhishek Veeramalla</h3>
+<p>Сильная сторона противоположная и дополняющая: <strong>как это выглядит на реальной работе.</strong> Разбор задач «день из жизни DevOps-инженера», реальные пайплайны, много про собеседования и про то, как формулировать ответы. Серии «Zero to Hero» по Kubernetes, Docker, Terraform, Ansible, AWS, GitOps.</p>
+<p>Как совмещать: Nana — чтобы понять, Abhishek — чтобы понять, как это применяют и как об этом говорят.</p>
+<h3>Русскоязычные интенсивы</h3>
+<p>Слёрм, Rebrain, Southbridge — формат «две недели, много практики, жёсткий дедлайн» работает против привычки бросать. Это добавка к плану, а не замена ему.</p>
+<h2 id="видео-на-youtube">Видео на YouTube</h2>
+<p>Каналы целиком плюс поиск по названию — так ссылки не гниют.</p>
+<h3>Основное</h3>
+<div class="scroller"><table><thead><tr><th>Канал</th><th>Что смотреть</th></tr></thead><tbody><tr><td><a href="https://www.youtube.com/@TechWorldwithNana/videos" target="_blank" rel="noopener">TechWorld with Nana</a></td><td><a href="https://www.youtube.com/results?search_query=techworld+with+nana+kubernetes+tutorial+for+beginners" target="_blank" rel="noopener">Kubernetes Tutorial for Beginners</a> (~4 ч) — главное видео канала, смотреть с кластером под рукой. Затем <a href="https://www.youtube.com/results?search_query=techworld+with+nana+docker+tutorial+for+beginners" target="_blank" rel="noopener">Docker Tutorial</a>, <a href="https://www.youtube.com/results?search_query=techworld+with+nana+terraform+course" target="_blank" rel="noopener">Terraform</a>, <a href="https://www.youtube.com/results?search_query=techworld+with+nana+helm" target="_blank" rel="noopener">Helm</a>, <a href="https://www.youtube.com/results?search_query=techworld+with+nana+prometheus+monitoring" target="_blank" rel="noopener">Prometheus</a>, <a href="https://www.youtube.com/results?search_query=techworld+with+nana+gitlab+ci+cd" target="_blank" rel="noopener">GitLab CI/CD</a></td></tr><tr><td><a href="https://www.youtube.com/@AbhishekVeeramalla/videos" target="_blank" rel="noopener">Abhishek Veeramalla</a></td><td>Серии «Zero to Hero», разборы собеседований, «day-to-day activities of a DevOps engineer»</td></tr></tbody></table></div>
+<h3>Дополнительно</h3>
+<div class="scroller"><table><thead><tr><th>Канал</th><th>Чем полезен</th></tr></thead><tbody><tr><td><a href="https://www.youtube.com/@MarcelDempers/videos" target="_blank" rel="noopener">That DevOps Guy (Marcel Dempers)</a></td><td>Практические разборы инструментов Kubernetes, коротко и по делу</td></tr><tr><td><a href="https://www.youtube.com/@DevOpsToolkit/videos" target="_blank" rel="noopener">DevOps Toolkit (Viktor Farcic)</a></td><td>Обзоры и сравнения — чтобы понимать ландшафт, а не один инструмент</td></tr><tr><td><a href="https://www.youtube.com/@AntonPutra/videos" target="_blank" rel="noopener">Anton Putra</a></td><td>Бенчмарки с цифрами: что быстрее и почему</td></tr><tr><td><a href="https://www.youtube.com/@cncf/videos" target="_blank" rel="noopener">CNCF</a></td><td>Доклады KubeCon — бесплатно, уровень выше любого курса</td></tr><tr><td><a href="https://kubernetespodcast.com/" target="_blank" rel="noopener">Kubernetes Podcast</a></td><td>В дорогу, чтобы держать контекст индустрии</td></tr></tbody></table></div>
+<p>Полезные конкретные темы, которые стоит найти и посмотреть один раз: <a href="https://www.youtube.com/results?search_query=what+happens+when+you+run+kubectl+apply+explained" target="_blank" rel="noopener">что происходит при kubectl apply</a>, <a href="https://www.youtube.com/results?search_query=ebpf+cilium+replace+kube-proxy+explained" target="_blank" rel="noopener">eBPF и Cilium — зачем заменяют kube-proxy</a>, <a href="https://www.youtube.com/results?search_query=kubernetes+gateway+api+vs+ingress" target="_blank" rel="noopener">Gateway API вместо Ingress</a>, <a href="https://www.youtube.com/results?search_query=argocd+tutorial+gitops+kubernetes" target="_blank" rel="noopener">ArgoCD за 20 минут</a>.</p>
+<h2 id="книги">Книги</h2>
+<p>По одной, а не коллекцией. Порядок — по отдаче на вложенное время.</p>
+<div class="scroller"><table><thead><tr><th>Книга</th><th>Зачем</th><th>Когда</th></tr></thead><tbody><tr><td><strong>Google SRE Book</strong> и <strong>SRE Workbook</strong> — <a href="https://sre.google/books/" target="_blank" rel="noopener">бесплатно на sre.google</a></td><td>Разделы про SLO, error budget и on-call. Это ровно тот словарь, которого не хватает при опыте дежурств: три вечера превращают «сидел на поддержке 24/7» в «владел надёжностью с измеримым SLO»</td><td><strong>Первое. Максимальная отдача из всего списка</strong></td></tr><tr><td><strong>The Kubernetes Book</strong>, Nigel Poulton</td><td>Самая быстрая нормальная книга по K8s, обновляется ежегодно</td><td>После первого своего кластера</td></tr><tr><td><strong>Terraform: Up &amp; Running</strong>, Yevgeniy Brikman</td><td>Как писать Terraform, чтобы не было больно через год</td><td>После первого своего модуля</td></tr><tr><td><strong>Kubernetes Up &amp; Running</strong></td><td>Академичнее Poulton, лучше про архитектуру</td><td>Если хочется глубже</td></tr><tr><td><strong>Accelerate</strong> (DORA)</td><td>Откуда взялись четыре метрики, которые спрашивают на платформенных вакансиях</td><td>Перед собеседованиями на Platform Engineer</td></tr><tr><td><strong>The Phoenix Project</strong></td><td>Художественная, про то, зачем всё это. Хороша именно когда бросаешь: возвращает смысл</td><td>В момент, когда «опять забросил»</td></tr><tr><td><strong>How Linux Works</strong> · <a href="https://linuxcommand.org/tlcl.php" target="_blank" rel="noopener">The Linux Command Line</a> (бесплатно)</td><td>Если решишь добирать основы — точечно отсюда, а не с начала</td><td>По потребности</td></tr><tr><td><strong>Systems Performance</strong>, Brendan Gregg</td><td>Тяжёлая. Тот уровень, после которого вопросы про диагностику перестают существовать</td><td>Когда закроешь всё остальное</td></tr></tbody></table></div>
+<h2 id="документацию-всё-таки-читать">Документацию всё-таки читать</h2>
+<p>Это не «для справки». Половина лучших текстов в индустрии — официальная документация.</p>
+<ul><li><a href="https://kubernetes.io/docs/concepts/" target="_blank" rel="noopener">kubernetes.io → Concepts</a> — <strong>целиком.</strong> Лучший текст по Kubernetes, который существует.</li><li><a href="https://argo-cd.readthedocs.io/en/stable/" target="_blank" rel="noopener">ArgoCD → Core Concepts и Best Practices</a> — короткие, закрывают весь GitOps-минимум.</li><li><a href="https://prometheus.io/docs/prometheus/latest/querying/basics/" target="_blank" rel="noopener">Prometheus → типы метрик и PromQL</a></li><li><a href="https://developer.hashicorp.com/terraform/language" target="_blank" rel="noopener">Terraform → Language</a> — весь.</li><li><a href="https://jvns.ca/" target="_blank" rel="noopener">Julia Evans</a> — лучшие в мире объяснения Linux, сетей и отладки. Её комиксы про strace, tcpdump и DNS дают понимание, которого не даёт документация.</li></ul>
+<h2 id="рассылки-держать-актуальность-без-усилий">Рассылки: держать актуальность без усилий</h2>
+<p>Десять минут в неделю.</p>
+<ul><li><a href="https://www.cncf.io/kubeweekly/" target="_blank" rel="noopener">KubeWeekly</a> — от CNCF, что произошло в экосистеме</li><li><a href="https://sreweekly.com/" target="_blank" rel="noopener">SRE Weekly</a> — <strong>разборы реальных публичных аварий.</strong> Самая полезная в списке: чужие постмортемы дают опыт без своих аварий</li><li><a href="https://www.lastweekinaws.com/" target="_blank" rel="noopener">Last Week in AWS</a> — Corey Quinn, ещё и смешно</li><li><a href="https://www.devopsweekly.com/" target="_blank" rel="noopener">DevOps Weekly</a></li></ul>
+<h2 id="сертификация">Сертификация</h2>
+<p><strong>CKA — единственная, которая нужна.</strong> С непрофильным образованием формальный сертификат снимает вопрос «откуда он это знает» на уровне HR-фильтра, а экзамен практический, поэтому подготовка совпадает с навыком.</p>
+<ul><li>Программа: <a href="https://github.com/cncf/curriculum" target="_blank" rel="noopener">cncf/curriculum</a></li><li>Мок-экзамены с таймером: <a href="https://github.com/sailor-sh/CK-X" target="_blank" rel="noopener">CK-X</a></li><li>Скорость с kubectl: <a href="https://github.com/dgkanatsios/CKAD-exercises" target="_blank" rel="noopener">CKAD-exercises</a>, Killercoda</li><li><strong>Купоны:</strong> <a href="https://github.com/techiescamp/linux-foundation-coupon" target="_blank" rel="noopener">linux-foundation-coupon</a> — часто на 40–50% дешевле. Не покупать по полной цене</li><li><strong>CKS</strong> — потом, когда будет работа. С банковским профилем это сильный долгосрочный вектор: <a href="https://github.com/madhuakula/kubernetes-goat" target="_blank" rel="noopener">kubernetes-goat</a>, <a href="https://github.com/ViktorUJ/cks" target="_blank" rel="noopener">cks</a></li></ul>
+<p>Terraform Associate и AWS SAA не нужны: дешевле показать проект.</p>
+<h2 id="чего-не-надо">Чего не надо</h2>
+<p>Не менее полезно, чем список того, что брать — потому что распыление здесь главный риск.</p>
+<ul><li><strong>Не учить все инструменты подряд.</strong> В CNCF Landscape полторы тысячи проектов. Знать надо один из категории и понимать, зачем категория существует. «Знаю Argo и понимаю, чем от него отличается Flux» — сильный ответ; «слышал про десять инструментов» — слабый.</li><li><strong>Не учить Jenkins с нуля</strong>, если его нет в вакансии. Легаси, порог входа высокий, отдача низкая.</li><li><strong>Не начинать с service mesh.</strong> Istio — самая частая ловушка «выучил сложное, не зная простого». К нему приходят, когда есть боль.</li><li><strong>Не учить Go специально ради DevOps.</strong> Читать Go полезно, писать — только если целишься в разработку операторов. Bash и Python закрывают 95% задач.</li><li><strong>Не сдавать несколько сертификатов подряд.</strong> Один CKA закрывает вопрос; три выглядят как замена практике.</li><li><strong>Не читать три курса по одной теме.</strong></li><li><strong>Не покупать курс, чтобы почувствовать, что начал.</strong> Покупка — не начало. Начало — это первая задача, сделанная руками.</li></ul>
+</div>
+<footer class="site"><p><a href="index.html">← ко всем материалам</a></p></footer>
+</div>
+</body>
+</html>

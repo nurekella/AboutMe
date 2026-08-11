@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roadmap: путь к middle DevOps</title>
+<meta name="description" content="Карта пути в DevOps по этапам: Linux, Docker, Kubernetes, GitOps, IaC, SRE, безопасность. С живым прогрессом из тренажёра.">
+<meta name="theme-color" content="#EFF1F3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1319" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="theme.js"></script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⎈</text></svg>">
+<style>
+  .legend{display:flex;flex-wrap:wrap;gap:10px 20px;background:var(--surface);border:1px solid var(--line);
+    border-radius:10px;padding:14px 18px;margin:0 0 34px;box-shadow:var(--shadow);font-size:.92rem}
+  .legend b{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);font-weight:500;display:block;margin-bottom:3px}
+
+  .track{position:relative;padding-left:34px}
+  .track::before{content:"";position:absolute;left:9px;top:6px;bottom:34px;width:2px;background:var(--line)}
+
+  .stage{position:relative;margin:0 0 12px;background:var(--surface);border:1px solid var(--line);
+    border-radius:11px;padding:18px 20px;box-shadow:var(--shadow)}
+  .stage::before{content:"";position:absolute;left:-30px;top:24px;width:12px;height:12px;border-radius:50%;
+    background:var(--bg);border:2px solid var(--line)}
+  .stage.done::before{background:var(--s2,#1C6B4B);border-color:var(--s2,#1C6B4B)}
+  .stage.here::before{background:var(--accent);border-color:var(--accent);
+    box-shadow:0 0 0 4px var(--accent-soft)}
+  .stage.here{border-color:var(--accent)}
+
+  .shead{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 12px;margin-bottom:6px}
+  .shead h2{font-size:1.16rem;margin:0;flex:1;min-width:180px}
+  .lvl{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    padding:2px 7px;border-radius:4px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+  .lvl.base{border-color:var(--muted)}
+  .lvl.mid{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .lvl.plus{border-color:var(--s2,#1C6B4B);color:var(--s2,#1C6B4B);background:var(--s2b,#E1F0E8)}
+  .youare{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    background:var(--accent);color:var(--surface);padding:2px 8px;border-radius:4px;white-space:nowrap}
+  .stage > p{margin:0 0 12px;color:var(--ink-2);font-size:.96rem}
+
+  .prog{display:flex;align-items:center;gap:11px;margin:0 0 12px}
+  .prog .bar{flex:1;height:6px;background:var(--line-soft);border-radius:3px;overflow:hidden}
+  .prog .fill{display:block;height:100%;width:0;background:var(--accent);transition:width .3s ease}
+  .prog .num{font-family:var(--mono);font-size:11.5px;color:var(--muted);white-space:nowrap;
+    font-variant-numeric:tabular-nums}
+  .manual{display:flex;align-items:center;gap:9px;cursor:pointer;font-size:.92rem;color:var(--muted)}
+  .manual input{appearance:none;-webkit-appearance:none;width:16px;height:16px;flex:none;
+    border:1.5px solid var(--line);border-radius:4px;background:var(--surface);position:relative;cursor:pointer}
+  .manual input:hover{border-color:var(--accent)}
+  .manual input:checked{background:var(--s2,#1C6B4B);border-color:var(--s2,#1C6B4B)}
+  .manual input:checked::after{content:"";position:absolute;left:4.5px;top:1.5px;width:4px;height:8px;
+    border:solid var(--surface);border-width:0 1.8px 1.8px 0;transform:rotate(45deg)}
+
+  .skills{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 12px;padding:0;list-style:none}
+  .skills li{font-family:var(--mono);font-size:11px;background:var(--surface-2);border:1px solid var(--line-soft);
+    border-radius:5px;padding:3px 8px;color:var(--ink-2);margin:0}
+  .links{display:flex;flex-wrap:wrap;gap:6px}
+  .links a{font-family:var(--mono);font-size:11px;letter-spacing:.03em;text-decoration:none;
+    border:1px solid var(--line);color:var(--muted);padding:5px 10px;border-radius:6px}
+  .links a:hover{border-color:var(--accent);color:var(--accent)}
+  .links a.go{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+
+  .top{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);
+    border-radius:10px;padding:14px 18px;margin:0 0 26px;box-shadow:var(--shadow);flex-wrap:wrap}
+  .top .big{font-family:var(--mono);font-size:1.5rem;color:var(--accent);letter-spacing:-.02em}
+  .top .meter{flex:1;min-width:120px;height:6px;background:var(--line-soft);border-radius:3px;overflow:hidden}
+  .top .mfill{display:block;height:100%;width:0;background:var(--accent)}
+  .top .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+  .top .verdict{font-size:.9rem;color:var(--ink-2)}
+  @media (max-width:640px){ .track{padding-left:22px} .track::before{left:5px} .stage::before{left:-22px;width:10px;height:10px} }
+  @media print{ .topnav,.links{display:none} .stage{break-inside:avoid} body{background:#fff;color:#000} }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-in">
+    <a class="brand" href="index.html">nurekella<b>/</b>devops</a>
+    <a class="nl" href="index.html">главная</a>
+    <a class="nl" href="qa-trainer.html">тренажёр</a>
+    <a class="nl" href="roadmap.html" aria-current="page">roadmap</a>
+    <a class="nl" href="resources.html">материалы</a>
+    <a class="nl" href="checklist.html">чеклист</a>
+    <a class="nl" href="devops-plan.html">план</a>
+    <a class="nl" href="diary.html">дневник</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Roadmap</p>
+    <h1>Путь к middle DevOps</h1>
+    <p class="lede">Одиннадцать этапов от базы до уровня, на котором можно торговаться за вилку. Прогресс не декоративный: он считается из твоих оценок в <a href="qa-trainer.html">тренажёре</a> — этап считается закрытым, когда 70% его вопросов отмечены как «уверенно».</p>
+  </header>
+
+  <div class="top">
+    <span class="lbl">Пройдено</span>
+    <span class="big" id="pct">0%</span>
+    <span class="meter"><span class="mfill" id="mfill"></span></span>
+    <span class="lbl" id="stages">0 / 11 этапов</span>
+    <span class="verdict" id="verdict"></span>
+  </div>
+
+  <div class="legend">
+    <div><b>база</b>ожидается от любого инженера инфраструктуры</div>
+    <div><b>middle</b>то, что спрашивают на целевых вакансиях</div>
+    <div><b>middle+</b>то, что отличает и позволяет торговаться</div>
+    <div><b>◉ ты здесь</b>первый незакрытый этап</div>
+  </div>
+
+  <div class="track" id="track"></div>
+
+  <footer class="site">
+    <p>Порядок не догма: если на собеседовании спросили то, чего ещё нет в пройденных этапах — это важнее плана, вписывай в ближайшие дни. Материалы к каждому этапу — на странице <a href="resources.html">материалов</a>.</p>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var KEY="qa-study-v3", DONE=0.7;
+  var el=function(id){return document.getElementById(id)};
+
+  var STAGES=[
+    { t:"Готовность к рынку", lvl:"база", q:null,
+      d:"Не технический этап, но первый по отдаче: пока в резюме стоит «системный инженер», по запросу «DevOps» тебя не находят вообще.",
+      skills:["позиционирование","теги навыков","вилка","портфолио"],
+      links:[["Разбор резюме","cv-review.html"],["Чеклист","checklist.html"]] },
+
+    { t:"Linux и сети", lvl:"база", q:[1,34],
+      d:"Фундамент, на котором стоит всё остальное. Спрашивают не «знаешь ли Linux», а конкретное: сигналы, systemd, диагностика, что происходит при вводе адреса в браузере.",
+      skills:["процессы и сигналы","systemd","права и SUID","диски и inode","OOM killer","strace","TCP и TLS","DNS","маршрутизация","балансировка L4/L7"],
+      links:[["escbash: Linux","https://www.escbash.com/"],["Julia Evans","https://jvns.ca/"]] },
+
+    { t:"Git и Docker", lvl:"база", q:[35,57],
+      d:"Git спрашивают в 100% случаев и отвечают плохо в половине. Docker — до уровня «почему образ жирный и почему нельзя от root».",
+      skills:["merge vs rebase","reflog","cherry-pick","namespaces и cgroups","multi-stage","слои и кэш","volumes","сети Docker","non-root"],
+      links:[["Nana: Docker","https://www.youtube.com/results?search_query=techworld+with+nana+docker+tutorial+for+beginners"],["Практика: задача 152","qa-trainer.html#q152"]] },
+
+    { t:"Kubernetes: эксплуатация", lvl:"middle", q:[58,74],
+      d:"Главный этап всего пути. Кластер поднять умеют многие — спрашивают про то, что происходит после: probes, лимиты, RBAC, разбор падений.",
+      skills:["архитектура кластера","probes","requests/limits и QoS","RBAC","scheduling","rolling update и PDB","CrashLoopBackOff","Pending","Service и endpoints"],
+      links:[["Nana: Kubernetes","https://www.youtube.com/results?search_query=techworld+with+nana+kubernetes+tutorial+for+beginners"],["Killercoda CKA","https://killercoda.com/"],["Вопросы 58–74","qa-trainer.html#q58"]] },
+
+    { t:"Kubernetes: внутренности и Helm", lvl:"middle", q:[75,91],
+      d:"То, что отличает «настроил по гайду» от «понимаю, что происходит». Здесь же Helm — без него не обходится ни один деплой.",
+      skills:["kubectl apply по шагам","etcd и кворум","операторы и CRD","NetworkPolicy","обновление кластера","бэкапы","Helm-чарт с нуля","hooks"],
+      links:[["kubernetes-the-hard-way","https://github.com/kelseyhightower/kubernetes-the-hard-way"],["what-happens-when-k8s","https://github.com/jamiehannaford/what-happens-when-k8s"],["Вопросы 75–91","qa-trainer.html#q75"]] },
+
+    { t:"CI/CD и GitOps", lvl:"middle", q:[92,100],
+      d:"Jenkins в резюме считают легаси. Нужен YAML-пайплайн и понимание GitOps: этого в опыте обычно нет, а спрашивают сразу после Kubernetes.",
+      skills:["пайплайн от коммита до прода","секреты и OIDC","blue-green / canary","ArgoCD","дрейф и self-heal","SOPS","откат"],
+      links:[["gitops-patterns","https://github.com/cloudogu/gitops-patterns"],["ArgoCD docs","https://argo-cd.readthedocs.io/en/stable/"],["Вопросы 92–100","qa-trainer.html#q92"]] },
+
+    { t:"IaC: Terraform и Ansible", lvl:"middle", q:[101,115],
+      d:"Второй по частоте пункт в вакансиях. Провижинить умеешь — спрашивают про state в команде, модули, plan в CI, дрейф.",
+      skills:["state и locking","count vs for_each","модули","plan в CI","дрейф","идемпотентность","роли и handlers","vault"],
+      links:[["Terraform: Up & Running","https://github.com/brikis98/terraform-up-and-running"],["localstack","https://github.com/localstack/localstack"],["Вопросы 101–115","qa-trainer.html#q101"]] },
+
+    { t:"Observability и SRE", lvl:"middle+", q:[116,126],
+      d:"Твоя сильная сторона, которой не хватает словаря. Три вечера с SRE Workbook превращают четыре года дежурств в «владел надёжностью с измеримым SLO».",
+      skills:["PromQL","типы метрик","кардинальность","SLI/SLO/error budget","алертинг без шума","golden signals","toil","postmortem"],
+      links:[["Google SRE Book","https://sre.google/books/"],["prometheus-training","https://github.com/acend/prometheus-training"],["Вопросы 116–126","qa-trainer.html#q116"]] },
+
+    { t:"Данные, облака, безопасность", lvl:"middle+", q:[127,141],
+      d:"Три темы, тонко покрытые у большинства кандидатов. С банковским бэкграундом security — твоё естественное преимущество, а не слабое место.",
+      skills:["репликация","PITR","пул соединений","миграции без простоя","VPC и IAM","FinOps","supply chain","Kyverno","секреты"],
+      links:[["kubernetes-goat","https://github.com/madhuakula/kubernetes-goat"],["awesome-devsecops-russia","https://github.com/Swordfish-Security/awesome-devsecops-russia"],["Вопросы 127–141","qa-trainer.html#q127"]] },
+
+    { t:"Архитектура и разговор о себе", lvl:"middle+", q:[142,151],
+      d:"Решение о найме часто принимается здесь, а готовятся к этому меньше всего. Шесть историй по STAR — обязательная часть.",
+      skills:["отказоустойчивый сервис","монолит vs микросервисы","отказ зависимости","кэширование","истории по STAR","зарплатный разговор"],
+      links:[["system-design-101","https://github.com/ByteByteGoHq/system-design-101"],["Вопросы 142–151","qa-trainer.html#q142"]] },
+
+    { t:"Практика под собеседование", lvl:"middle+", q:[152,165],
+      d:"Финальный этап: не вопросы, а задачи. Переписать Dockerfile, найти ошибки в манифесте, написать PromQL, разобрать вывод команды — то, что реально дают делать.",
+      skills:["Dockerfile","ошибки в манифесте","PromQL","разбор describe","bash без багов","NetworkPolicy","RBAC","error budget","первые 5 минут аварии"],
+      links:[["Задачи 152–165","qa-trainer.html#q152"],["Мок CKA","https://killercoda.com/"]] }
+  ];
+
+  var data={v:{}};
+  try{ var o=JSON.parse(localStorage.getItem(KEY)); if(o&&o.v) data=o }catch(e){}
+
+  // Этапы без вопросов отмечаются вручную.
+  var MKEY="qa-roadmap-v1", manual={};
+  try{ manual=JSON.parse(localStorage.getItem(MKEY))||{} }catch(e){ manual={} }
+  function saveManual(){ try{localStorage.setItem(MKEY,JSON.stringify(manual))}catch(e){} }
+
+  function score(range){
+    if(!range) return null;
+    var two=0, tot=0;
+    for(var n=range[0]; n<=range[1]; n++){ tot++; if(data.v[String(n)]==="2") two++ }
+    return {two:two, tot:tot, r:tot?two/tot:0};
+  }
+
+  var results=STAGES.map(function(st){ return score(st.q) });
+  function isDone(i){
+    var r=results[i];
+    return r ? r.r>=DONE : !!manual["s"+i];
+  }
+  var hereIdx=-1;
+  for(var i=0;i<STAGES.length;i++){ if(!isDone(i)){ hereIdx=i; break } }
+
+  el("track").innerHTML=STAGES.map(function(st,i){
+    var r=results[i];
+    var done = isDone(i);
+    var cls="stage"+(done?" done":"")+(i===hereIdx?" here":"");
+    var lvlCls = st.lvl==="база" ? "base" : (st.lvl==="middle" ? "mid" : "plus");
+    var prog = r
+      ? '<div class="prog"><span class="bar"><span class="fill" style="width:'+Math.round(r.r*100)+'%"></span></span>'
+        +'<span class="num">'+r.two+' / '+r.tot+' уверенно</span></div>'
+      : '<div class="prog"><label class="manual"><input type="checkbox" data-manual="'+i+'"'
+        +(manual["s"+i]?" checked":"")+'><span>'+(manual["s"+i]?"сделано":"отметить, когда резюме приведено в порядок")
+        +'</span></label></div>';
+    return '<div class="'+cls+'">'
+      +'<div class="shead"><h2>'+(i)+'. '+st.t+'</h2>'
+      +(i===hereIdx?'<span class="youare">◉ ты здесь</span>':'')
+      +'<span class="lvl '+lvlCls+'">'+st.lvl+'</span></div>'
+      +'<p>'+st.d+'</p>'
+      + prog
+      +'<ul class="skills">'+st.skills.map(function(s){return '<li>'+s+'</li>'}).join("")+'</ul>'
+      +'<div class="links">'+st.links.map(function(l,li){
+          var ext=/^http/.test(l[1]);
+          return '<a class="'+(li===st.links.length-1&&!ext?"go":"")+'" href="'+l[1]+'"'
+            +(ext?' target="_blank" rel="noopener"':'')+'>'+l[0]+(ext?' ↗':'')+'</a>';
+        }).join("")+'</div>'
+      +'</div>';
+  }).join("");
+
+  document.addEventListener("change",function(e){
+    var b=e.target.closest("[data-manual]");
+    if(!b) return;
+    var i=b.getAttribute("data-manual");
+    if(b.checked) manual["s"+i]=1; else delete manual["s"+i];
+    saveManual();
+    location.reload();
+  });
+
+  var withQ=results.filter(Boolean);
+  var doneCount=STAGES.map(function(_,i){return isDone(i)}).filter(Boolean).length;
+  var twoAll=withQ.reduce(function(a,r){return a+r.two},0);
+  var totAll=withQ.reduce(function(a,r){return a+r.tot},0);
+  var pct=totAll?Math.round(twoAll/totAll*100):0;
+  el("pct").textContent=pct+"%";
+  el("mfill").style.width=pct+"%";
+  el("stages").textContent=doneCount+" / "+STAGES.length+" этапов";
+  el("verdict").textContent = pct<40
+    ? "Начни с этапа, отмеченного «ты здесь» — и с резюме, оно нулевой этап не случайно."
+    : pct<60 ? "Проходишь собеседования, но срезают на глубине. Дальше — middle-этапы."
+    : pct<80 ? "Уровень middle. Пора откликаться активно и не соглашаться на первую цифру."
+    : "Уровень middle+. Смотри на Platform Engineer и SRE, там вилка выше.";
+})();
+</script>
+</body>
+</html>

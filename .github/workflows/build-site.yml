@@ -10,12 +10,14 @@ on:
     paths:
       - 'INTERVIEW_QA.md'
       - 'CV_REVIEW.md'
+      - 'RESOURCES.md'
       - 'tools/**'
       - '.github/workflows/build-site.yml'
   pull_request:
     paths:
       - 'INTERVIEW_QA.md'
       - 'CV_REVIEW.md'
+      - 'RESOURCES.md'
       - 'tools/**'
   workflow_dispatch:
 
@@ -43,6 +45,8 @@ jobs:
           cd tools
           python3 build_page.py ../CV_REVIEW.md ../docs/cv-review.html \
             "Разбор резюме — Нурбол Хамзаулы" cv-review.html
+          python3 build_page.py ../RESOURCES.md ../docs/resources.html \
+            "Материалы: курсы, книги, видео, лабы" resources.html
 
       - name: Проверить, что вопросы не потерялись
         run: |
