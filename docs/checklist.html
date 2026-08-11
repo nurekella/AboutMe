@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Чеклист перед собеседованием</title>
+<meta name="description" content="Что сделать за две недели, за неделю, за три дня, за день и за 15 минут до собеседования. С галочками.">
+<meta name="theme-color" content="#EFF1F3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1319" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="theme.js"></script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⎈</text></svg>">
+<style>
+  .bar{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);
+    border-radius:10px;padding:13px 18px;margin:0 0 30px;box-shadow:var(--shadow);
+    position:sticky;top:0;z-index:10;flex-wrap:wrap}
+  .bar .big{font-family:var(--mono);font-size:1.3rem;color:var(--accent);letter-spacing:-.02em}
+  .bar .meter{flex:1;min-width:110px;height:6px;background:var(--line-soft);border-radius:3px;overflow:hidden}
+  .bar .fill{height:100%;width:0;background:var(--accent);transition:width .28s ease}
+  .bar .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+  .bar button{font-family:var(--mono);font-size:11px;background:none;border:1px solid var(--line);
+    color:var(--muted);padding:5px 10px;border-radius:6px;cursor:pointer}
+  .bar button:hover{border-color:var(--accent);color:var(--accent)}
+
+  .stage{border-top:1px solid var(--line);padding:22px 0}
+  .stage:last-of-type{border-bottom:1px solid var(--line)}
+  .stage-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:4px}
+  .stage-head h2{font-size:1.3rem;margin:0}
+  .when{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--accent);border:1px solid var(--accent);background:var(--accent-soft);
+    border-radius:4px;padding:2px 8px;white-space:nowrap}
+  .stage>p{color:var(--ink-2);margin:6px 0 12px}
+  .stage .cnt{font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:auto}
+
+  ul.check{list-style:none;padding:0;margin:0;max-width:var(--measure)}
+  ul.check li{margin:0;border-bottom:1px solid var(--line-soft)}
+  ul.check li:last-child{border-bottom:0}
+  ul.check label{display:grid;grid-template-columns:20px minmax(0,1fr);gap:12px;align-items:start;
+    padding:10px 0;cursor:pointer;font-size:.97rem}
+  ul.check input{appearance:none;-webkit-appearance:none;width:17px;height:17px;margin:3px 0 0;
+    border:1.5px solid var(--line);border-radius:4px;background:var(--surface);cursor:pointer;
+    position:relative;flex:none}
+  ul.check input:hover{border-color:var(--accent)}
+  ul.check input:checked{background:var(--accent);border-color:var(--accent)}
+  ul.check input:checked::after{content:"";position:absolute;left:5px;top:2px;width:4px;height:8px;
+    border:solid var(--surface);border-width:0 1.8px 1.8px 0;transform:rotate(45deg)}
+  ul.check input:checked ~ span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+  @media print{
+    .topnav,.bar button,footer.site{display:none}
+    body{background:#fff;color:#000}
+    .stage{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-in">
+    <a class="brand" href="index.html">nurekella<b>/</b>devops</a>
+    <a class="nl" href="index.html">главная</a>
+    <a class="nl" href="resume.html">резюме</a>
+    <a class="nl" href="qa-trainer.html">тренажёр</a>
+    <a class="nl" href="checklist.html" aria-current="page">чеклист</a>
+    <a class="nl" href="devops-plan.html">план</a>
+    <a class="nl" href="diary.html">дневник</a>
+    <a class="nl" href="cv-review.html">разбор резюме</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Чеклист</p>
+    <h1>Подготовка к собеседованию</h1>
+    <p class="lede">Порядок действий от «за две недели» до «за 15 минут». Галочки сохраняются в браузере; когда назначено новое собеседование — сбрось и пройди заново.</p>
+  </header>
+
+  <div class="bar">
+    <span class="lbl">Готовность</span>
+    <span class="big" id="pct">0%</span>
+    <span class="meter"><span class="fill" id="fill"></span></span>
+    <span class="lbl" id="count">0 / 0</span>
+    <button type="button" id="reset">сбросить</button>
+    <button type="button" id="print">печать</button>
+  </div>
+
+  <section id="list"></section>
+
+  <footer class="site">
+    <p>Полная версия раздела — в <a href="qa-trainer.html">тренажёре</a>, часть 18. Там же вопросы, на которых надо потренироваться перед каждым пунктом этого списка.</p>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var KEY="qa-checklist-v1";
+  var el=function(id){return document.getElementById(id)};
+
+  var STAGES=[
+    {when:"за две недели", title:"Замер и материал",
+     note:"Задача этих дней — узнать своё настоящее состояние и подготовить то, что нельзя придумать на ходу.",
+     items:[
+      "Пройти тренажёр целиком, отмечая 0 / 1 / 2 — не подглядывая в ответы",
+      "Записать дату и процент двоек: это точка отсчёта",
+      "Выписать все нули и единицы в очередь повторения",
+      "Написать шесть историй по STAR текстом, а не «в голове»: инцидент, автоматизация, CI/CD до и после, зачем понадобился Kubernetes, случай когда сломал прод, руководство командой",
+      "Назначить дату собеседования — дедлайн работает лучше плана"
+     ]},
+    {when:"за неделю", title:"Закрыть частые провалы",
+     note:"Не гнаться за всем. Закрыть то, что спрашивают чаще всего.",
+     items:[
+      "Probes: liveness / readiness / startup — что сломается, если перепутать",
+      "requests и limits, QoS-классы, кого убьют первым",
+      "Разбор CrashLoopBackOff и Pending по шагам",
+      "Что происходит при kubectl apply — рассказать вслух целиком",
+      "State в Terraform: зачем, потеря, работа в команде, дрейф",
+      "Идемпотентность в Ansible — объяснить своими словами",
+      "SLI, SLO, error budget — посчитать бюджет для 99.9%",
+      "PromQL: rate, increase, histogram_quantile — написать, а не узнать",
+      "merge против rebase, revert против reset"
+     ]},
+    {when:"за три дня", title:"Скорость и руки",
+     note:"Знать и успеть сделать — разные навыки. Второй тренируется только на времени.",
+     items:[
+      "Killercoda: задачи на время, без подглядывания в документацию",
+      "Прогнать режим экзамена на 20 вопросов, посмотреть результат",
+      "Проговорить вслух пять главных ответов, записав себя на телефон",
+      "Прослушать записи: убрать «ну», паузы и «наверное, я немного трогал»",
+      "Повторить всё, что в фильтре «0 и 1»"
+     ]},
+    {when:"за день", title:"Под конкретную вакансию",
+     note:"Общая подготовка закончена. Дальше — только про эту компанию.",
+     items:[
+      "Прочитать вакансию ещё раз и выписать весь названный стек",
+      "На каждый пункт стека — свой вопрос интервьюеру и своя история",
+      "Посмотреть, чем занимается компания и какой у неё продукт",
+      "Подготовить вопросы: путь изменения до прода, дежурства, SLO, кто владеет инфраструктурой, что самое неприятное в инфраструктуре сейчас",
+      "Определить зарплатную вилку: медиана рынка плюс 10–15%, диапазон снизу вверх",
+      "Проверить связь, камеру, микрофон, ссылку на звонок",
+      "Ничего нового не учить"
+     ]},
+    {when:"за 15 минут", title:"Разминка",
+     note:"Читать новое уже поздно и вредно. Только разогреть речь.",
+     items:[
+      "Проговорить вслух две истории по STAR",
+      "Проговорить вслух свою зарплатную вилку — чтобы цифра прозвучала уверенно",
+      "Пролистать шпаргалки, не вникая",
+      "Открыть блокнот для записи вопросов, которые задают"
+     ]},
+    {when:"на собеседовании", title:"Как себя вести",
+     note:"Здесь решается больше, чем в объёме знаний.",
+     items:[
+      "Не знаю — сказать «не знаю, но рассуждал бы так…» и рассуждать. Придуманный ответ распознаётся сразу",
+      "Широкий вопрос — уточнить: «как это работает внутри или как я применял?»",
+      "Отвечать структурой: «три причины: первая… вторая… третья»",
+      "Приводить примеры из своей практики — «так у нас было в проде» весит больше теории",
+      "Не преуменьшать: «настраивал Kubernetes», а не «ну, немного трогал»",
+      "После названной зарплаты — пауза, а не оправдание",
+      "Задать свои вопросы: их отсутствие читается как безразличие"
+     ]},
+    {when:"после", title:"Обязательная часть",
+     note:"Без этого шага собеседование даёт вдвое меньше пользы.",
+     items:[
+      "Записать в дневник: компания, этап, что спрашивали, где поплыл, какую вилку называли",
+      "Вопросы, которых нет в тренажёре, добавить как свои",
+      "Всё, на чём поплыл — в план на следующие дни, приоритетно",
+      "Назначить следующее собеседование"
+     ]}
+  ];
+
+  var state={};
+  try{ state=JSON.parse(localStorage.getItem(KEY))||{} }catch(e){ state={} }
+  function save(){ try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){} }
+
+  function esc(t){ return String(t).replace(/[&<>"]/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c] }) }
+
+  var total=0;
+  el("list").innerHTML=STAGES.map(function(st,si){
+    var items=st.items.map(function(txt,ii){
+      var id="s"+si+"i"+ii; total++;
+      return '<li><label><input type="checkbox" data-k="'+id+'"'+(state[id]?" checked":"")+'>'
+        +'<span>'+esc(txt)+'</span></label></li>';
+    }).join("");
+    return '<div class="stage" data-stage="'+si+'">'
+      +'<div class="stage-head"><span class="when">'+esc(st.when)+'</span>'
+      +'<h2>'+esc(st.title)+'</h2><span class="cnt" data-cnt="'+si+'"></span></div>'
+      +'<p>'+esc(st.note)+'</p><ul class="check">'+items+'</ul></div>';
+  }).join("");
+
+  var boxes=Array.prototype.slice.call(document.querySelectorAll('input[type="checkbox"]'));
+
+  function recount(){
+    var done=boxes.filter(function(b){return b.checked}).length;
+    var pct=total?Math.round(done/total*100):0;
+    el("pct").textContent=pct+"%";
+    el("fill").style.width=pct+"%";
+    el("count").textContent=done+" / "+total;
+    STAGES.forEach(function(st,si){
+      var bs=document.querySelectorAll('.stage[data-stage="'+si+'"] input');
+      var d=Array.prototype.slice.call(bs).filter(function(b){return b.checked}).length;
+      var c=document.querySelector('[data-cnt="'+si+'"]');
+      if(c) c.textContent=d+" / "+bs.length;
+    });
+  }
+
+  document.addEventListener("change",function(e){
+    var b=e.target.closest('input[type="checkbox"]');
+    if(!b) return;
+    var k=b.getAttribute("data-k");
+    if(b.checked) state[k]=1; else delete state[k];
+    save(); recount();
+  });
+
+  el("reset").addEventListener("click",function(){
+    if(!confirm("Снять все галочки? Так делают перед новым собеседованием.")) return;
+    state={}; save();
+    boxes.forEach(function(b){b.checked=false});
+    recount();
+  });
+  el("print").addEventListener("click",function(){ window.print() });
+
+  recount();
+})();
+</script>
+</body>
+</html>

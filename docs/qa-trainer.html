@@ -7,6 +7,7 @@
 <meta name="theme-color" content="#EFF1F3" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0F1319" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.webmanifest">
+<script src="theme.js"></script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#9096;</text></svg>">
 <title>Тренажёр DevOps-собеседования — DevOps: вопросы, ответы и объяснения</title>
 <style>
@@ -201,6 +202,9 @@ tbody tr:last-child td{border-bottom:0}
   border-radius:6px;padding:4px 9px;white-space:nowrap}
 .timer[hidden]{display:none}
 .timer.low{background:var(--s0b);color:var(--s0);border-color:var(--s0)}
+.jump{font-size:13px;background:var(--surface-2);border:1px solid var(--accent);color:var(--accent);
+  border-radius:6px;padding:4px 9px;white-space:nowrap}
+.jump[hidden]{display:none}
 #dueN:empty{display:none}
 .reveal[disabled]{opacity:.5;cursor:not-allowed;border-style:solid}
 .reveal[disabled]:hover{border-color:var(--line);background:var(--surface-2)}
@@ -243,6 +247,30 @@ body.cards .cardnav{display:flex}
   .rate button.clr{flex:0 0 auto;min-width:44px;margin-left:0}
   .rate .rl{flex-basis:100%;margin:0 0 2px}
 }
+@media print{
+  /* Печатается ровно то, что сейчас в фильтре, с раскрытыми ответами и заметками. */
+  .topbar,.sitenav,.rail,.keyhint,.panel,.cardnav,.progress,.rate,.extras,.reveal,
+  .empty,.masthead,.prose.lead,.sub,.sect-score{display:none!important}
+  body{background:#fff;color:#000;font-size:10.5pt}
+  .shell{display:block;max-width:none;padding:0}
+  .main{padding:0}
+  .q.hide{display:none!important}
+  .q{border:0;border-top:1px solid #bbb;border-radius:0;box-shadow:none;padding:10px 0;
+     break-inside:avoid;page-break-inside:avoid}
+  .q[data-v="0"],.q[data-v="1"],.q[data-v="2"]{border-left:0}
+  .ans[hidden]{display:block!important}
+  .notewrap[hidden]{display:block!important}
+  .notewrap textarea{border:1px solid #bbb;background:#fff}
+  .callout{background:#f4f4f4!important;border-left:2px solid #999}
+  pre{background:#f4f4f4;border:1px solid #ddd}
+  a{color:#000;text-decoration:none}
+  a[href^="http"]::after{content:" (" attr(href) ")";font-size:8pt;color:#666}
+  section{margin:0 0 8px}
+  .sect-head{border:0;padding:0;margin:0 0 6px}
+  h2{font-size:13pt;margin:14px 0 0}
+  .qh{margin-bottom:6px}
+  .mark{display:none}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 <style>
@@ -261,7 +289,7 @@ body.cards .cardnav{display:flex}
 <a class="sbrand" href="./">nurekella<b>/</b>devops</a>
 <a href="./">главная</a><a href="resume.html">резюме</a>
 <a href="qa-trainer.html" aria-current="page">тренажёр</a>
-<a href="devops-plan.html">план</a><a href="diary.html">дневник</a><a href="cv-review.html">разбор резюме</a>
+<a href="checklist.html">чеклист</a><a href="devops-plan.html">план</a><a href="diary.html">дневник</a><a href="cv-review.html">разбор резюме</a>
 <a href="https://github.com/nurekella">github</a>
 </div></nav>
 <div class="topbar">
@@ -271,6 +299,7 @@ body.cards .cardnav{display:flex}
       <span class="meter"><i class="m2" id="m2"></i><i class="m1" id="m1"></i><i class="m0" id="m0"></i></span>
       <span class="verdict" id="verdict">оцени первый вопрос</span>
       <span class="timer" id="timer" hidden>00:00</span>
+      <span class="jump mono" id="jump" hidden></span>
     </div>
     <div class="tools">
       <input type="search" id="search" placeholder="поиск" aria-label="Поиск по вопросам">
@@ -284,6 +313,7 @@ body.cards .cardnav{display:flex}
       <button class="chip" id="addBtn" type="button">+ свой вопрос</button>
       <button class="chip" id="statsBtn" type="button">активность</button>
       <button class="chip" id="syncBtn" type="button">синхрон</button>
+      <button class="chip" id="printBtn" type="button">печать</button>
       <button class="chip" id="collapse" type="button">скрыть ответы</button>
       <button class="chip" id="reset" type="button">сбросить</button>
     </div>
@@ -370,7 +400,8 @@ body.cards .cardnav{display:flex}
     </div>
 
     <p class="keyhint">С клавиатуры: <kbd>Space</kbd> показать ответ · <kbd>0</kbd> <kbd>1</kbd> <kbd>2</kbd> оценка ·
-      <kbd>J</kbd> / <kbd>K</kbd> следующий и предыдущий вопрос · <kbd>/</kbd> поиск</p>
+      <kbd>J</kbd> / <kbd>K</kbd> следующий и предыдущий вопрос · <kbd>N</kbd> заметка ·
+      <kbd>R</kbd> запись · <kbd>G</kbd> + номер переход · <kbd>/</kbd> поиск</p>
     <p class="empty" id="empty" hidden>Ничего не найдено — измени запрос или фильтр.</p>
     <section id="s0" data-sec="0">
 <div class="sect-head"><h2>Как этим пользоваться</h2></div>
@@ -4381,6 +4412,17 @@ sudo systemctl restart myapp</code></pre></div>
     setActive(0);
   });
 
+  el("printBtn").addEventListener("click",function(){
+    var n=visibleCards().length;
+    if(!n){ alert("В текущем фильтре нет вопросов."); return }
+    var what = filter==="weak" ? "нули и единицы"
+             : filter==="due"  ? "очередь повторения"
+             : filter==="todo" ? "неоценённые"
+             : query ? "результаты поиска" : "все вопросы";
+    if(!confirm("Печатать "+what+" — "+n+" шт.? Ответы и заметки будут раскрыты.")) return;
+    window.print();
+  });
+
   el("collapse").addEventListener("click",function(){
     document.querySelectorAll("[data-ans]").forEach(function(a){a.hidden=true});
     document.querySelectorAll(".reveal").forEach(function(x){x.hidden=false});
@@ -4558,6 +4600,32 @@ sudo systemctl restart myapp</code></pre></div>
     }catch(err){ el("syncMsg").textContent="не разобрал код" }
   });
 
+  // ── переход по номеру: g, цифры, Enter ──
+  var jumpBuf=null, jumpTimer=null;
+  function showJump(){
+    var j=el("jump"); j.hidden=false;
+    j.textContent="перейти к вопросу: "+(jumpBuf||"…");
+    clearTimeout(jumpTimer);
+    jumpTimer=setTimeout(function(){ if(jumpBuf) doJump(); else cancelJump() },1600);
+  }
+  function cancelJump(){ jumpBuf=null; clearTimeout(jumpTimer); el("jump").hidden=true }
+  function doJump(){
+    var want=jumpBuf; cancelJump();
+    if(!want) return;
+    var card=document.getElementById("q"+parseInt(want,10));
+    if(!card){
+      var j=el("jump"); j.hidden=false; j.textContent="вопроса "+want+" нет";
+      setTimeout(function(){ j.hidden=true },1400);
+      return;
+    }
+    if(card.classList.contains("hide")){
+      var all=document.querySelector('[data-filter="all"]');
+      if(all) all.click();
+      el("search").value=""; query=""; applyFilter();
+    }
+    setActive(visibleCards().indexOf(card));
+  }
+
   // ── клавиатура ──
   document.addEventListener("keydown",function(e){
     var sb=el("search");
@@ -4567,6 +4635,16 @@ sudo systemctl restart myapp</code></pre></div>
     if(e.metaKey||e.ctrlKey||e.altKey) return;
 
     var k=e.key.toLowerCase();
+
+    // g + номер + Enter (или пауза) — прыжок к вопросу
+    if(jumpBuf!==null){
+      if(/^[0-9]$/.test(e.key)){ e.preventDefault(); jumpBuf+=e.key; showJump(); return }
+      if(e.key==="Enter"||e.key===" "){ e.preventDefault(); doJump(); return }
+      if(e.key==="Escape"||e.key==="Backspace"){ e.preventDefault(); cancelJump(); return }
+      cancelJump();
+    }
+    if(k==="g"){ e.preventDefault(); jumpBuf=""; showJump(); return }
+
     if(k==="j"||e.key==="ArrowRight"){ e.preventDefault(); setActive(activeIdx<0?0:activeIdx+1); return }
     if(k==="k"||e.key==="ArrowLeft"){ e.preventDefault(); setActive(activeIdx<0?0:activeIdx-1); return }
 
