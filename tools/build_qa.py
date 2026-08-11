@@ -11,7 +11,7 @@ OUT = "docs/qa-trainer.html"
 OUT_USED = []
 
 MARKERS = ("Что проверяют", "Глубже", "Типичная ошибка", "Типичные ошибки")
-ANSWER_STARTS = ("**Ответ", "**Как отвечать", "**Структура", "**Хорошие вопросы")
+ANSWER_STARTS = ("**Ответ", "**Решение", "**Как отвечать", "**Структура", "**Хорошие вопросы")
 
 
 # ─────────────────────────── inline markdown ───────────────────────────
@@ -489,6 +489,39 @@ tbody tr:last-child td{border-bottom:0}
 .q[data-v="0"] .rate button[data-v="0"]{background:var(--s0);border-color:var(--s0);color:var(--surface)}
 .q[data-v="1"] .rate button[data-v="1"]{background:var(--s1);border-color:var(--s1);color:var(--surface)}
 .q[data-v="2"] .rate button[data-v="2"]{background:var(--s2);border-color:var(--s2);color:var(--surface)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;
+  padding:16px 18px;margin:0 0 20px;box-shadow:var(--shadow)}
+.panel[hidden]{display:none}
+.panel .pt{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--accent);margin:0 0 8px}
+.panel .pd{font-size:.94rem;color:var(--ink-2);margin:0 0 12px;max-width:var(--measure)}
+.panel .prow{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.panel textarea{width:100%;font-family:var(--mono);font-size:11px;line-height:1.5;
+  background:var(--surface-2);color:var(--ink-2);border:1px solid var(--line);
+  border-radius:7px;padding:9px 11px;margin:0 0 10px;resize:vertical;word-break:break-all}
+.panel .pmsg{font-family:var(--mono);font-size:11px;color:var(--s2)}
+.panel table{margin:0}
+.panel .big2{font-family:var(--mono);font-size:1.6rem;color:var(--accent);letter-spacing:-.02em}
+.timer{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;
+  background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent);
+  border-radius:6px;padding:4px 9px;white-space:nowrap}
+.timer[hidden]{display:none}
+.timer.low{background:var(--s0b);color:var(--s0);border-color:var(--s0)}
+#dueN:empty{display:none}
+.reveal[disabled]{opacity:.5;cursor:not-allowed;border-style:solid}
+.reveal[disabled]:hover{border-color:var(--line);background:var(--surface-2)}
+body.cards .rail,body.cards .keyhint,body.cards section .sect-head,
+body.cards .masthead,body.cards .progress{display:none}
+body.cards .shell{grid-template-columns:minmax(0,1fr);max-width:760px}
+body.cards .q{display:none}
+body.cards .q.active{display:block;margin-top:12px}
+body.cards .cardnav{display:flex}
+.cardnav{display:none;position:sticky;bottom:0;gap:10px;padding:12px 0 16px;
+  background:linear-gradient(to top,var(--bg) 70%,transparent);align-items:center}
+.cardnav button{flex:1;font-family:var(--mono);font-size:13px;padding:13px 10px;
+  background:var(--surface);border:1px solid var(--line);color:var(--ink-2);border-radius:8px;cursor:pointer}
+.cardnav button:hover{border-color:var(--accent);color:var(--accent)}
+.cardnav .pos{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
 .keyhint{font-family:var(--mono);font-size:11px;color:var(--muted);margin:0 0 18px;line-height:1.9}
 .keyhint kbd{font-family:var(--mono);font-size:10.5px;background:var(--surface);
   border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:1px 5px;color:var(--ink-2)}
@@ -525,13 +558,18 @@ tbody tr:last-child td{border-bottom:0}
       <span class="big" id="pct">—</span>
       <span class="meter"><i class="m2" id="m2"></i><i class="m1" id="m1"></i><i class="m0" id="m0"></i></span>
       <span class="verdict" id="verdict">оцени первый вопрос</span>
+      <span class="timer" id="timer" hidden>00:00</span>
     </div>
     <div class="tools">
-      <input type="search" id="search" placeholder="поиск по вопросам" aria-label="Поиск по вопросам">
+      <input type="search" id="search" placeholder="поиск" aria-label="Поиск по вопросам">
       <button class="chip on" data-filter="all" type="button">все</button>
       <button class="chip" data-filter="todo" type="button">не оценено</button>
       <button class="chip" data-filter="weak" type="button">0 и 1</button>
+      <button class="chip" data-filter="due" type="button">повторить <span id="dueN"></span></button>
       <button class="chip" id="resume" type="button">продолжить</button>
+      <button class="chip" id="examBtn" type="button">экзамен</button>
+      <button class="chip" id="cardsBtn" type="button">карточки</button>
+      <button class="chip" id="syncBtn" type="button">синхрон</button>
       <button class="chip" id="collapse" type="button">скрыть ответы</button>
       <button class="chip" id="reset" type="button">сбросить</button>
     </div>
@@ -550,183 +588,386 @@ tbody tr:last-child td{border-bottom:0}
       <h1>{{TITLE}}</h1>
       <div class="prose lead">{{INTRO}}</div>
     </header>
+    <div class="panel" id="examPanel" hidden>
+      <p class="pt">Режим экзамена</p>
+      <p class="pd">Случайные вопросы, таймер, ответ открывается только после того, как ты поставил себе оценку. Так же, как на собеседовании: сначала отвечаешь, потом узнаёшь.</p>
+      <div class="prow">
+        <button class="chip" data-exam="10" type="button">10 вопросов · 10 мин</button>
+        <button class="chip" data-exam="20" type="button">20 вопросов · 20 мин</button>
+        <button class="chip" data-exam="30" type="button">30 вопросов · 30 мин</button>
+        <button class="chip" data-exam="0" type="button">отмена</button>
+      </div>
+    </div>
+
+    <div class="panel" id="syncPanel" hidden>
+      <p class="pt">Перенос прогресса между устройствами</p>
+      <p class="pd">Оценки хранятся в браузере, поэтому между ноутом и телефоном не переносятся сами. Скопируй код здесь и вставь его на другом устройстве.</p>
+      <textarea id="syncBox" rows="3" spellcheck="false" aria-label="Код прогресса"></textarea>
+      <div class="prow">
+        <button class="chip" id="syncCopy" type="button">скопировать</button>
+        <button class="chip" id="syncApply" type="button">применить вставленный</button>
+        <button class="chip" id="syncClose" type="button">закрыть</button>
+        <span class="pmsg" id="syncMsg"></span>
+      </div>
+    </div>
+
+    <div class="panel" id="resultPanel" hidden></div>
+
     <p class="keyhint">С клавиатуры: <kbd>Space</kbd> показать ответ · <kbd>0</kbd> <kbd>1</kbd> <kbd>2</kbd> оценка ·
       <kbd>J</kbd> / <kbd>K</kbd> следующий и предыдущий вопрос · <kbd>/</kbd> поиск</p>
     <p class="empty" id="empty" hidden>Ничего не найдено — измени запрос или фильтр.</p>
     {{BODY}}
+    <div class="cardnav" id="cardnav">
+      <button type="button" id="cardPrev">← назад</button>
+      <span class="pos" id="cardPos">—</span>
+      <button type="button" id="cardNext">вперёд →</button>
+    </div>
   </main>
 </div>
 
 <script>
 (function(){
-  var KEY="qa-trainer-v1", TOTAL={{TOTAL}};
-  var state={};
-  try{state=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){state={}}
-  function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+  var KEY="qa-trainer-v2", OLD="qa-trainer-v1", TOTAL={{TOTAL}};
+  var GAP={"0":1,"1":3,"2":14};                 // дней до повторения
+  var today=function(){return Math.floor(Date.now()/864e5)};
 
-  var cards=[].slice.call(document.querySelectorAll(".q"));
+  // ── хранилище: {v:{n:"0|1|2"}, d:{n:день_повторения}} ──
+  var data={v:{},d:{}};
+  try{
+    var raw=localStorage.getItem(KEY);
+    if(raw){ data=JSON.parse(raw); data.v=data.v||{}; data.d=data.d||{}; }
+    else{
+      var old=localStorage.getItem(OLD);
+      if(old){ data.v=JSON.parse(old)||{}; data.d={}; }
+    }
+  }catch(e){ data={v:{},d:{}} }
+  function save(){ try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){} }
+
+  var cards=Array.prototype.slice.call(document.querySelectorAll(".q"));
   var LABEL={"0":"0 — не знаю","1":"1 — плыл","2":"2 — уверенно"};
+  var el=function(id){return document.getElementById(id)};
 
+  var exam=null;            // {set:Set, ends:ms, tick:id}
+  var cardsMode=false;
+  var filter="all", query="", activeIdx=-1;
+
+  // ── отрисовка одной карточки ──
   function paint(card){
-    var n=card.getAttribute("data-q"), v=state[n];
+    var n=card.getAttribute("data-q"), v=data.v[n];
     var mark=card.querySelector("[data-mark]");
-    if(v===undefined){card.removeAttribute("data-v");mark.textContent=""}
-    else{card.setAttribute("data-v",v);mark.textContent=LABEL[v]}
+    var rev=card.querySelector(".reveal");
+    if(v===undefined){ card.removeAttribute("data-v"); mark.textContent=""; }
+    else { card.setAttribute("data-v",v); mark.textContent=LABEL[v]; }
+    if(rev){
+      var locked = exam && v===undefined;
+      rev.disabled=!!locked;
+      rev.textContent = locked ? "Сначала поставь оценку" : "Показать ответ";
+    }
   }
 
+  function setVal(card,v){
+    var n=card.getAttribute("data-q");
+    if(v===null){ delete data.v[n]; delete data.d[n]; }
+    else { data.v[n]=v; data.d[n]=today()+GAP[v]; }
+    save(); paint(card); recount();
+  }
+
+  // ── счёт ──
   function verdictFor(p){
     if(p<40) return "junior / вход в DevOps — база есть, системы нет";
     if(p<60) return "junior+ / middle-минус — срезают на глубине";
     if(p<80) return "middle — целевой уровень, можно торговаться";
     return "middle+ / senior — вилка выше рынка";
   }
-
+  function dueCount(){
+    var t=today(), k=0;
+    for(var n in data.d){ if(data.d.hasOwnProperty(n) && data.d[n]<=t) k++; }
+    return k;
+  }
   function recount(){
     var c={0:0,1:0,2:0}, rated=0;
-    for(var k in state){if(state.hasOwnProperty(k)){c[state[k]]++;rated++}}
+    for(var k in data.v){ if(data.v.hasOwnProperty(k)){ c[data.v[k]]++; rated++; } }
     var pct=TOTAL?Math.round(c[2]/TOTAL*100):0;
-    document.getElementById("pct").textContent=rated?pct+"%":"—";
-    document.getElementById("m2").style.width=(c[2]/TOTAL*100)+"%";
-    document.getElementById("m1").style.width=(c[1]/TOTAL*100)+"%";
-    document.getElementById("m0").style.width=(c[0]/TOTAL*100)+"%";
-    document.getElementById("verdict").textContent=
-      rated?(verdictFor(pct)+" · оценено "+rated+" из "+TOTAL):"оцени первый вопрос";
+    el("pct").textContent=rated?pct+"%":"—";
+    el("m2").style.width=(c[2]/TOTAL*100)+"%";
+    el("m1").style.width=(c[1]/TOTAL*100)+"%";
+    el("m0").style.width=(c[0]/TOTAL*100)+"%";
+    el("verdict").textContent=rated?(verdictFor(pct)+" · оценено "+rated+" из "+TOTAL):"оцени первый вопрос";
+    var d=dueCount(); el("dueN").textContent=d?("· "+d):"";
 
     var per={};
     cards.forEach(function(card){
-      var s=card.getAttribute("data-sec"), n=card.getAttribute("data-q");
-      per[s]=per[s]||{two:0,tot:0};
-      per[s].tot++;
-      if(state[n]==="2"||state[n]===2) per[s].two++;
+      var sec=card.getAttribute("data-sec"), n=card.getAttribute("data-q");
+      per[sec]=per[sec]||{two:0,tot:0}; per[sec].tot++;
+      if(data.v[n]==="2") per[sec].two++;
     });
-    Object.keys(per).forEach(function(s){
-      var d=per[s];
-      var nsc=document.querySelector('.nsc[data-sec="'+s+'"]');
-      if(nsc) nsc.textContent=d.two+"/"+d.tot;
-      var fill=document.querySelector('[data-secfill="'+s+'"]');
-      if(fill) fill.style.width=(d.two/d.tot*100)+"%";
-      var lab=document.querySelector('[data-seclabel="'+s+'"]');
-      if(lab) lab.textContent=d.two+" / "+d.tot;
+    Object.keys(per).forEach(function(sec){
+      var x=per[sec];
+      var a=document.querySelector('.nsc[data-sec="'+sec+'"]'); if(a) a.textContent=x.two+"/"+x.tot;
+      var f=document.querySelector('[data-secfill="'+sec+'"]'); if(f) f.style.width=(x.two/x.tot*100)+"%";
+      var l=document.querySelector('[data-seclabel="'+sec+'"]'); if(l) l.textContent=x.two+" / "+x.tot;
     });
   }
 
-  document.addEventListener("click",function(e){
-    var r=e.target.closest(".reveal");
-    if(r){
-      var n=r.getAttribute("data-reveal");
-      document.querySelector('[data-ans="'+n+'"]').hidden=false;
-      r.hidden=true;
-      return;
-    }
-    var b=e.target.closest(".rate button");
-    if(b){
-      var card=b.closest(".q"), n2=card.getAttribute("data-q"), v=b.getAttribute("data-v");
-      if(v==="-") delete state[n2]; else state[n2]=v;
-      save(); paint(card); recount(); applyFilter();
-      return;
-    }
-  });
-
-  var filter="all", query="";
-  document.querySelectorAll("[data-filter]").forEach(function(btn){
-    btn.addEventListener("click",function(){
-      document.querySelectorAll("[data-filter]").forEach(function(x){x.classList.remove("on")});
-      btn.classList.add("on"); filter=btn.getAttribute("data-filter"); applyFilter();
-    });
-  });
-  document.getElementById("search").addEventListener("input",function(e){
-    query=e.target.value.trim().toLowerCase(); applyFilter();
-  });
+  // ── фильтры ──
+  function visibleCards(){ return cards.filter(function(c){return !c.classList.contains("hide")}) }
 
   function applyFilter(){
-    var shown=0;
+    var t=today(), shown=0;
     cards.forEach(function(card){
-      var n=card.getAttribute("data-q"), v=state[n], ok=true;
-      if(filter==="todo") ok=(v===undefined);
+      var n=card.getAttribute("data-q"), v=data.v[n], ok=true;
+      if(exam) ok=exam.set.has(n);
+      else if(filter==="todo") ok=(v===undefined);
       else if(filter==="weak") ok=(v==="0"||v==="1");
+      else if(filter==="due") ok=(data.d[n]!==undefined && data.d[n]<=t);
       if(ok&&query) ok=card.getAttribute("data-text").indexOf(query)>-1;
       card.classList.toggle("hide",!ok);
       if(ok) shown++;
     });
-    document.getElementById("empty").hidden=(shown>0);
+    var em=el("empty");
+    em.hidden=(shown>0);
+    if(!em.hidden){
+      em.textContent = (filter==="due" && !query)
+        ? "Сегодня повторять нечего — очередь пополнится, когда подойдёт срок: ноль через день, единица через три, двойка через две недели."
+        : (filter==="todo" && !query)
+          ? "Оценены все вопросы. Дальше — фильтр «повторить» или режим экзамена."
+          : "Ничего не найдено — измени запрос или фильтр.";
+    }
     document.querySelectorAll("section[data-sec]").forEach(function(sec){
       var qs=sec.querySelectorAll(".q");
-      if(!qs.length) { sec.style.display=(filter==="all"&&!query)?"":"none"; return; }
-      var any=[].slice.call(qs).some(function(c){return !c.classList.contains("hide")});
+      if(!qs.length){ sec.style.display=(filter==="all"&&!query&&!exam&&!cardsMode)?"":"none"; return; }
+      var any=Array.prototype.slice.call(qs).some(function(c){return !c.classList.contains("hide")});
       sec.style.display=any?"":"none";
     });
+    if(cardsMode) setActive(activeIdx<0?0:Math.min(activeIdx,visibleCards().length-1),false);
+    updateCardNav();
   }
 
-  document.getElementById("collapse").addEventListener("click",function(){
-    document.querySelectorAll("[data-ans]").forEach(function(a){a.hidden=true});
-    document.querySelectorAll(".reveal").forEach(function(r){r.hidden=false});
-    window.scrollTo({top:0,behavior:"smooth"});
-  });
-
-  document.getElementById("reset").addEventListener("click",function(){
-    if(!confirm("Сбросить все оценки?")) return;
-    state={}; save();
-    cards.forEach(paint); recount(); applyFilter();
-  });
-
-  function visibleCards(){
-    return cards.filter(function(c){return !c.classList.contains("hide")});
-  }
-  var activeIdx=-1;
+  // ── активная карточка ──
   function setActive(i,scroll){
     var vis=visibleCards();
-    if(!vis.length) return;
+    if(!vis.length){ activeIdx=-1; updateCardNav(); return; }
     if(i<0) i=0; if(i>=vis.length) i=vis.length-1;
     cards.forEach(function(c){c.classList.remove("active")});
-    var card=vis[i]; card.classList.add("active"); activeIdx=i;
-    if(scroll!==false) card.scrollIntoView({block:"center",behavior:"smooth"});
+    vis[i].classList.add("active"); activeIdx=i;
+    if(scroll!==false) vis[i].scrollIntoView({block:cardsMode?"start":"center",behavior:"smooth"});
+    updateCardNav();
   }
-  function activeCard(){
+  function activeCard(){ var vis=visibleCards(); return (activeIdx>=0&&activeIdx<vis.length)?vis[activeIdx]:null }
+  function updateCardNav(){
+    if(!cardsMode) return;
     var vis=visibleCards();
-    if(activeIdx<0||activeIdx>=vis.length) return null;
-    return vis[activeIdx];
+    el("cardPos").textContent=vis.length?((activeIdx+1)+" / "+vis.length):"—";
   }
 
-  document.getElementById("resume").addEventListener("click",function(){
-    var vis=visibleCards();
-    for(var i=0;i<vis.length;i++){
-      if(state[vis[i].getAttribute("data-q")]===undefined){ setActive(i); return; }
+  // ── клики ──
+  document.addEventListener("click",function(e){
+    var r=e.target.closest(".reveal");
+    if(r&&!r.disabled){
+      document.querySelector('[data-ans="'+r.getAttribute("data-reveal")+'"]').hidden=false;
+      r.hidden=true; return;
     }
+    var b=e.target.closest(".rate button");
+    if(b){
+      var card=b.closest(".q"), v=b.getAttribute("data-v");
+      setVal(card, v==="-"?null:v);
+      var wasIdx=visibleCards().indexOf(card);
+      if(!exam&&!cardsMode&&(filter==="todo"||filter==="weak"||filter==="due")){
+        applyFilter(); setActive(Math.min(wasIdx,visibleCards().length-1),false);
+      } else { applyFilter(); }
+      if(exam) maybeFinish();
+      return;
+    }
+    var c=e.target.closest(".q");
+    if(c) setActive(visibleCards().indexOf(c),false);
+  });
+
+  document.querySelectorAll("[data-filter]").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      if(exam) return;
+      document.querySelectorAll("[data-filter]").forEach(function(x){x.classList.remove("on")});
+      btn.classList.add("on"); filter=btn.getAttribute("data-filter"); activeIdx=-1; applyFilter();
+    });
+  });
+  el("search").addEventListener("input",function(e){ query=e.target.value.trim().toLowerCase(); applyFilter(); });
+
+  el("resume").addEventListener("click",function(){
+    var vis=visibleCards();
+    for(var i=0;i<vis.length;i++){ if(data.v[vis[i].getAttribute("data-q")]===undefined){ setActive(i); return; } }
     setActive(0);
   });
 
+  el("collapse").addEventListener("click",function(){
+    document.querySelectorAll("[data-ans]").forEach(function(a){a.hidden=true});
+    document.querySelectorAll(".reveal").forEach(function(x){x.hidden=false});
+    cards.forEach(paint);
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+
+  el("reset").addEventListener("click",function(){
+    if(!confirm("Сбросить все оценки?")) return;
+    data={v:{},d:{}}; save(); cards.forEach(paint); recount(); applyFilter();
+  });
+
+  // ── карточный режим ──
+  el("cardsBtn").addEventListener("click",function(){
+    cardsMode=!cardsMode;
+    document.body.classList.toggle("cards",cardsMode);
+    el("cardsBtn").classList.toggle("on",cardsMode);
+    applyFilter(); setActive(cardsMode?0:activeIdx,cardsMode);
+  });
+  el("cardPrev").addEventListener("click",function(){ setActive(activeIdx-1) });
+  el("cardNext").addEventListener("click",function(){ setActive(activeIdx+1) });
+
+  var tx=0;
+  document.addEventListener("touchstart",function(e){ tx=e.changedTouches[0].clientX },{passive:true});
+  document.addEventListener("touchend",function(e){
+    if(!cardsMode) return;
+    var dx=e.changedTouches[0].clientX-tx;
+    if(Math.abs(dx)>70) setActive(activeIdx+(dx<0?1:-1));
+  },{passive:true});
+
+  // ── экзамен ──
+  el("examBtn").addEventListener("click",function(){
+    if(exam){ finishExam(true); return; }
+    el("examPanel").hidden=!el("examPanel").hidden;
+    el("syncPanel").hidden=true;
+  });
+  document.querySelectorAll("[data-exam]").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      var n=parseInt(btn.getAttribute("data-exam"),10);
+      el("examPanel").hidden=true;
+      if(n>0) startExam(n);
+    });
+  });
+
+  function startExam(n){
+    var pool=cards.slice();
+    for(var i=pool.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=pool[i]; pool[i]=pool[j]; pool[j]=t; }
+    var chosen=pool.slice(0,Math.min(n,pool.length));
+    exam={set:new Set(chosen.map(function(c){return c.getAttribute("data-q")})), total:chosen.length,
+          ends:Date.now()+n*60000, tick:null, start:{}};
+    chosen.forEach(function(c){ var q=c.getAttribute("data-q"); exam.start[q]=data.v[q]; delete data.v[q]; });
+    save();
+    document.querySelectorAll("[data-ans]").forEach(function(a){a.hidden=true});
+    document.querySelectorAll(".reveal").forEach(function(x){x.hidden=false});
+    el("examBtn").textContent="завершить"; el("examBtn").classList.add("on");
+    el("resultPanel").hidden=true;
+    query=""; el("search").value="";
+    cards.forEach(paint); recount(); applyFilter(); setActive(0);
+    exam.tick=setInterval(tickTimer,1000); tickTimer();
+  }
+
+  function tickTimer(){
+    if(!exam) return;
+    var left=Math.max(0,Math.round((exam.ends-Date.now())/1000));
+    var t=el("timer"); t.hidden=false;
+    t.textContent=String(Math.floor(left/60)).padStart(2,"0")+":"+String(left%60).padStart(2,"0");
+    t.classList.toggle("low",left<=60);
+    if(left<=0) finishExam(false);
+  }
+
+  function maybeFinish(){
+    if(!exam) return;
+    var done=0;
+    exam.set.forEach(function(q){ if(data.v[q]!==undefined) done++; });
+    if(done>=exam.total) finishExam(false);
+  }
+
+  function finishExam(cancelled){
+    if(!exam) return;
+    clearInterval(exam.tick);
+    var ids=Array.from(exam.set), c={0:0,1:0,2:0}, unrated=0;
+    ids.forEach(function(q){ var v=data.v[q]; if(v===undefined) unrated++; else c[v]++; });
+    var answered=ids.length-unrated;
+    var pct=answered?Math.round(c[2]/ids.length*100):0;
+    exam=null;
+    el("timer").hidden=true;
+    el("examBtn").textContent="экзамен"; el("examBtn").classList.remove("on");
+
+    if(!cancelled){
+      var p=el("resultPanel");
+      p.innerHTML='<p class="pt">Результат экзамена</p>'
+        +'<p><span class="big2">'+pct+'%</span> уверенных ответов из '+ids.length+' вопросов</p>'
+        +'<p class="pd">'+verdictFor(pct)+'. Уверенно: '+c["2"]+' · плыл: '+c["1"]+' · не знаю: '+c["0"]
+        +(unrated?' · не дошёл: '+unrated:'')+'.</p>'
+        +'<p class="pd">Всё, что ниже двойки, попало в очередь повторения — фильтр «повторить».</p>'
+        +'<div class="prow"><button class="chip" id="resClose" type="button">закрыть</button>'
+        +'<button class="chip" data-filter-jump="weak" type="button">показать провалы</button></div>';
+      p.hidden=false;
+      el("resClose").addEventListener("click",function(){p.hidden=true});
+      p.querySelector("[data-filter-jump]").addEventListener("click",function(){
+        p.hidden=true;
+        var w=document.querySelector('[data-filter="weak"]'); if(w) w.click();
+      });
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+    cards.forEach(paint); recount(); applyFilter();
+  }
+
+  // ── перенос прогресса ──
+  el("syncBtn").addEventListener("click",function(){
+    var p=el("syncPanel"); p.hidden=!p.hidden; el("examPanel").hidden=true;
+    if(!p.hidden){ el("syncBox").value=encodeState(); el("syncMsg").textContent=""; }
+  });
+  el("syncClose").addEventListener("click",function(){ el("syncPanel").hidden=true });
+
+  function encodeState(){
+    try{ return "QA2:"+btoa(unescape(encodeURIComponent(JSON.stringify(data)))); }
+    catch(e){ return "" }
+  }
+  function decodeState(str){
+    str=(str||"").trim();
+    if(str.indexOf("QA2:")===0) str=str.slice(4);
+    var obj=JSON.parse(decodeURIComponent(escape(atob(str))));
+    if(!obj||typeof obj!=="object"||!obj.v) throw new Error("формат");
+    return obj;
+  }
+  el("syncCopy").addEventListener("click",function(){
+    var box=el("syncBox"); box.value=encodeState(); box.select();
+    var done=function(){ el("syncMsg").textContent="скопировано" };
+    if(navigator.clipboard) navigator.clipboard.writeText(box.value).then(done,function(){ document.execCommand("copy"); done(); });
+    else { document.execCommand("copy"); done(); }
+  });
+  el("syncApply").addEventListener("click",function(){
+    try{
+      var obj=decodeState(el("syncBox").value);
+      var n=Object.keys(obj.v).length;
+      data={v:obj.v||{},d:obj.d||{}}; save();
+      cards.forEach(paint); recount(); applyFilter();
+      el("syncMsg").textContent="применено: "+n+" оценок";
+    }catch(err){ el("syncMsg").textContent="не разобрал код"; }
+  });
+
+  // ── клавиатура ──
   document.addEventListener("keydown",function(e){
-    var s2=document.getElementById("search");
-    if(e.key==="/"&&document.activeElement!==s2){ e.preventDefault(); s2.focus(); return; }
-    if(document.activeElement===s2){ if(e.key==="Escape") s2.blur(); return; }
+    var sb=el("search");
+    if(e.key==="/"&&document.activeElement!==sb){ e.preventDefault(); sb.focus(); return; }
+    if(document.activeElement===sb){ if(e.key==="Escape") sb.blur(); return; }
+    if(document.activeElement===el("syncBox")) return;
     if(e.metaKey||e.ctrlKey||e.altKey) return;
 
     var k=e.key.toLowerCase();
-    if(k==="j"){ e.preventDefault(); setActive(activeIdx<0?0:activeIdx+1); return; }
-    if(k==="k"){ e.preventDefault(); setActive(activeIdx<0?0:activeIdx-1); return; }
+    if(k==="j"||e.key==="ArrowRight"){ e.preventDefault(); setActive(activeIdx<0?0:activeIdx+1); return; }
+    if(k==="k"||e.key==="ArrowLeft"){ e.preventDefault(); setActive(activeIdx<0?0:activeIdx-1); return; }
 
-    var card=activeCard();
-    if(!card) return;
-    var n=card.getAttribute("data-q");
+    var card=activeCard(); if(!card) return;
     if(e.key===" "||e.key==="Enter"){
       var btn=card.querySelector(".reveal");
-      if(btn&&!btn.hidden){ e.preventDefault(); btn.click(); }
+      if(btn&&!btn.hidden&&!btn.disabled){ e.preventDefault(); btn.click(); }
       return;
     }
     if(k==="0"||k==="1"||k==="2"){
       e.preventDefault();
-      state[n]=k; save(); paint(card); recount();
-      var vis=visibleCards(), pos=vis.indexOf(card);
-      applyFilter();
-      var nv=visibleCards();
-      setActive(nv.indexOf(card)>=0?nv.indexOf(card)+1:Math.min(pos,nv.length-1));
+      var idx=visibleCards().indexOf(card);
+      setVal(card,k);
+      if(!exam&&!cardsMode&&(filter==="todo"||filter==="weak"||filter==="due")){
+        applyFilter(); setActive(Math.min(idx,visibleCards().length-1));
+      } else { applyFilter(); setActive(idx+1); }
+      if(exam) maybeFinish();
       return;
     }
-    if(k==="x"){ e.preventDefault(); delete state[n]; save(); paint(card); recount(); applyFilter(); }
-  });
-
-  cards.forEach(function(card,i){
-    card.addEventListener("click",function(){ setActive(visibleCards().indexOf(card),false); });
+    if(k==="x"){ e.preventDefault(); setVal(card,null); applyFilter(); }
   });
 
   cards.forEach(paint); recount(); applyFilter();
@@ -774,8 +1015,6 @@ def main():
     OUT_USED.append(out_path)
     nq = sum(1 for s in sections for it in s["items"] if it["num"])
     print("%s: sections=%d questions=%d chars=%d" % (out_path, len(sections), nq, len(out)))
-    if nq != 151:
-        print("WARNING: ожидалось 151 вопрос", file=sys.stderr)
 
 
 if __name__ == "__main__":

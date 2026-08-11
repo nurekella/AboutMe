@@ -161,6 +161,39 @@ tbody tr:last-child td{border-bottom:0}
 .q[data-v="0"] .rate button[data-v="0"]{background:var(--s0);border-color:var(--s0);color:var(--surface)}
 .q[data-v="1"] .rate button[data-v="1"]{background:var(--s1);border-color:var(--s1);color:var(--surface)}
 .q[data-v="2"] .rate button[data-v="2"]{background:var(--s2);border-color:var(--s2);color:var(--surface)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;
+  padding:16px 18px;margin:0 0 20px;box-shadow:var(--shadow)}
+.panel[hidden]{display:none}
+.panel .pt{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--accent);margin:0 0 8px}
+.panel .pd{font-size:.94rem;color:var(--ink-2);margin:0 0 12px;max-width:var(--measure)}
+.panel .prow{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.panel textarea{width:100%;font-family:var(--mono);font-size:11px;line-height:1.5;
+  background:var(--surface-2);color:var(--ink-2);border:1px solid var(--line);
+  border-radius:7px;padding:9px 11px;margin:0 0 10px;resize:vertical;word-break:break-all}
+.panel .pmsg{font-family:var(--mono);font-size:11px;color:var(--s2)}
+.panel table{margin:0}
+.panel .big2{font-family:var(--mono);font-size:1.6rem;color:var(--accent);letter-spacing:-.02em}
+.timer{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;
+  background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent);
+  border-radius:6px;padding:4px 9px;white-space:nowrap}
+.timer[hidden]{display:none}
+.timer.low{background:var(--s0b);color:var(--s0);border-color:var(--s0)}
+#dueN:empty{display:none}
+.reveal[disabled]{opacity:.5;cursor:not-allowed;border-style:solid}
+.reveal[disabled]:hover{border-color:var(--line);background:var(--surface-2)}
+body.cards .rail,body.cards .keyhint,body.cards section .sect-head,
+body.cards .masthead,body.cards .progress{display:none}
+body.cards .shell{grid-template-columns:minmax(0,1fr);max-width:760px}
+body.cards .q{display:none}
+body.cards .q.active{display:block;margin-top:12px}
+body.cards .cardnav{display:flex}
+.cardnav{display:none;position:sticky;bottom:0;gap:10px;padding:12px 0 16px;
+  background:linear-gradient(to top,var(--bg) 70%,transparent);align-items:center}
+.cardnav button{flex:1;font-family:var(--mono);font-size:13px;padding:13px 10px;
+  background:var(--surface);border:1px solid var(--line);color:var(--ink-2);border-radius:8px;cursor:pointer}
+.cardnav button:hover{border-color:var(--accent);color:var(--accent)}
+.cardnav .pos{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
 .keyhint{font-family:var(--mono);font-size:11px;color:var(--muted);margin:0 0 18px;line-height:1.9}
 .keyhint kbd{font-family:var(--mono);font-size:10.5px;background:var(--surface);
   border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:1px 5px;color:var(--ink-2)}
@@ -215,13 +248,18 @@ tbody tr:last-child td{border-bottom:0}
       <span class="big" id="pct">—</span>
       <span class="meter"><i class="m2" id="m2"></i><i class="m1" id="m1"></i><i class="m0" id="m0"></i></span>
       <span class="verdict" id="verdict">оцени первый вопрос</span>
+      <span class="timer" id="timer" hidden>00:00</span>
     </div>
     <div class="tools">
-      <input type="search" id="search" placeholder="поиск по вопросам" aria-label="Поиск по вопросам">
+      <input type="search" id="search" placeholder="поиск" aria-label="Поиск по вопросам">
       <button class="chip on" data-filter="all" type="button">все</button>
       <button class="chip" data-filter="todo" type="button">не оценено</button>
       <button class="chip" data-filter="weak" type="button">0 и 1</button>
+      <button class="chip" data-filter="due" type="button">повторить <span id="dueN"></span></button>
       <button class="chip" id="resume" type="button">продолжить</button>
+      <button class="chip" id="examBtn" type="button">экзамен</button>
+      <button class="chip" id="cardsBtn" type="button">карточки</button>
+      <button class="chip" id="syncBtn" type="button">синхрон</button>
       <button class="chip" id="collapse" type="button">скрыть ответы</button>
       <button class="chip" id="reset" type="button">сбросить</button>
     </div>
@@ -249,19 +287,45 @@ tbody tr:last-child td{border-bottom:0}
 <a href="#s15"><span class="nt">Часть 14. Безопасность</span><span class="nsc" data-sec="15">—</span></a>
 <a href="#s16"><span class="nt">Часть 15. Архитектура и системный дизайн</span><span class="nsc" data-sec="16">—</span></a>
 <a href="#s17"><span class="nt">Часть 16. Поведенческие вопросы</span><span class="nsc" data-sec="17">—</span></a>
-<a href="#s18"><span class="nt">Часть 17. Как готовиться к собеседованию</span></a>
-<a href="#s19"><span class="nt">Итог</span></a></nav>
+<a href="#s18"><span class="nt">Часть 17. Практические задачи</span><span class="nsc" data-sec="18">—</span></a>
+<a href="#s19"><span class="nt">Часть 18. Как готовиться к собеседованию</span></a>
+<a href="#s20"><span class="nt">Итог</span></a></nav>
   </aside>
 
   <main class="main">
     <header class="masthead">
-      <p class="eyebrow">Тренажёр · 151 вопросов</p>
+      <p class="eyebrow">Тренажёр · 165 вопросов</p>
       <h1>DevOps: вопросы, ответы и объяснения</h1>
       <div class="prose lead"><p>Файл-тренажёр и одновременно честный замер уровня. Вопросы составлены с нуля, без оглядки на резюме и на чью-либо программу — только то, что реально спрашивают на собеседованиях DevOps/SRE и что нужно понимать, чтобы работать.</p>
 <p>Ресурсы в части 1 — сумма трёх источников: то, что ты назвал сам, мои добавления, и отфильтрованное из твоей коллекции звёзд.</p>
 <p><strong>Как устроен каждый пункт:</strong></p>
 <blockquote><strong>Вопрос</strong> <code>Что проверяют</code> — зачем это спросили и что услышит интервьюер. <strong>Ответ</strong> — то, что надо сказать. <code>Глубже</code> — уровень, отличающий middle от junior. <code>Типичная ошибка</code> — как обычно проваливают.</blockquote></div>
     </header>
+    <div class="panel" id="examPanel" hidden>
+      <p class="pt">Режим экзамена</p>
+      <p class="pd">Случайные вопросы, таймер, ответ открывается только после того, как ты поставил себе оценку. Так же, как на собеседовании: сначала отвечаешь, потом узнаёшь.</p>
+      <div class="prow">
+        <button class="chip" data-exam="10" type="button">10 вопросов · 10 мин</button>
+        <button class="chip" data-exam="20" type="button">20 вопросов · 20 мин</button>
+        <button class="chip" data-exam="30" type="button">30 вопросов · 30 мин</button>
+        <button class="chip" data-exam="0" type="button">отмена</button>
+      </div>
+    </div>
+
+    <div class="panel" id="syncPanel" hidden>
+      <p class="pt">Перенос прогресса между устройствами</p>
+      <p class="pd">Оценки хранятся в браузере, поэтому между ноутом и телефоном не переносятся сами. Скопируй код здесь и вставь его на другом устройстве.</p>
+      <textarea id="syncBox" rows="3" spellcheck="false" aria-label="Код прогресса"></textarea>
+      <div class="prow">
+        <button class="chip" id="syncCopy" type="button">скопировать</button>
+        <button class="chip" id="syncApply" type="button">применить вставленный</button>
+        <button class="chip" id="syncClose" type="button">закрыть</button>
+        <span class="pmsg" id="syncMsg"></span>
+      </div>
+    </div>
+
+    <div class="panel" id="resultPanel" hidden></div>
+
     <p class="keyhint">С клавиатуры: <kbd>Space</kbd> показать ответ · <kbd>0</kbd> <kbd>1</kbd> <kbd>2</kbd> оценка ·
       <kbd>J</kbd> / <kbd>K</kbd> следующий и предыдущий вопрос · <kbd>/</kbd> поиск</p>
     <p class="empty" id="empty" hidden>Ничего не найдено — измени запрос или фильтр.</p>
@@ -315,7 +379,7 @@ tbody tr:last-child td{border-bottom:0}
 <ol><li><strong><code>kubernetes-the-hard-way</code></strong> (Kelsey Hightower) — собрать кластер вручную, компонент за компонентом. Один-два дня. После него архитектурные вопросы перестают быть проблемой, потому что ты видел, из чего это склеено.</li><li><strong><code>kubernetes-goat</code></strong> — намеренно уязвимый кластер. Проходишь сценарии атак и понимаешь K8s security изнутри, а не по списку рекомендаций. Отдельная польза: даёт живые истории для собеседования.</li><li><strong>Killercoda CKA/CKAD scenarios</strong> — задачи на время. Тренируют не знание, а скорость: на экзамене и на техническом собеседовании с живым кластером это решает.</li><li><strong><code>k8squest</code></strong> — troubleshooting в игровом формате, ровно тот жанр задач, что дают на собеседовании.</li><li><strong>Сломай свой кластер специально.</strong> Убей etcd. Заполни диск на узле. Поставь <code>memory limit</code> в 10Mi. Сломай CoreDNS. Испорти RBAC так, чтобы под не смог читать Secret. Каждая поломка — это вопрос из этого файла, прожитый руками, и он больше не забудется.</li></ol>
 <p><strong>Мини-проект вместо десятого туториала.</strong> Одно приложение, которое ты проводишь через весь путь: Dockerfile → Helm-чарт → кластер → ArgoCD → Prometheus с своими алертами → SLO-дашборд → сломать и откатить. Это одновременно и учёба, и портфолио, и материал для рассказа на собеседовании.</p></div></div>
 <div class="sub"><h3>Из твоей коллекции — что действительно стоит открыть</h3><div class="prose"><p>У тебя больше пятисот звёзд, и это не бесполезно — просто нужен фильтр. Вот десять, которые дополняют всё вышеперечисленное и которые я бы оставил в работе. Остальное — закрыть до оффера.</p>
-<div class="scroller"><table><thead><tr><th>Репозиторий</th><th>Зачем</th></tr></thead><tbody><tr><td><code>bregman-arie/devops-exercises</code></td><td>Второй банк вопросов после этого файла. Когда закроешь мои 151 — иди туда за объёмом.</td></tr><tr><td><code>rmntrvn/adm_linux_ops_questions</code></td><td><strong>На русском.</strong> Ближе всего к тому, как спрашивают на рынке КЗ и РФ.</td></tr><tr><td><code>trimstray/test-your-sysadmin-skills</code></td><td>284 вопроса по Linux. Проверка глубины там, где ты сильнее всего.</td></tr><tr><td><code>omerbsezer/Fast-Kubernetes</code></td><td>Формат «тема + лаба». Хорош как основной курс, если Nana покажется медленной.</td></tr><tr><td><code>jamiehannaford/what-happens-when-k8s</code></td><td>Разбор <code>kubectl run</code> по шагам. Прямо вопрос 59 этого файла, только подробнее.</td></tr><tr><td><code>dgkanatsios/CKAD-exercises</code></td><td>Упражнения на скорость с kubectl.</td></tr><tr><td><code>sailor-sh/CK-X</code></td><td>Мок-экзамены CKA с таймером. Перед сертификацией.</td></tr><tr><td><code>acend/prometheus-training</code></td><td>Интерактивный тренинг по PromQL — ровно твой пробел.</td></tr><tr><td><code>cloudogu/gitops-patterns</code></td><td>Паттерны и антипаттерны GitOps. Короткий, читать целиком.</td></tr><tr><td><code>dastergon/awesome-sre</code></td><td>Вход в SRE-словарь, если SRE Workbook покажется длинным.</td></tr></tbody></table></div>
+<div class="scroller"><table><thead><tr><th>Репозиторий</th><th>Зачем</th></tr></thead><tbody><tr><td><code>bregman-arie/devops-exercises</code></td><td>Второй банк вопросов после этого файла. Когда закроешь мои 165 — иди туда за объёмом.</td></tr><tr><td><code>rmntrvn/adm_linux_ops_questions</code></td><td><strong>На русском.</strong> Ближе всего к тому, как спрашивают на рынке КЗ и РФ.</td></tr><tr><td><code>trimstray/test-your-sysadmin-skills</code></td><td>284 вопроса по Linux. Проверка глубины там, где ты сильнее всего.</td></tr><tr><td><code>omerbsezer/Fast-Kubernetes</code></td><td>Формат «тема + лаба». Хорош как основной курс, если Nana покажется медленной.</td></tr><tr><td><code>jamiehannaford/what-happens-when-k8s</code></td><td>Разбор <code>kubectl run</code> по шагам. Прямо вопрос 59 этого файла, только подробнее.</td></tr><tr><td><code>dgkanatsios/CKAD-exercises</code></td><td>Упражнения на скорость с kubectl.</td></tr><tr><td><code>sailor-sh/CK-X</code></td><td>Мок-экзамены CKA с таймером. Перед сертификацией.</td></tr><tr><td><code>acend/prometheus-training</code></td><td>Интерактивный тренинг по PromQL — ровно твой пробел.</td></tr><tr><td><code>cloudogu/gitops-patterns</code></td><td>Паттерны и антипаттерны GitOps. Короткий, читать целиком.</td></tr><tr><td><code>dastergon/awesome-sre</code></td><td>Вход в SRE-словарь, если SRE Workbook покажется длинным.</td></tr></tbody></table></div>
 <p>И два, которые стоят отдельно, потому что это не чтение, а работа руками: <strong><code>kelseyhightower/kubernetes-the-hard-way</code></strong> и <strong><code>madhuakula/kubernetes-goat</code></strong> — см. предыдущий раздел.</p></div></div>
 <div class="sub"><h3>Как тренировать само собеседование</h3><div class="prose"><p>Технические знания и умение их предъявить — разные навыки, и второй тренируется отдельно. Иначе получается ровно твой случай: знаешь больше, чем можешь сказать.</p>
 <ul><li><strong>Отвечай вслух и записывай себя</strong> на телефон. Слушать себя неприятно, но это самый быстрый способ увидеть проблему: «ну», длинные паузы, ответ без структуры, извиняющиеся формулировки («я немного трогал», «наверное»). После трёх записей это само выправляется.</li><li><strong>Таймер на две минуты.</strong> Хороший ответ на технический вопрос — 1–2 минуты. Меньше — недостаточно, больше — интервьюер уже потерял нить.</li><li><strong>Мок-собеседования с живым человеком</strong> — в разы полезнее самопроверки. Кто угодно из знакомых с задачей «задай мне 20 вопросов из этого файла и не помогай». Есть и платформы (Pramp, interviewing.io), там бесплатный обмен: ты проводишь собес другому, он тебе.</li><li><strong>Записывайся на собесы, которые тебе не нужны.</strong> Первые два-три — тренировочные, и относиться к ним надо как к тренировке. Ходить сразу на вакансию мечты — то же, что выйти на соревнование без разминки.</li><li><strong>Веди журнал.</strong> После каждого собеса: какие вопросы задали, где поплыл, какую вилку назвали. Через пять собесов ты будешь знать реальные требования рынка точнее любого курса — и увидишь, что вопросы повторяются процентов на семьдесят.</li></ul></div></div>
@@ -1971,7 +2035,496 @@ predict_linear(node_filesystem_avail_bytes{mountpoint="/"}[6h], 4*3600) &lt; 0</
 </article>
 </section>
 <section id="s18" data-sec="18">
-<div class="sect-head"><h2>Часть 17. Как готовиться к собеседованию</h2></div>
+<div class="sect-head"><h2>Часть 17. Практические задачи</h2><div class="sect-score"><span class="bar"><span class="fill" data-secfill="18"></span></span><span class="mono" data-seclabel="18">0 / 14</span></div></div>
+<div class="prose lead"><p>На собеседовании редко ограничиваются вопросами. Дают делать: переписать Dockerfile, найти ошибку в манифесте, написать запрос, разобрать вывод команды. Этот жанр тренируется отдельно от теории — знать ответ и уметь его написать под наблюдением это разные вещи.</p>
+<p>Формат тот же: сначала попробуй сам, с клавиатурой или на бумаге, и только потом открывай решение.</p></div>
+<article class="q" id="q152" data-q="152" data-sec="18" data-text="152 перепиши этот dockerfile.">
+<header class="qh"><span class="qn mono">152</span><h3>Перепиши этот Dockerfile.</h3><span class="mark mono" data-mark="152"></span></header>
+<div class="prose qvis"><div class="callout probe"><span class="clabel">Что проверяют</span>Понимание кэша слоёв, размера образа и безопасности. Одна из самых частых практических задач.</div>
+<div class="scroller"><pre><code>FROM python:3.11
+WORKDIR /app
+COPY . .
+RUN apt-get update
+RUN apt-get install -y curl vim
+RUN pip install -r requirements.txt
+ENV API_TOKEN=secret123
+EXPOSE 8000
+CMD python app.py</code></pre></div></div>
+<button class="reveal" type="button" data-reveal="152">Показать ответ</button>
+<div class="prose ans" data-ans="152" hidden><p><strong>Решение.</strong> Проблем здесь семь.</p>
+<div class="scroller"><pre><code># 1. Multi-stage: зависимости собираем отдельно, в финальный образ тащим только их
+FROM python:3.11-slim AS builder
+WORKDIR /app
+# 2. Сначала только файл зависимостей — тогда изменение кода не ломает кэш установки
+COPY requirements.txt .
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+FROM python:3.11-slim
+# 3. Непривилегированный пользователь с числовым UID
+RUN useradd -u 10001 -m app
+WORKDIR /app
+COPY --from=builder /install /usr/local
+COPY --chown=10001:10001 . .
+USER 10001
+EXPOSE 8000
+# 4. Exec-форма: процесс становится PID 1 и получает SIGTERM
+CMD ["python", "app.py"]</code></pre></div>
+<p>Что именно исправлено:</p>
+<ol><li><strong><code>FROM python:3.11</code></strong> — полный образ на ~1 ГБ. <code>-slim</code> меньше в разы; для совсем маленького — distroless.</li><li><strong><code>COPY . .</code> перед установкой зависимостей</strong> — любое изменение кода инвалидирует кэш, и <code>pip install</code> идёт заново каждую сборку. Сначала <code>requirements.txt</code>, потом код.</li><li><strong><code>apt-get update</code> и <code>install</code> в разных <code>RUN</code></strong> — кэш слоя с <code>update</code> может быть старым, и установка пойдёт по устаревшему индексу. Всегда в одной команде, плюс <code>rm -rf /var/lib/apt/lists/*</code> в том же слое.</li><li><strong><code>curl</code> и <code>vim</code> в образе</strong> — отладочные утилиты в проде это лишний вес и лишняя поверхность атаки. Отлаживать через <code>kubectl debug</code> с отдельным образом.</li><li><strong><code>ENV API_TOKEN=secret123</code></strong> — секрет навсегда остаётся в слое и виден в <code>docker history</code>. Только через переменные среды в рантайме или смонтированный файл.</li><li><strong>Запуск от root</strong> — по умолчанию UID 0. Нужен <code>USER</code> с числовым UID.</li><li><strong><code>CMD python app.py</code> в shell-форме</strong> — PID 1 становится <code>/bin/sh</code>, который не пробрасывает SIGTERM, и контейнер не завершается корректно. Exec-форма обязательна.</li></ol>
+<p>Плюс <code>.dockerignore</code> с <code>.git</code>, <code>__pycache__</code>, <code>.env</code> — иначе они попадут в контекст сборки и в образ.</p></div>
+<div class="rate" data-rate="152"><span class="rl mono">Оценка</span><button type="button" data-v="0">0 — не знаю</button><button type="button" data-v="1">1 — плыл</button><button type="button" data-v="2">2 — уверенно</button><button type="button" data-v="-" class="clr">×</button></div>
+</article>
+<article class="q" id="q153" data-q="153" data-sec="18" data-text="153 найди ошибки в этом манифесте.">
+<header class="qh"><span class="qn mono">153</span><h3>Найди ошибки в этом манифесте.</h3><span class="mark mono" data-mark="153"></span></header>
+<div class="prose qvis"><div class="callout probe"><span class="clabel">Что проверяют</span>Умение читать YAML глазами человека, который дежурил.</div>
+<div class="scroller"><pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api-service
+    spec:
+      containers:
+        - name: api
+          image: mycompany/api:latest
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 1
+          resources:
+            limits:
+              memory: 128Mi
+              cpu: 100m
+          env:
+            - name: DB_PASSWORD
+              value: "prod_password_123"</code></pre></div></div>
+<button class="reveal" type="button" data-reveal="153">Показать ответ</button>
+<div class="prose ans" data-ans="153" hidden><p><strong>Решение.</strong> Восемь проблем, две из них фатальные.</p>
+<p><strong>Фатальные:</strong></p>
+<ol><li><strong><code>selector.matchLabels: app: api</code>, а метка пода <code>app: api-service</code></strong> — они не совпадают, и Deployment не примет свои поды. Он будет бесконечно создавать новые, а Service ни одного не найдёт. Это первое, что надо заметить.</li><li><strong><code>DB_PASSWORD</code> открытым текстом в манифесте</strong> — пароль прода в Git. Нужен Secret, а лучше внешнее хранилище через External Secrets.</li></ol>
+<p><strong>Серьёзные:</strong></p>
+<ol><li><strong><code>replicas: 1</code></strong> — любой рестарт, drain узла или обновление означает простой. Минимум 2, а лучше 3 с распределением по зонам.</li><li><strong><code>image: latest</code></strong> — невозможно понять, что запущено, и невозможно откатиться. Тег по версии или git sha, в критичных местах digest.</li><li><strong>Нет <code>readinessProbe</code></strong> — трафик пойдёт на непрогретый под, и каждый деплой даст порцию пятисоток.</li><li><strong><code>livenessProbe</code> с <code>initialDelaySeconds: 1</code></strong> — приложение почти наверняка не успеет подняться, проба провалится, контейнер убьют, и так по кругу: CrashLoopBackOff на здоровом приложении. Нужен <code>startupProbe</code> вместо угадывания задержки.</li><li><strong><code>limits</code> без <code>requests</code></strong> — Kubernetes подставит requests равными limits, то есть под получит QoS Guaranteed, но планировщик будет считать, что нужно 100m CPU и 128Mi всегда. Задавать requests осознанно; для памяти <code>request == limit</code>, для CPU часто лучше вообще без limit, чтобы не было троттлинга.</li><li><strong>Нет <code>securityContext</code></strong> — работает от root, с записываемым корнем, со всеми capabilities. Минимум: <code>runAsNonRoot</code>, <code>runAsUser</code>, <code>allowPrivilegeEscalation: false</code>, <code>capabilities.drop: [ALL]</code>, <code>readOnlyRootFilesystem</code>.</li></ol>
+<p>Плюс по-хорошему: <code>PodDisruptionBudget</code>, <code>topologySpreadConstraints</code>, отдельный <code>serviceAccountName</code> и <code>automountServiceAccountToken: false</code>, если токен не нужен.</p></div>
+<div class="rate" data-rate="153"><span class="rl mono">Оценка</span><button type="button" data-v="0">0 — не знаю</button><button type="button" data-v="1">1 — плыл</button><button type="button" data-v="2">2 — уверенно</button><button type="button" data-v="-" class="clr">×</button></div>
+</article>
+<article class="q" id="q154" data-q="154" data-sec="18" data-text="154 напиши четыре запроса promql.">
+<header class="qh"><span class="qn mono">154</span><h3>Напиши четыре запроса PromQL.</h3><span class="mark mono" data-mark="154"></span></header>
+<div class="prose qvis"><div class="callout probe"><span class="clabel">Что проверяют</span>Умение писать, а не узнавать. Просят прямо в редакторе.</div>
+<ol><li>Доля ошибок 5xx за 5 минут.</li><li>95-й перцентиль латентности по сервису.</li><li>Поды, которые перезапускались за последний час.</li><li>Диски, которые заполнятся в течение четырёх часов.</li></ol></div>
+<button class="reveal" type="button" data-reveal="154">Показать ответ</button>
+<div class="prose ans" data-ans="154" hidden><p><strong>Решение.</strong></p>
+<div class="scroller"><pre><code># 1. Доля 5xx. Суммируем числитель и знаменатель ОТДЕЛЬНО, потом делим.
+sum(rate(http_requests_total{status=~"5.."}[5m]))
+  /
+sum(rate(http_requests_total[5m]))
+
+# 2. p95. Обязательно sum by (le) — иначе перцентиль считается по каждой серии отдельно.
+histogram_quantile(
+  0.95,
+  sum(rate(http_request_duration_seconds_bucket{service="api"}[5m])) by (le)
+)
+
+# 3. Рестарты за час. increase, а не текущее значение счётчика.
+increase(kube_pod_container_status_restarts_total[1h]) &gt; 0
+
+# 4. Прогноз заполнения диска на 4 часа вперёд по тренду за 6 часов.
+predict_linear(node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"}[6h], 4*3600) &lt; 0</code></pre></div>
+<p>Ошибки, на которых обычно спотыкаются:</p>
+<ul><li><strong><code>rate()</code> на gauge</strong> — бессмысленно; <code>rate</code> только для counter.</li><li><strong>деление до агрегации</strong> — <code>rate(errors)/rate(total)</code> без <code>sum</code> даёт вектор на каждую серию, и результат не тот, что спрашивали.</li><li><strong><code>histogram_quantile</code> без <code>by (le)</code></strong> — вернёт ерунду или ничего.</li><li><strong>окно короче четырёх интервалов скрейпа</strong> — в <code>rate</code> появятся дыры.</li><li><strong><code>irate</code> в алертах</strong> — он смотрит две последние точки и шумит; для алертов только <code>rate</code>.</li></ul></div>
+<div class="rate" data-rate="154"><span class="rl mono">Оценка</span><button type="button" data-v="0">0 — не знаю</button><button type="button" data-v="1">1 — плыл</button><button type="button" data-v="2">2 — уверенно</button><button type="button" data-v="-" class="clr">×</button></div>
+</article>
+<article class="q" id="q155" data-q="155" data-sec="18" data-text="155 разбери этот вывод.">
+<header class="qh"><span class="qn mono">155</span><h3>Разбери этот вывод.</h3><span class="mark mono" data-mark="155"></span></header>
+<div class="prose qvis"><div class="callout probe"><span class="clabel">Что проверяют</span>Умение читать <code>describe</code>, а не только запускать его.</div>
+<div class="scroller"><pre><code>Name:         payments-7d9f8b6c4-x2p1q
+Status:       Pending
+Node:         &lt;none&gt;
+Events:
+  Type     Reason            Age   From               Message
+  ----     ------            ----  ----------------   -------
+  Warning  FailedScheduling  2m    default-scheduler  0/6 nodes are available:
+           3 Insufficient memory, 2 node(s) had untolerated taint {workload: gpu},
+           1 node(s) didn't match Pod's node affinity/selector.</code></pre></div></div>
+<button class="reveal" type="button" data-reveal="155">Показать ответ</button>
+<div class="prose ans" data-ans="155" hidden><p><strong>Решение.</strong> Под не запланирован ни на один из шести узлов, и планировщик честно перечислил три разные причины:</p>
+<ul><li><strong>3 узла — не хватает памяти.</strong> Не «на узле мало свободной памяти», а «сумма <code>requests</code> уже размещённых подов плюс наш <code>request</code> не влезает в allocatable». Проверить: <code>kubectl describe node &lt;n&gt;</code> и раздел Allocated resources. Лечится либо снижением request до реального потребления, либо добавлением узлов.</li><li><strong>2 узла — taint <code>workload: gpu</code> без toleration.</strong> Это выделенный пул, и нас туда специально не пускают. Если поду GPU не нужен — так и должно быть.</li><li><strong>1 узел — не подходит по nodeSelector или affinity.</strong> Смотреть, какие метки требует под и какие есть у узла.</li></ul>
+<p>Порядок действий: сначала посчитать, сколько под реально просит (<code>kubectl get pod -o jsonpath</code> по requests) и сравнить с фактическим потреблением похожих подов через <code>kubectl top</code>. Очень часто request завышен в разы, и правильное решение — привести его к реальности, а не расширять кластер.</p>
+<p>Если requests адекватны — расширять кластер, и это задача Cluster Autoscaler или Karpenter: проверить, что он работает, и посмотреть его логи. Если автоскейлера нет, а Pending регулярный — это и есть ответ, чего не хватает в инфраструктуре.</p></div>
+<div class="rate" data-rate="155"><span class="rl mono">Оценка</span><button type="button" data-v="0">0 — не знаю</button><button type="button" data-v="1">1 — плыл</button><button type="button" data-v="2">2 — уверенно</button><button type="button" data-v="-" class="clr">×</button></div>
+</article>
+<article class="q" id="q156" data-q="156" data-sec="18" data-text="156 что не так с этим скриптом?">
+<header class="qh"><span class="qn mono">156</span><h3>Что не так с этим скриптом?</h3><span class="mark mono" data-mark="156"></span></header>
+<div class="prose qvis"><div class="callout probe"><span class="clabel">Что проверяют</span>Bash на уровне «писал в проде», а не «копировал со stackoverflow».</div>
+<div class="scroller"><pre><code>#!/bin/bash
+BACKUP_DIR=/backup/$(date +%F)
+mkdir $BACKUP_DIR
+for f in $(ls /data); do
+  cp /data/$f $BACKUP_DIR
+done
+tar czf $BACKUP_DIR.tar.gz $BACKUP_DIR
+rm -rf $BACKUP_DIR
+echo "Backup done" | mail -s "OK" admin@example.com</code></pre></div></div>
+<button class="reveal" type="button" data-reveal="156">Показать ответ</button>
+<div class="prose ans" data-ans="156" hidden><p><strong>Решение.</strong> Скрипт молча теряет данные и рапортует об успехе.</p>
+<div class="scroller"><pre><code>#!/usr/bin/env bash
+set -Eeuo pipefail
+
+BACKUP_DIR="/backup/$(date +%F)"
+ARCHIVE="${BACKUP_DIR}.tar.gz"
+
+cleanup() { rm -rf "${BACKUP_DIR:?}"; }
+trap cleanup EXIT
+trap 'echo "FAILED at line $LINENO" &gt;&amp;2; mail -s "Backup FAILED" admin@example.com &lt;&lt;&lt; "line $LINENO"' ERR
+
+mkdir -p "$BACKUP_DIR"
+cp -a /data/. "$BACKUP_DIR"/
+tar czf "$ARCHIVE" -C "$(dirname "$BACKUP_DIR")" "$(basename "$BACKUP_DIR")"
+test -s "$ARCHIVE"
+tar tzf "$ARCHIVE" &gt;/dev/null
+mail -s "Backup OK" admin@example.com &lt;&lt;&lt; "$ARCHIVE $(du -h "$ARCHIVE" | cut -f1)"</code></pre></div>
+<p>Что было не так:</p>
+<ol><li><strong>Нет <code>set -euo pipefail</code></strong> — любая ошибка игнорируется, скрипт доходит до конца и пишет «Backup done». Это худшая часть: бэкапа нет, а отчёт положительный.</li><li><strong>Переменные без кавычек</strong> — путь с пробелом ломает всё; <code>rm -rf $BACKUP_DIR</code> при пустой переменной превращается в <code>rm -rf /</code>.</li><li><strong><code>for f in $(ls /data)</code></strong> — разбивает имена по пробелам, не видит скрытые файлы. Правильно <code>cp -a /data/. dst/</code> или <code>find -print0</code>.</li><li><strong><code>mkdir</code> без <code>-p</code></strong> — падает, если каталог существует.</li><li><strong><code>tar</code> с абсолютным путём</strong> — архив с полными путями, при распаковке легко перезаписать не то. Нужен <code>-C</code>.</li><li><strong>Нет проверки результата</strong> — архив мог получиться пустым или битым. <code>test -s</code> и <code>tar tzf</code> дают минимальную проверку.</li><li><strong>Нет уведомления об ошибке</strong> — письмо приходит только при успехе, значит тишина неотличима от «скрипт не запускался».</li><li><strong><code>rm -rf</code> без страховки</strong> — <code>${VAR:?}</code> не даст выполниться при пустой переменной.</li></ol>
+<p>Ответ уровня middle+: такой скрипт вообще не должен существовать. Бэкап — задача инструмента с проверкой восстановления (для PostgreSQL это WAL-архив и PITR), а не самописного tar по cron.</p></div>
+<div class="rate" data-rate="156"><span class="rl mono">Оценка</span><button type="button" data-v="0">0 — не знаю</button><button type="button" data-v="1">1 — плыл</button><button type="button" data-v="2">2 — уверенно</button><button type="button" data-v="-" class="clr">×</button></div>
+</article>
+<article class="q" id="q157" data-q="157" data-sec="18" data-text="157 terraform хочет пересоздать все ресурсы. почему?">
+<header class="qh"><span class="qn mono">157</span><h3>Terraform хочет пересоздать все ресурсы. Почему?</h3><span class="mark mono" data-mark="157"></span></header>
+<div class="prose qvis"><div class="callout probe"><span class="clabel">Что проверяют</span>Понимание того, как Terraform адресует ресурсы.</div>
+<p>Было:</p>
+<div class="scroller"><pre><code>variable "users" {
+  default = ["alice", "bob", "carol"]
+}
+
+resource "aws_iam_user" "team" {
+  count = length(var.users)
+  name  = var.users[count.index]
+}</code></pre></div>
+<p>Алиса ушла, из списка убрали <code>"alice"</code>. <code>terraform plan</code> показывает: пересоздать всех.</p></div>
+<button class="reveal" type="button" data-reveal="157">Показать ответ</button>
+<div class="prose ans" data-ans="157" hidden><p><strong>Решение.</strong> Причина в <code>count</code>: ресурсы адресуются по индексу, а не по значению.</p>
+<p>Было в state: <code>[0]=alice</code>, <code>[1]=bob</code>, <code>[2]=carol</code>. Стало в конфигурации: <code>[0]=bob</code>, <code>[1]=carol</code>. Terraform сравнивает по адресу и видит, что у <code>[0]</code> имя изменилось с alice на bob, у <code>[1]</code> — с bob на carol, а <code>[2]</code> надо удалить. Для IAM-пользователя имя нельзя изменить на месте, значит — пересоздать.</p>
+<p>Правильно — <code>for_each</code>, где адресом становится ключ:</p>
+<div class="scroller"><pre><code>variable "users" {
+  type    = set(string)
+  default = ["alice", "bob", "carol"]
+}
+
+resource "aws_iam_user" "team" {
+  for_each = var.users
+  name     = each.value
+}</code></pre></div>
+<p>Теперь адреса <code>["alice"]</code>, <code>["bob"]</code>, <code>["carol"]</code>, и удаление alice затрагивает только её.</p>
+<p><strong>Как выйти из ситуации, если уже на <code>count</code>:</strong> не применять план, а переехать через блоки <code>moved</code> (в коде, проходит review) или <code>terraform state mv</code>:</p>
+<div class="scroller"><pre><code>terraform state mv 'aws_iam_user.team[0]' 'aws_iam_user.team["bob"]'</code></pre></div>
+<p>Правило: <code>count</code> только для «создавать или нет» (<code>count = var.enabled ? 1 : 0</code>), для наборов — всегда <code>for_each</code>.</p></div>
+<div class="rate" data-rate="157"><span class="rl mono">Оценка</span><button type="button" data-v="0">0 — не знаю</button><button type="button" data-v="1">1 — плыл</button><button type="button" data-v="2">2 — уверенно</button><button type="button" data-v="-" class="clr">×</button></div>
+</article>
+<article class="q" id="q158" data-q="158" data-sec="18" data-text="158 сделай этот таск ansible идемпотентным.">
+<header class="qh"><span class="qn mono">158</span><h3>Сделай этот таск Ansible идемпотентным.</h3><span class="mark mono" data-mark="158"></span></header>
+<div class="prose qvis"><div class="callout probe"><span class="clabel">Что проверяют</span>Понимание модели Ansible, а не синтаксиса.</div>
+<div class="scroller"><pre><code>- name: Install app
+  shell: |
+    wget https://example.com/app-1.2.tar.gz
+    tar xzf app-1.2.tar.gz -C /opt
+    /opt/app/bin/setup.sh
+  
+- name: Restart service
+  shell: systemctl restart myapp</code></pre></div></div>
+<button class="reveal" type="button" data-reveal="158">Показать ответ</button>
+<div class="prose ans" data-ans="158" hidden><p><strong>Решение.</strong> Оба таска выполняются при каждом запуске и всегда сообщают <code>changed</code>, то есть плейбук нельзя прогонять регулярно и <code>--check</code> бесполезен.</p>
+<div class="scroller"><pre><code>- name: Download app archive
+  ansible.builtin.get_url:
+    url: https://example.com/app-1.2.tar.gz
+    dest: /tmp/app-1.2.tar.gz
+    checksum: sha256:ab12cd34...        # проверка целостности, а не только «скачалось»
+  register: download
+
+- name: Unpack app
+  ansible.builtin.unarchive:
+    src: /tmp/app-1.2.tar.gz
+    dest: /opt
+    remote_src: true
+    creates: /opt/app/bin/app           # не распаковывать повторно
+  notify: restart myapp
+
+- name: Run setup once
+  ansible.builtin.command: /opt/app/bin/setup.sh
+  args:
+    creates: /opt/app/.setup-done       # маркер: второй раз не запустится
+  notify: restart myapp
+
+handlers:
+  - name: restart myapp
+    ansible.builtin.systemd:
+      name: myapp
+      state: restarted</code></pre></div>
+<p>Что изменилось и почему:</p>
+<ul><li><strong><code>get_url</code> вместо <code>wget</code></strong> — проверяет, что файл уже на месте, умеет checksum, идемпотентен.</li><li><strong><code>unarchive</code> с <code>creates</code></strong> — не распаковывает, если результат уже есть.</li><li><strong><code>command</code> вместо <code>shell</code></strong> — <code>shell</code> нужен только при использовании пайпов и подстановок; <code>command</code> безопаснее. Плюс <code>args.creates</code> делает запуск однократным.</li><li><strong>Перезапуск через handler, а не таском</strong> — сервис перезапускается только если что-то реально изменилось. Перезапуск на каждом прогоне — это лишний простой на пустом месте.</li><li><strong>Версия в URL</strong> — при обновлении на 1.3 маркеры и <code>creates</code> надо привязывать к версии, иначе новая версия не установится. Правильнее — ставить пакетом из репозитория (<code>ansible.builtin.package</code>), тогда версионирование делает пакетный менеджер.</li></ul></div>
+<div class="rate" data-rate="158"><span class="rl mono">Оценка</span><button type="button" data-v="0">0 — не знаю</button><button type="button" data-v="1">1 — плыл</button><button type="button" data-v="2">2 — уверенно</button><button type="button" data-v="-" class="clr">×</button></div>
+</article>
+<article class="q" id="q159" data-q="159" data-sec="18" data-text="159 service не отдаёт трафик. найди причину по данным.">
+<header class="qh"><span class="qn mono">159</span><h3>Service не отдаёт трафик. Найди причину по данным.</h3><span class="mark mono" data-mark="159"></span></header>
+<div class="prose qvis"><div class="callout probe"><span class="clabel">Что проверяют</span>Умение сузить проблему по конкретному выводу.</div>
+<div class="scroller"><pre><code>$ kubectl get pods -l app=web
+NAME                   READY   STATUS    RESTARTS   AGE
+web-5c8d7f9b4-abcde    0/1     Running   0          4m
+web-5c8d7f9b4-fghij    0/1     Running   0          4m
+
+$ kubectl get endpoints web
+NAME   ENDPOINTS   AGE
+web    &lt;none&gt;      4m
+
+$ kubectl describe pod web-5c8d7f9b4-abcde | tail -4
+  Warning  Unhealthy  30s (x12 over 3m)  kubelet
+  Readiness probe failed: HTTP probe failed with statuscode: 404</code></pre></div></div>
+<button class="reveal" type="button" data-reveal="159">Показать ответ</button>
+<div class="prose ans" data-ans="159" hidden><p><strong>Решение.</strong> Причина видна и подтверждается тремя строками одновременно.</p>
+<p>Поды в статусе <code>Running</code>, но <strong><code>READY 0/1</code></strong> — то есть процесс жив, а readiness не проходит. Из-за этого EndpointSlice пуст (<code>ENDPOINTS &lt;none&gt;</code>), а Service без endpoints никуда не маршрутизирует — отсюда «не отдаёт трафик».</p>
+<p>Корневая причина в последней строке: <strong>readiness-проба получает 404</strong>, а не таймаут и не connection refused. Это важное различие:</p>
+<ul><li><strong>404</strong> — приложение отвечает, но по указанному пути ничего нет. Значит проба настроена на неверный путь: <code>/health</code> вместо <code>/healthz</code>, или отсутствует префикс, или эндпоинт ещё не реализован.</li><li><strong>timeout</strong> — указывал бы на медленный старт или зависшее приложение.</li><li><strong>connection refused</strong> — приложение слушает другой порт или только <code>127.0.0.1</code>.</li></ul>
+<p>Что делать: посмотреть, какие пути приложение действительно отдаёт, и привести пробу в соответствие.</p>
+<div class="scroller"><pre><code>kubectl exec web-5c8d7f9b4-abcde -- wget -qO- localhost:8080/healthz
+kubectl get deploy web -o jsonpath='{.spec.template.spec.containers[0].readinessProbe}'</code></pre></div>
+<p>Итог: сервис исправен, конфигурация пробы — нет. И отдельный вывод: без readiness этого падения не случилось бы, но зато трафик пошёл бы на приложение без проверки — то есть проба нужна, её надо просто настроить правильно.</p></div>
+<div class="rate" data-rate="159"><span class="rl mono">Оценка</span><button type="button" data-v="0">0 — не знаю</button><button type="button" data-v="1">1 — плыл</button><button type="button" data-v="2">2 — уверенно</button><button type="button" data-v="-" class="clr">×</button></div>
+</article>
+<article class="q" id="q160" data-q="160" data-sec="18" data-text="160 что не так с этим пайплайном?">
+<header class="qh"><span class="qn mono">160</span><h3>Что не так с этим пайплайном?</h3><span class="mark mono" data-mark="160"></span></header>
+<div class="prose qvis"><div class="callout probe"><span class="clabel">Что проверяют</span>Понимание CI не как набора шагов, а как процесса с безопасностью и воспроизводимостью.</div>
+<div class="scroller"><pre><code>stages: [build, test, deploy]
+
+build:
+  stage: build
+  script:
+    - docker build -t myapp:latest .
+    - docker push myapp:latest
+
+test:
+  stage: test
+  script:
+    - docker build -t myapp:test .
+    - pytest
+
+deploy:
+  stage: deploy
+  script:
+    - echo "$KUBE_TOKEN"
+    - kubectl set image deployment/api api=myapp:latest
+  only: [main]</code></pre></div></div>
+<button class="reveal" type="button" data-reveal="160">Показать ответ</button>
+<div class="prose ans" data-ans="160" hidden><p><strong>Решение.</strong> Шесть проблем.</p>
+<ol><li><strong>Образ собирается дважды</strong> — в <code>build</code> и в <code>test</code>. Значит тестируется не то, что уедет в прод. Собирать один раз, дальше передавать по пайплайну тег или digest.</li><li><strong>Тег <code>latest</code> везде</strong> — невозможно понять, какая версия в проде, и невозможно откатиться. Нужен тег с <code>$CI_COMMIT_SHORT_SHA</code>, а деплой по digest.</li><li><strong><code>echo "$KUBE_TOKEN"</code></strong> — секрет попадает в лог задачи. Даже с маскированием так делать нельзя; здесь это просто утечка.</li><li><strong>Долгоживущий токен кластера в переменных</strong> — правильно OIDC: пайплайн получает короткоживущий токен по доверию, статических кредов нет вообще.</li><li><strong><code>kubectl set image</code> как способ деплоя</strong> — императивное изменение, которого нет в Git. Следующий <code>apply</code> его перетрёт, а история изменений прода не восстанавливается. Правильно — обновить тег в репозитории манифестов и дать ArgoCD синхронизировать.</li><li><strong>Нет проверок безопасности</strong> — сканирование образа (Trivy), поиск секретов в коде, линт манифестов. И нет проверки, что деплой удался: после <code>set image</code> пайплайн зелёный независимо от того, поднялся под или упал в CrashLoop.</li></ol>
+<p>Как должно выглядеть по существу:</p>
+<div class="scroller"><pre><code>build:
+  script:
+    - docker build -t "$IMAGE:$CI_COMMIT_SHORT_SHA" .
+    - trivy image --exit-code 1 --severity HIGH,CRITICAL "$IMAGE:$CI_COMMIT_SHORT_SHA"
+    - docker push "$IMAGE:$CI_COMMIT_SHORT_SHA"
+
+test:
+  script:
+    - docker run --rm "$IMAGE:$CI_COMMIT_SHORT_SHA" pytest    # ровно тот образ
+
+deploy:
+  script:
+    - yq -i ".image.tag = \"$CI_COMMIT_SHORT_SHA\"" infra/values.yaml
+    - git commit -am "deploy $CI_COMMIT_SHORT_SHA" &amp;&amp; git push
+  only: [main]</code></pre></div></div>
+<div class="rate" data-rate="160"><span class="rl mono">Оценка</span><button type="button" data-v="0">0 — не знаю</button><button type="button" data-v="1">1 — плыл</button><button type="button" data-v="2">2 — уверенно</button><button type="button" data-v="-" class="clr">×</button></div>
+</article>
+<article class="q" id="q161" data-q="161" data-sec="18" data-text="161 напиши networkpolicy: закрыть namespace и разрешить только нужное.">
+<header class="qh"><span class="qn mono">161</span><h3>Напиши NetworkPolicy: закрыть namespace и разрешить только нужное.</h3><span class="mark mono" data-mark="161"></span></header>
+<div class="prose qvis"><div class="callout probe"><span class="clabel">Что проверяют</span>Понимание логики политик и знание про DNS.</div>
+<p>Задача: в namespace <code>prod</code> запретить весь входящий и исходящий трафик, кроме: входящий на поды <code>app=api</code> от подов <code>app=frontend</code> на порт 8080; исходящий от <code>app=api</code> к <code>app=db</code> на 5432; DNS для всех.</p></div>
+<button class="reveal" type="button" data-reveal="161">Показать ответ</button>
+<div class="prose ans" data-ans="161" hidden><p><strong>Решение.</strong></p>
+<div class="scroller"><pre><code># 1. Всё запрещено по умолчанию
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: default-deny, namespace: prod}
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+---
+# 2. DNS — иначе перестанет работать вообще всё
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: allow-dns, namespace: prod}
+spec:
+  podSelector: {}
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: kube-system}
+          podSelector:
+            matchLabels: {k8s-app: kube-dns}
+      ports:
+        - {protocol: UDP, port: 53}
+        - {protocol: TCP, port: 53}
+---
+# 3. frontend → api:8080
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: api-from-frontend, namespace: prod}
+spec:
+  podSelector:
+    matchLabels: {app: api}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: {app: frontend}
+      ports:
+        - {protocol: TCP, port: 8080}
+---
+# 4. api → db:5432
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: api-to-db, namespace: prod}
+spec:
+  podSelector:
+    matchLabels: {app: api}
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - podSelector:
+            matchLabels: {app: db}
+      ports:
+        - {protocol: TCP, port: 5432}</code></pre></div>
+<p>Что здесь важно и на чём валятся:</p>
+<ul><li><strong>DNS забывают</strong> в 90% случаев. Симптом характерный: «ничего не работает, но политика вроде правильная» — потому что имена не резолвятся.</li><li><strong>Политики складываются, запрещающих правил нет.</strong> Default-deny плюс несколько разрешающих — это и есть весь механизм.</li><li><strong>Политики stateful</strong> — обратный трафик для установленного соединения разрешать не нужно.</li><li><strong><code>namespaceSelector</code> с <code>kubernetes.io/metadata.name</code></strong> — эта метка ставится автоматически с версии 1.21, вручную ничего размечать не надо.</li><li><strong>Нужен CNI с поддержкой</strong> — Calico, Cilium. С flannel манифест применится и не будет делать ничего, что опаснее отсутствия политики: создаётся ложное чувство защиты.</li></ul></div>
+<div class="rate" data-rate="161"><span class="rl mono">Оценка</span><button type="button" data-v="0">0 — не знаю</button><button type="button" data-v="1">1 — плыл</button><button type="button" data-v="2">2 — уверенно</button><button type="button" data-v="-" class="clr">×</button></div>
+</article>
+<article class="q" id="q162" data-q="162" data-sec="18" data-text="162 посчитай error budget.">
+<header class="qh"><span class="qn mono">162</span><h3>Посчитай error budget.</h3><span class="mark mono" data-mark="162"></span></header>
+<div class="prose qvis"><div class="callout probe"><span class="clabel">Что проверяют</span>SRE-арифметику. Простая задача, на которой многие плывут.</div>
+<p>SLO сервиса: 99.9% успешных запросов за 30 дней. Сервис обрабатывает 10 миллионов запросов в месяц. Вопросы:</p>
+<ol><li>Сколько минут недоступности допустимо?</li><li>Сколько неуспешных запросов допустимо?</li><li>Инцидент длился 25 минут при полной недоступности. Сколько бюджета осталось?</li><li>Стоит ли ставить SLO 99.999%?</li></ol></div>
+<button class="reveal" type="button" data-reveal="162">Показать ответ</button>
+<div class="prose ans" data-ans="162" hidden><p><strong>Решение.</strong></p>
+<ol><li><strong>43.2 минуты.</strong> 30 дней = 43 200 минут; 0.1% от них = 43.2 минуты.</li><li><strong>10 000 запросов.</strong> 0.1% от 10 миллионов.</li><li><strong>18.2 минуты, то есть 42% бюджета.</strong> Потрачено 25 из 43.2 — осталось 18.2, это 42%. Практический вывод: больше половины месячного бюджета сожжено одним инцидентом, и до конца периода стоит притормозить рискованные изменения.</li><li><strong>Нет.</strong> 99.999% за 30 дней — это <strong>26 секунд</strong> в месяц. Меньше, чем длится одно плановое обновление или один перезапуск пода. Каждая следующая девятка стоит примерно на порядок дороже, а разницу между 99.9% и 99.99% пользователь чаще всего не замечает, потому что его собственная сеть надёжна не настолько.</li></ol>
+<p>Ориентиры за 30 дней, которые стоит помнить наизусть:</p>
+<div class="scroller"><table><thead><tr><th>SLO</th><th>Бюджет</th></tr></thead><tbody><tr><td>99%</td><td>7 ч 12 мин</td></tr><tr><td>99.5%</td><td>3 ч 36 мин</td></tr><tr><td>99.9%</td><td>43.2 мин</td></tr><tr><td>99.95%</td><td>21.6 мин</td></tr><tr><td>99.99%</td><td>4.32 мин</td></tr><tr><td>99.999%</td><td>26 сек</td></tr></tbody></table></div>
+<p>Важная оговорка, которая отличает содержательный ответ: считать надо не по времени, а <strong>по доле неуспешных запросов</strong> — сервис, который лежал 40 минут ночью, потратил меньше пользовательского бюджета, чем тот, что отдавал 1% ошибок весь день. Поэтому SLI формулируют как отношение хороших событий к общему числу, а «минуты недоступности» — это упрощение для разговора.</p></div>
+<div class="rate" data-rate="162"><span class="rl mono">Оценка</span><button type="button" data-v="0">0 — не знаю</button><button type="button" data-v="1">1 — плыл</button><button type="button" data-v="2">2 — уверенно</button><button type="button" data-v="-" class="clr">×</button></div>
+</article>
+<article class="q" id="q163" data-q="163" data-sec="18" data-text="163 выдай приложению минимальные права.">
+<header class="qh"><span class="qn mono">163</span><h3>Выдай приложению минимальные права.</h3><span class="mark mono" data-mark="163"></span></header>
+<div class="prose qvis"><div class="callout probe"><span class="clabel">Что проверяют</span>RBAC руками, без гугла.</div>
+<p>Приложению в namespace <code>prod</code> нужно: читать ConfigMap <code>app-config</code>, читать все Secret'ы с префиксом не важно какой (то есть все в namespace), и перезапускать собственный Deployment <code>api</code>. Напиши всё необходимое.</p></div>
+<button class="reveal" type="button" data-reveal="163">Показать ответ</button>
+<div class="prose ans" data-ans="163" hidden><p><strong>Решение.</strong></p>
+<div class="scroller"><pre><code>apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: api-sa
+  namespace: prod
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: api-role
+  namespace: prod
+rules:
+  # конкретный ConfigMap по имени
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames: ["app-config"]
+    verbs: ["get", "watch"]
+  # секреты: get без list, чтобы нельзя было выкачать всё разом
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get"]
+  # перезапуск своего Deployment = patch аннотации в шаблоне пода
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    resourceNames: ["api"]
+    verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: api-binding
+  namespace: prod
+subjects:
+  - kind: ServiceAccount
+    name: api-sa
+    namespace: prod
+roleRef:
+  kind: Role
+  name: api-role
+  apiGroup: rbac.authorization.k8s.io</code></pre></div>
+<p>Проверка обязательна, иначе это гадание:</p>
+<div class="scroller"><pre><code>kubectl auth can-i get configmap/app-config --as=system:serviceaccount:prod:api-sa -n prod
+kubectl auth can-i list secrets --as=system:serviceaccount:prod:api-sa -n prod   # должно быть no
+kubectl auth can-i --list --as=system:serviceaccount:prod:api-sa -n prod</code></pre></div>
+<p>Тонкости, которые здесь и проверяют:</p>
+<ul><li><strong><code>resourceNames</code> не работает с <code>list</code> и <code>watch</code>.</strong> Ограничить листинг конкретным объектом нельзя — либо <code>get</code> по имени, либо <code>list</code> всего. Поэтому для ConfigMap оставлен <code>get</code> и <code>watch</code>, а <code>watch</code> с <code>resourceNames</code> тоже не сработает: если нужен watch, придётся давать его на весь тип.</li><li><strong><code>get</code> без <code>list</code> для секретов</strong> — важное различие: с <code>list</code> приложение (или тот, кто его скомпрометирует) выкачает все секреты одним запросом.</li><li><strong>«Перезапустить Deployment»</strong> — это не отдельный verb, а <code>patch</code>: <code>kubectl rollout restart</code> меняет аннотацию в <code>spec.template</code>. Отдельного права на рестарт не существует.</li><li><strong>Не использовать <code>default</code> ServiceAccount</strong> и ставить <code>automountServiceAccountToken: false</code> там, где доступ к API вообще не нужен.</li></ul></div>
+<div class="rate" data-rate="163"><span class="rl mono">Оценка</span><button type="button" data-v="0">0 — не знаю</button><button type="button" data-v="1">1 — плыл</button><button type="button" data-v="2">2 — уверенно</button><button type="button" data-v="-" class="clr">×</button></div>
+</article>
+<article class="q" id="q164" data-q="164" data-sec="18" data-text="164 диск заполнен, а файлов нет. разбери.">
+<header class="qh"><span class="qn mono">164</span><h3>Диск заполнен, а файлов нет. Разбери.</h3><span class="mark mono" data-mark="164"></span></header>
+<div class="prose qvis"><div class="callout probe"><span class="clabel">Что проверяют</span>Тот самый инцидент, который у всех был.</div>
+<div class="scroller"><pre><code>$ df -h /var
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda2        50G   50G     0 100% /var
+
+$ du -sh /var
+23G   /var</code></pre></div></div>
+<button class="reveal" type="button" data-reveal="164">Показать ответ</button>
+<div class="prose ans" data-ans="164" hidden><p><strong>Решение.</strong> Расхождение в 27 ГБ. Проверять в таком порядке:</p>
+<div class="scroller"><pre><code># 1. Удалённые файлы, которые ещё держит открытыми процесс — самая частая причина
+sudo lsof +L1
+sudo lsof -nP | grep -i deleted
+
+# 2. Что-то смонтировано ПОВЕРХ каталога: du не видит того, что под точкой монтирования
+mount | grep /var
+sudo du -sh --exclude=/var/lib/docker /var
+
+# 3. Кончились не блоки, а inode
+df -i /var
+
+# 4. Зарезервированные для root 5%
+sudo tune2fs -l /dev/sda2 | grep -i reserved</code></pre></div>
+<p>Самый вероятный сценарий здесь: <strong>logrotate удалил или переименовал лог, а приложение продолжает писать в старый файловый дескриптор.</strong> Ссылки из каталога нет — <code>du</code> файл не видит; inode и блоки не освобождены — <code>df</code> считает место занятым. Растёт до тех пор, пока процесс не перезапустят.</p>
+<p>Лечение:</p>
+<div class="scroller"><pre><code># найти виновника
+sudo lsof +L1 | head
+# обнулить через дескриптор, не перезапуская сервис
+sudo truncate -s 0 /proc/&lt;pid&gt;/fd/&lt;N&gt;
+# или, если можно, перезапустить процесс
+sudo systemctl restart myapp</code></pre></div>
+<p>Профилактика: в конфигурации logrotate использовать <code>copytruncate</code> либо <code>postrotate</code> с сигналом приложению на переоткрытие логов (<code>systemctl reload</code> или <code>kill -USR1</code>), плюс алерт на заполнение диска с <code>predict_linear</code> — чтобы узнавать за часы до, а не в момент отказа.</p></div>
+<div class="rate" data-rate="164"><span class="rl mono">Оценка</span><button type="button" data-v="0">0 — не знаю</button><button type="button" data-v="1">1 — плыл</button><button type="button" data-v="2">2 — уверенно</button><button type="button" data-v="-" class="clr">×</button></div>
+</article>
+<article class="q" id="q165" data-q="165" data-sec="18" data-text="165 сервис лёг. расскажи первые пять минут.">
+<header class="qh"><span class="qn mono">165</span><h3>Сервис лёг. Расскажи первые пять минут.</h3><span class="mark mono" data-mark="165"></span></header>
+<div class="prose qvis"><div class="callout probe"><span class="clabel">Что проверяют</span>Финальная задача многих собеседований: как ты действуешь под давлением. Отвечать надо порядком действий, а не списком команд.</div></div>
+<button class="reveal" type="button" data-reveal="165">Показать ответ</button>
+<div class="prose ans" data-ans="165" hidden><p><strong>Решение.</strong> Порядок именно такой, и первый пункт важнее остальных.</p>
+<p><strong>Минута 1 — снизить влияние, а не искать причину.</strong> Что изменилось за последний час? Был деплой — откатываем немедленно, не разбираясь. Правило: если проблема на проде и причина не очевидна в первые минуты, сначала возвращаем работоспособность, потом исследуем. Попытка «сейчас быстро починим вперёд» под давлением почти всегда удлиняет инцидент.</p>
+<p><strong>Минута 2 — оценить масштаб.</strong> Лежит всё или часть? Все пользователи или один регион? Смотрю дашборд golden signals: доля ошибок, латентность, трафик. Это определяет, объявлять инцидент и звать людей или чинить самому.</p>
+<p><strong>Минута 3 — сообщить.</strong> Короткое сообщение в канал инцидентов: что наблюдаем, кого затрагивает, кто занимается, когда следующее обновление. Пока чинишь молча, три человека делают ту же работу параллельно, а четвёртый отвечает клиентам наугад.</p>
+<p><strong>Минута 4 — сузить слой.</strong> Приложение, зависимость или инфраструктура? Быстрые проверки: поды готовы, endpoints не пусты, база отвечает, внешние зависимости живы, узлы в Ready, места на дисках хватает. Ищу симптом на границе: если ошибки только на запись — смотрю базу; если растёт латентность на всём — смотрю общую зависимость.</p>
+<p><strong>Минута 5 — действовать по гипотезе и фиксировать.</strong> Одно изменение за раз, с проверкой эффекта. Параллельно пишу таймлайн: время, что увидел, что сделал. Потом по памяти его никто не восстановит, а он нужен для постмортема.</p>
+<p><strong>После восстановления:</strong> blameless postmortem, и главное в нём — не «что сломалось», а <strong>что позволило этому дойти до прода</strong> и какой проверки не хватало. Action items должны убирать класс проблемы, а не конкретный случай.</p>
+<div class="callout deep"><span class="clabel">Глубже</span>Что добавить, чтобы ответ выделился: разделение ролей при серьёзном инциденте — incident commander координирует и не чинит руками, отдельный человек общается с бизнесом, остальные работают по гипотезам. И честное признание: если о падении узнали от клиентов, а не от мониторинга, то первый пункт постмортема — именно это, а не техническая причина.</div></div>
+<div class="rate" data-rate="165"><span class="rl mono">Оценка</span><button type="button" data-v="0">0 — не знаю</button><button type="button" data-v="1">1 — плыл</button><button type="button" data-v="2">2 — уверенно</button><button type="button" data-v="-" class="clr">×</button></div>
+</article>
+</section>
+<section id="s19" data-sec="19">
+<div class="sect-head"><h2>Часть 18. Как готовиться к собеседованию</h2></div>
 <div class="prose lead"><p><strong>За две недели.</strong> Прогнать этот файл целиком, отмечая нули и единицы. Всё, что ниже двойки — в список. Отдельно выписать шесть историй по STAR и написать их текстом, не «в голове».</p>
 <p><strong>За неделю.</strong> Пройти список нулей. Не гнаться за всем — закрыть то, что спрашивают чаще: probes, requests/limits и QoS, разбор CrashLoopBackOff, что происходит при <code>kubectl apply</code>, state в Terraform, идемпотентность в Ansible, SLI/SLO/error budget, PromQL с <code>rate</code> и <code>histogram_quantile</code>, merge против rebase.</p>
 <p><strong>За три дня.</strong> Тренировать скорость с kubectl на Killercoda: живые задачи на время, без подглядывания в документацию. Проговорить вслух пять главных ответов.</p>
@@ -1981,184 +2534,362 @@ predict_linear(node_filesystem_avail_bytes{mountpoint="/"}[6h], 4*3600) &lt; 0</
 <ul><li>Не знаешь — говори «не знаю, но рассуждал бы так…» и рассуждай. Это оценивается выше, чем угадывание. Придуманный ответ распознаётся сразу и портит всё остальное.</li><li>Уточняй вопрос, если он широкий: «уточню — вас интересует, как это работает внутри, или как я это применял?»</li><li>Отвечай структурой: «три причины: первая… вторая… третья». Структура воспринимается как компетентность даже при равном содержании.</li><li>Приводи примеры из своей практики. «Так у нас было в проде» весит больше любой теории.</li><li>Не преуменьшай: «настраивал Kubernetes» вместо «ну, немного трогал». Второе — то, что ты делаешь по привычке, и это стоит тебе денег.</li></ul>
 <p><strong>После собеседования — обязательно.</strong> Записать все вопросы, на которые ответил плохо. Это твоя персональная программа на следующие дни, точнее любого плана. Через месяц таких записей ты будешь знать рынок лучше, чем любой курс.</p></div>
 </section>
-<section id="s19" data-sec="19">
+<section id="s20" data-sec="20">
 <div class="sect-head"><h2>Итог</h2></div>
-<div class="prose lead"><p>Этот файл — 151 вопрос. Их не надо знать все. Задача другая: <strong>закрыть 60–70% на уверенную двойку</strong> — этого достаточно для позиции middle DevOps, а вместе с десятью годами реального продакшна за спиной — для того, чтобы не соглашаться на первую предложенную цифру.</p>
+<div class="prose lead"><p>Этот файл — 165 вопросов, включая 14 практических задач. Их не надо знать все. Задача другая: <strong>закрыть 60–70% на уверенную двойку</strong> — этого достаточно для позиции middle DevOps, а вместе с десятью годами реального продакшна за спиной — для того, чтобы не соглашаться на первую предложенную цифру.</p>
 <p>И одна вещь, которую стоит помнить, читая этот файл: если на многие вопросы ты уже отвечаешь — значит ты не «типичный сисадмин, который пытается учить». Значит ты инженер, который себя недооценивает. Это разные проблемы, и вторая решается быстрее.</p></div>
 </section>
+    <div class="cardnav" id="cardnav">
+      <button type="button" id="cardPrev">← назад</button>
+      <span class="pos" id="cardPos">—</span>
+      <button type="button" id="cardNext">вперёд →</button>
+    </div>
   </main>
 </div>
 
 <script>
 (function(){
-  var KEY="qa-trainer-v1", TOTAL=151;
-  var state={};
-  try{state=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){state={}}
-  function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+  var KEY="qa-trainer-v2", OLD="qa-trainer-v1", TOTAL=165;
+  var GAP={"0":1,"1":3,"2":14};                 // дней до повторения
+  var today=function(){return Math.floor(Date.now()/864e5)};
 
-  var cards=[].slice.call(document.querySelectorAll(".q"));
+  // ── хранилище: {v:{n:"0|1|2"}, d:{n:день_повторения}} ──
+  var data={v:{},d:{}};
+  try{
+    var raw=localStorage.getItem(KEY);
+    if(raw){ data=JSON.parse(raw); data.v=data.v||{}; data.d=data.d||{}; }
+    else{
+      var old=localStorage.getItem(OLD);
+      if(old){ data.v=JSON.parse(old)||{}; data.d={}; }
+    }
+  }catch(e){ data={v:{},d:{}} }
+  function save(){ try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){} }
+
+  var cards=Array.prototype.slice.call(document.querySelectorAll(".q"));
   var LABEL={"0":"0 — не знаю","1":"1 — плыл","2":"2 — уверенно"};
+  var el=function(id){return document.getElementById(id)};
 
+  var exam=null;            // {set:Set, ends:ms, tick:id}
+  var cardsMode=false;
+  var filter="all", query="", activeIdx=-1;
+
+  // ── отрисовка одной карточки ──
   function paint(card){
-    var n=card.getAttribute("data-q"), v=state[n];
+    var n=card.getAttribute("data-q"), v=data.v[n];
     var mark=card.querySelector("[data-mark]");
-    if(v===undefined){card.removeAttribute("data-v");mark.textContent=""}
-    else{card.setAttribute("data-v",v);mark.textContent=LABEL[v]}
+    var rev=card.querySelector(".reveal");
+    if(v===undefined){ card.removeAttribute("data-v"); mark.textContent=""; }
+    else { card.setAttribute("data-v",v); mark.textContent=LABEL[v]; }
+    if(rev){
+      var locked = exam && v===undefined;
+      rev.disabled=!!locked;
+      rev.textContent = locked ? "Сначала поставь оценку" : "Показать ответ";
+    }
   }
 
+  function setVal(card,v){
+    var n=card.getAttribute("data-q");
+    if(v===null){ delete data.v[n]; delete data.d[n]; }
+    else { data.v[n]=v; data.d[n]=today()+GAP[v]; }
+    save(); paint(card); recount();
+  }
+
+  // ── счёт ──
   function verdictFor(p){
     if(p<40) return "junior / вход в DevOps — база есть, системы нет";
     if(p<60) return "junior+ / middle-минус — срезают на глубине";
     if(p<80) return "middle — целевой уровень, можно торговаться";
     return "middle+ / senior — вилка выше рынка";
   }
-
+  function dueCount(){
+    var t=today(), k=0;
+    for(var n in data.d){ if(data.d.hasOwnProperty(n) && data.d[n]<=t) k++; }
+    return k;
+  }
   function recount(){
     var c={0:0,1:0,2:0}, rated=0;
-    for(var k in state){if(state.hasOwnProperty(k)){c[state[k]]++;rated++}}
+    for(var k in data.v){ if(data.v.hasOwnProperty(k)){ c[data.v[k]]++; rated++; } }
     var pct=TOTAL?Math.round(c[2]/TOTAL*100):0;
-    document.getElementById("pct").textContent=rated?pct+"%":"—";
-    document.getElementById("m2").style.width=(c[2]/TOTAL*100)+"%";
-    document.getElementById("m1").style.width=(c[1]/TOTAL*100)+"%";
-    document.getElementById("m0").style.width=(c[0]/TOTAL*100)+"%";
-    document.getElementById("verdict").textContent=
-      rated?(verdictFor(pct)+" · оценено "+rated+" из "+TOTAL):"оцени первый вопрос";
+    el("pct").textContent=rated?pct+"%":"—";
+    el("m2").style.width=(c[2]/TOTAL*100)+"%";
+    el("m1").style.width=(c[1]/TOTAL*100)+"%";
+    el("m0").style.width=(c[0]/TOTAL*100)+"%";
+    el("verdict").textContent=rated?(verdictFor(pct)+" · оценено "+rated+" из "+TOTAL):"оцени первый вопрос";
+    var d=dueCount(); el("dueN").textContent=d?("· "+d):"";
 
     var per={};
     cards.forEach(function(card){
-      var s=card.getAttribute("data-sec"), n=card.getAttribute("data-q");
-      per[s]=per[s]||{two:0,tot:0};
-      per[s].tot++;
-      if(state[n]==="2"||state[n]===2) per[s].two++;
+      var sec=card.getAttribute("data-sec"), n=card.getAttribute("data-q");
+      per[sec]=per[sec]||{two:0,tot:0}; per[sec].tot++;
+      if(data.v[n]==="2") per[sec].two++;
     });
-    Object.keys(per).forEach(function(s){
-      var d=per[s];
-      var nsc=document.querySelector('.nsc[data-sec="'+s+'"]');
-      if(nsc) nsc.textContent=d.two+"/"+d.tot;
-      var fill=document.querySelector('[data-secfill="'+s+'"]');
-      if(fill) fill.style.width=(d.two/d.tot*100)+"%";
-      var lab=document.querySelector('[data-seclabel="'+s+'"]');
-      if(lab) lab.textContent=d.two+" / "+d.tot;
+    Object.keys(per).forEach(function(sec){
+      var x=per[sec];
+      var a=document.querySelector('.nsc[data-sec="'+sec+'"]'); if(a) a.textContent=x.two+"/"+x.tot;
+      var f=document.querySelector('[data-secfill="'+sec+'"]'); if(f) f.style.width=(x.two/x.tot*100)+"%";
+      var l=document.querySelector('[data-seclabel="'+sec+'"]'); if(l) l.textContent=x.two+" / "+x.tot;
     });
   }
 
-  document.addEventListener("click",function(e){
-    var r=e.target.closest(".reveal");
-    if(r){
-      var n=r.getAttribute("data-reveal");
-      document.querySelector('[data-ans="'+n+'"]').hidden=false;
-      r.hidden=true;
-      return;
-    }
-    var b=e.target.closest(".rate button");
-    if(b){
-      var card=b.closest(".q"), n2=card.getAttribute("data-q"), v=b.getAttribute("data-v");
-      if(v==="-") delete state[n2]; else state[n2]=v;
-      save(); paint(card); recount(); applyFilter();
-      return;
-    }
-  });
-
-  var filter="all", query="";
-  document.querySelectorAll("[data-filter]").forEach(function(btn){
-    btn.addEventListener("click",function(){
-      document.querySelectorAll("[data-filter]").forEach(function(x){x.classList.remove("on")});
-      btn.classList.add("on"); filter=btn.getAttribute("data-filter"); applyFilter();
-    });
-  });
-  document.getElementById("search").addEventListener("input",function(e){
-    query=e.target.value.trim().toLowerCase(); applyFilter();
-  });
+  // ── фильтры ──
+  function visibleCards(){ return cards.filter(function(c){return !c.classList.contains("hide")}) }
 
   function applyFilter(){
-    var shown=0;
+    var t=today(), shown=0;
     cards.forEach(function(card){
-      var n=card.getAttribute("data-q"), v=state[n], ok=true;
-      if(filter==="todo") ok=(v===undefined);
+      var n=card.getAttribute("data-q"), v=data.v[n], ok=true;
+      if(exam) ok=exam.set.has(n);
+      else if(filter==="todo") ok=(v===undefined);
       else if(filter==="weak") ok=(v==="0"||v==="1");
+      else if(filter==="due") ok=(data.d[n]!==undefined && data.d[n]<=t);
       if(ok&&query) ok=card.getAttribute("data-text").indexOf(query)>-1;
       card.classList.toggle("hide",!ok);
       if(ok) shown++;
     });
-    document.getElementById("empty").hidden=(shown>0);
+    var em=el("empty");
+    em.hidden=(shown>0);
+    if(!em.hidden){
+      em.textContent = (filter==="due" && !query)
+        ? "Сегодня повторять нечего — очередь пополнится, когда подойдёт срок: ноль через день, единица через три, двойка через две недели."
+        : (filter==="todo" && !query)
+          ? "Оценены все вопросы. Дальше — фильтр «повторить» или режим экзамена."
+          : "Ничего не найдено — измени запрос или фильтр.";
+    }
     document.querySelectorAll("section[data-sec]").forEach(function(sec){
       var qs=sec.querySelectorAll(".q");
-      if(!qs.length) { sec.style.display=(filter==="all"&&!query)?"":"none"; return; }
-      var any=[].slice.call(qs).some(function(c){return !c.classList.contains("hide")});
+      if(!qs.length){ sec.style.display=(filter==="all"&&!query&&!exam&&!cardsMode)?"":"none"; return; }
+      var any=Array.prototype.slice.call(qs).some(function(c){return !c.classList.contains("hide")});
       sec.style.display=any?"":"none";
     });
+    if(cardsMode) setActive(activeIdx<0?0:Math.min(activeIdx,visibleCards().length-1),false);
+    updateCardNav();
   }
 
-  document.getElementById("collapse").addEventListener("click",function(){
-    document.querySelectorAll("[data-ans]").forEach(function(a){a.hidden=true});
-    document.querySelectorAll(".reveal").forEach(function(r){r.hidden=false});
-    window.scrollTo({top:0,behavior:"smooth"});
-  });
-
-  document.getElementById("reset").addEventListener("click",function(){
-    if(!confirm("Сбросить все оценки?")) return;
-    state={}; save();
-    cards.forEach(paint); recount(); applyFilter();
-  });
-
-  function visibleCards(){
-    return cards.filter(function(c){return !c.classList.contains("hide")});
-  }
-  var activeIdx=-1;
+  // ── активная карточка ──
   function setActive(i,scroll){
     var vis=visibleCards();
-    if(!vis.length) return;
+    if(!vis.length){ activeIdx=-1; updateCardNav(); return; }
     if(i<0) i=0; if(i>=vis.length) i=vis.length-1;
     cards.forEach(function(c){c.classList.remove("active")});
-    var card=vis[i]; card.classList.add("active"); activeIdx=i;
-    if(scroll!==false) card.scrollIntoView({block:"center",behavior:"smooth"});
+    vis[i].classList.add("active"); activeIdx=i;
+    if(scroll!==false) vis[i].scrollIntoView({block:cardsMode?"start":"center",behavior:"smooth"});
+    updateCardNav();
   }
-  function activeCard(){
+  function activeCard(){ var vis=visibleCards(); return (activeIdx>=0&&activeIdx<vis.length)?vis[activeIdx]:null }
+  function updateCardNav(){
+    if(!cardsMode) return;
     var vis=visibleCards();
-    if(activeIdx<0||activeIdx>=vis.length) return null;
-    return vis[activeIdx];
+    el("cardPos").textContent=vis.length?((activeIdx+1)+" / "+vis.length):"—";
   }
 
-  document.getElementById("resume").addEventListener("click",function(){
-    var vis=visibleCards();
-    for(var i=0;i<vis.length;i++){
-      if(state[vis[i].getAttribute("data-q")]===undefined){ setActive(i); return; }
+  // ── клики ──
+  document.addEventListener("click",function(e){
+    var r=e.target.closest(".reveal");
+    if(r&&!r.disabled){
+      document.querySelector('[data-ans="'+r.getAttribute("data-reveal")+'"]').hidden=false;
+      r.hidden=true; return;
     }
+    var b=e.target.closest(".rate button");
+    if(b){
+      var card=b.closest(".q"), v=b.getAttribute("data-v");
+      setVal(card, v==="-"?null:v);
+      var wasIdx=visibleCards().indexOf(card);
+      if(!exam&&!cardsMode&&(filter==="todo"||filter==="weak"||filter==="due")){
+        applyFilter(); setActive(Math.min(wasIdx,visibleCards().length-1),false);
+      } else { applyFilter(); }
+      if(exam) maybeFinish();
+      return;
+    }
+    var c=e.target.closest(".q");
+    if(c) setActive(visibleCards().indexOf(c),false);
+  });
+
+  document.querySelectorAll("[data-filter]").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      if(exam) return;
+      document.querySelectorAll("[data-filter]").forEach(function(x){x.classList.remove("on")});
+      btn.classList.add("on"); filter=btn.getAttribute("data-filter"); activeIdx=-1; applyFilter();
+    });
+  });
+  el("search").addEventListener("input",function(e){ query=e.target.value.trim().toLowerCase(); applyFilter(); });
+
+  el("resume").addEventListener("click",function(){
+    var vis=visibleCards();
+    for(var i=0;i<vis.length;i++){ if(data.v[vis[i].getAttribute("data-q")]===undefined){ setActive(i); return; } }
     setActive(0);
   });
 
+  el("collapse").addEventListener("click",function(){
+    document.querySelectorAll("[data-ans]").forEach(function(a){a.hidden=true});
+    document.querySelectorAll(".reveal").forEach(function(x){x.hidden=false});
+    cards.forEach(paint);
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+
+  el("reset").addEventListener("click",function(){
+    if(!confirm("Сбросить все оценки?")) return;
+    data={v:{},d:{}}; save(); cards.forEach(paint); recount(); applyFilter();
+  });
+
+  // ── карточный режим ──
+  el("cardsBtn").addEventListener("click",function(){
+    cardsMode=!cardsMode;
+    document.body.classList.toggle("cards",cardsMode);
+    el("cardsBtn").classList.toggle("on",cardsMode);
+    applyFilter(); setActive(cardsMode?0:activeIdx,cardsMode);
+  });
+  el("cardPrev").addEventListener("click",function(){ setActive(activeIdx-1) });
+  el("cardNext").addEventListener("click",function(){ setActive(activeIdx+1) });
+
+  var tx=0;
+  document.addEventListener("touchstart",function(e){ tx=e.changedTouches[0].clientX },{passive:true});
+  document.addEventListener("touchend",function(e){
+    if(!cardsMode) return;
+    var dx=e.changedTouches[0].clientX-tx;
+    if(Math.abs(dx)>70) setActive(activeIdx+(dx<0?1:-1));
+  },{passive:true});
+
+  // ── экзамен ──
+  el("examBtn").addEventListener("click",function(){
+    if(exam){ finishExam(true); return; }
+    el("examPanel").hidden=!el("examPanel").hidden;
+    el("syncPanel").hidden=true;
+  });
+  document.querySelectorAll("[data-exam]").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      var n=parseInt(btn.getAttribute("data-exam"),10);
+      el("examPanel").hidden=true;
+      if(n>0) startExam(n);
+    });
+  });
+
+  function startExam(n){
+    var pool=cards.slice();
+    for(var i=pool.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=pool[i]; pool[i]=pool[j]; pool[j]=t; }
+    var chosen=pool.slice(0,Math.min(n,pool.length));
+    exam={set:new Set(chosen.map(function(c){return c.getAttribute("data-q")})), total:chosen.length,
+          ends:Date.now()+n*60000, tick:null, start:{}};
+    chosen.forEach(function(c){ var q=c.getAttribute("data-q"); exam.start[q]=data.v[q]; delete data.v[q]; });
+    save();
+    document.querySelectorAll("[data-ans]").forEach(function(a){a.hidden=true});
+    document.querySelectorAll(".reveal").forEach(function(x){x.hidden=false});
+    el("examBtn").textContent="завершить"; el("examBtn").classList.add("on");
+    el("resultPanel").hidden=true;
+    query=""; el("search").value="";
+    cards.forEach(paint); recount(); applyFilter(); setActive(0);
+    exam.tick=setInterval(tickTimer,1000); tickTimer();
+  }
+
+  function tickTimer(){
+    if(!exam) return;
+    var left=Math.max(0,Math.round((exam.ends-Date.now())/1000));
+    var t=el("timer"); t.hidden=false;
+    t.textContent=String(Math.floor(left/60)).padStart(2,"0")+":"+String(left%60).padStart(2,"0");
+    t.classList.toggle("low",left<=60);
+    if(left<=0) finishExam(false);
+  }
+
+  function maybeFinish(){
+    if(!exam) return;
+    var done=0;
+    exam.set.forEach(function(q){ if(data.v[q]!==undefined) done++; });
+    if(done>=exam.total) finishExam(false);
+  }
+
+  function finishExam(cancelled){
+    if(!exam) return;
+    clearInterval(exam.tick);
+    var ids=Array.from(exam.set), c={0:0,1:0,2:0}, unrated=0;
+    ids.forEach(function(q){ var v=data.v[q]; if(v===undefined) unrated++; else c[v]++; });
+    var answered=ids.length-unrated;
+    var pct=answered?Math.round(c[2]/ids.length*100):0;
+    exam=null;
+    el("timer").hidden=true;
+    el("examBtn").textContent="экзамен"; el("examBtn").classList.remove("on");
+
+    if(!cancelled){
+      var p=el("resultPanel");
+      p.innerHTML='<p class="pt">Результат экзамена</p>'
+        +'<p><span class="big2">'+pct+'%</span> уверенных ответов из '+ids.length+' вопросов</p>'
+        +'<p class="pd">'+verdictFor(pct)+'. Уверенно: '+c["2"]+' · плыл: '+c["1"]+' · не знаю: '+c["0"]
+        +(unrated?' · не дошёл: '+unrated:'')+'.</p>'
+        +'<p class="pd">Всё, что ниже двойки, попало в очередь повторения — фильтр «повторить».</p>'
+        +'<div class="prow"><button class="chip" id="resClose" type="button">закрыть</button>'
+        +'<button class="chip" data-filter-jump="weak" type="button">показать провалы</button></div>';
+      p.hidden=false;
+      el("resClose").addEventListener("click",function(){p.hidden=true});
+      p.querySelector("[data-filter-jump]").addEventListener("click",function(){
+        p.hidden=true;
+        var w=document.querySelector('[data-filter="weak"]'); if(w) w.click();
+      });
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+    cards.forEach(paint); recount(); applyFilter();
+  }
+
+  // ── перенос прогресса ──
+  el("syncBtn").addEventListener("click",function(){
+    var p=el("syncPanel"); p.hidden=!p.hidden; el("examPanel").hidden=true;
+    if(!p.hidden){ el("syncBox").value=encodeState(); el("syncMsg").textContent=""; }
+  });
+  el("syncClose").addEventListener("click",function(){ el("syncPanel").hidden=true });
+
+  function encodeState(){
+    try{ return "QA2:"+btoa(unescape(encodeURIComponent(JSON.stringify(data)))); }
+    catch(e){ return "" }
+  }
+  function decodeState(str){
+    str=(str||"").trim();
+    if(str.indexOf("QA2:")===0) str=str.slice(4);
+    var obj=JSON.parse(decodeURIComponent(escape(atob(str))));
+    if(!obj||typeof obj!=="object"||!obj.v) throw new Error("формат");
+    return obj;
+  }
+  el("syncCopy").addEventListener("click",function(){
+    var box=el("syncBox"); box.value=encodeState(); box.select();
+    var done=function(){ el("syncMsg").textContent="скопировано" };
+    if(navigator.clipboard) navigator.clipboard.writeText(box.value).then(done,function(){ document.execCommand("copy"); done(); });
+    else { document.execCommand("copy"); done(); }
+  });
+  el("syncApply").addEventListener("click",function(){
+    try{
+      var obj=decodeState(el("syncBox").value);
+      var n=Object.keys(obj.v).length;
+      data={v:obj.v||{},d:obj.d||{}}; save();
+      cards.forEach(paint); recount(); applyFilter();
+      el("syncMsg").textContent="применено: "+n+" оценок";
+    }catch(err){ el("syncMsg").textContent="не разобрал код"; }
+  });
+
+  // ── клавиатура ──
   document.addEventListener("keydown",function(e){
-    var s2=document.getElementById("search");
-    if(e.key==="/"&&document.activeElement!==s2){ e.preventDefault(); s2.focus(); return; }
-    if(document.activeElement===s2){ if(e.key==="Escape") s2.blur(); return; }
+    var sb=el("search");
+    if(e.key==="/"&&document.activeElement!==sb){ e.preventDefault(); sb.focus(); return; }
+    if(document.activeElement===sb){ if(e.key==="Escape") sb.blur(); return; }
+    if(document.activeElement===el("syncBox")) return;
     if(e.metaKey||e.ctrlKey||e.altKey) return;
 
     var k=e.key.toLowerCase();
-    if(k==="j"){ e.preventDefault(); setActive(activeIdx<0?0:activeIdx+1); return; }
-    if(k==="k"){ e.preventDefault(); setActive(activeIdx<0?0:activeIdx-1); return; }
+    if(k==="j"||e.key==="ArrowRight"){ e.preventDefault(); setActive(activeIdx<0?0:activeIdx+1); return; }
+    if(k==="k"||e.key==="ArrowLeft"){ e.preventDefault(); setActive(activeIdx<0?0:activeIdx-1); return; }
 
-    var card=activeCard();
-    if(!card) return;
-    var n=card.getAttribute("data-q");
+    var card=activeCard(); if(!card) return;
     if(e.key===" "||e.key==="Enter"){
       var btn=card.querySelector(".reveal");
-      if(btn&&!btn.hidden){ e.preventDefault(); btn.click(); }
+      if(btn&&!btn.hidden&&!btn.disabled){ e.preventDefault(); btn.click(); }
       return;
     }
     if(k==="0"||k==="1"||k==="2"){
       e.preventDefault();
-      state[n]=k; save(); paint(card); recount();
-      var vis=visibleCards(), pos=vis.indexOf(card);
-      applyFilter();
-      var nv=visibleCards();
-      setActive(nv.indexOf(card)>=0?nv.indexOf(card)+1:Math.min(pos,nv.length-1));
+      var idx=visibleCards().indexOf(card);
+      setVal(card,k);
+      if(!exam&&!cardsMode&&(filter==="todo"||filter==="weak"||filter==="due")){
+        applyFilter(); setActive(Math.min(idx,visibleCards().length-1));
+      } else { applyFilter(); setActive(idx+1); }
+      if(exam) maybeFinish();
       return;
     }
-    if(k==="x"){ e.preventDefault(); delete state[n]; save(); paint(card); recount(); applyFilter(); }
-  });
-
-  cards.forEach(function(card,i){
-    card.addEventListener("click",function(){ setActive(visibleCards().indexOf(card),false); });
+    if(k==="x"){ e.preventDefault(); setVal(card,null); applyFilter(); }
   });
 
   cards.forEach(paint); recount(); applyFilter();
