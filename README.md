@@ -32,6 +32,7 @@
 | [**Резюме**](https://nurekella.github.io/AboutMe/resume.html) | Опыт по местам работы, образование, курсы |
 | [**План подготовки**](https://nurekella.github.io/AboutMe/devops-plan.html) · [`DEVOPS_PLAN.md`](DEVOPS_PLAN.md) | Восемь недель: эксплуатация Kubernetes, GitOps, SRE, Terraform, платформенная инженерия, портфолио, CKA |
 | [**Roadmap**](https://nurekella.github.io/AboutMe/roadmap.html) | Три грейда и 25 этапов от junior до senior с живым прогрессом из оценок тренажёра |
+| [**GitHub: материалы и экзамены**](https://nurekella.github.io/AboutMe/repos.html) | 377 репозиториев из моих звёзд, разобранных по назначению: курсы и программы, лабы для практики руками, подготовка к CKA/CKAD/CKS, банки вопросов для собеседований, проекты для портфолио, шпаргалки, инструменты. С поиском, фильтром по разделам и отметками о пройденном |
 | [**Материалы**](https://nurekella.github.io/AboutMe/resources.html) · [`RESOURCES.md`](RESOURCES.md) | Курсы, книги, видео, интерактивные лабы — с порядком прохождения и разделом «чего не надо» |
 | [**Чеклист**](https://nurekella.github.io/AboutMe/checklist.html) | 41 пункт подготовки: за две недели, за неделю, за три дня, за день, за 15 минут |
 | [**Дневник собеседований**](https://nurekella.github.io/AboutMe/diary.html) | Что спрашивали, где поплыл, какую вилку называли, чем закончилось |

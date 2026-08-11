@@ -1026,7 +1026,7 @@ SITE_NAV = """<nav class="sitenav"><div class="sitenav-in">
 <a class="sbrand" href="./">nurekella<b>/</b>devops</a>
 <a href="./">главная</a><a href="resume.html">резюме</a>
 <a href="qa-trainer.html" aria-current="page">тренажёр</a>
-<a href="roadmap.html">roadmap</a><a href="resources.html">материалы</a><a href="checklist.html">чеклист</a><a href="devops-plan.html">план</a><a href="diary.html">дневник</a><a href="cv-review.html">разбор резюме</a>
+<a href="roadmap.html">roadmap</a><a href="resources.html">материалы</a><a href="repos.html">репозитории</a><a href="checklist.html">чеклист</a><a href="devops-plan.html">план</a><a href="diary.html">дневник</a><a href="cv-review.html">разбор резюме</a>
 <a href="https://github.com/nurekella">github</a>
 </div></nav>"""
 
