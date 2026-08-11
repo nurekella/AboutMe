@@ -13,6 +13,9 @@ OUT_USED = []
 MARKERS = ("Что проверяют", "Глубже", "Типичная ошибка", "Типичные ошибки")
 ANSWER_STARTS = ("**Ответ", "**Решение", "**Как отвечать", "**Структура", "**Хорошие вопросы")
 
+# Грейд рендерится не как callout, а как значок в шапке вопроса и атрибут для фильтра.
+GRADES = ("junior", "middle", "senior")
+
 
 # ─────────────────────────── inline markdown ───────────────────────────
 
@@ -236,10 +239,20 @@ def parse(text):
             while i < len(lines) and not lines[i].startswith(("## ", "### ")):
                 body.append(lines[i])
                 i += 1
+            bs = blocks(body)
+            grade = None
+            for bi, (kind, payload) in enumerate(bs):
+                if kind == "p" and isinstance(payload, str) and payload.startswith("`Грейд`"):
+                    g = payload[len("`Грейд`"):].strip().lower()
+                    if g in GRADES:
+                        grade = g
+                        bs = bs[:bi] + bs[bi + 1:]
+                    break
             cur["items"].append({
                 "num": int(m.group(1)) if m else None,
                 "title": m.group(2) if m else heading,
-                "blocks": blocks(body),
+                "grade": grade,
+                "blocks": bs,
             })
             continue
         (cur["lead"] if cur else intro).append(line)
@@ -280,14 +293,16 @@ def build(doc_title, intro_blocks, sections):
             if it["num"]:
                 vis, hid = split_answer(it["blocks"])
                 qid = "q%d" % it["num"]
+                grade = it.get("grade") or "middle"
                 body.append(
-                    '<article class="q" id="%s" data-q="%d" data-sec="%d" '
+                    '<article class="q" id="%s" data-q="%d" data-sec="%d" data-grade="%s" '
                     'data-text="%s">' % (
-                        qid, it["num"], si,
+                        qid, it["num"], si, grade,
                         html.escape(("%d %s" % (it["num"], it["title"])).lower(), quote=True)))
                 body.append('<header class="qh"><span class="qn mono">%02d</span>'
-                            '<h3>%s</h3><span class="mark mono" data-mark="%d"></span></header>'
-                            % (it["num"], inline(it["title"]), it["num"]))
+                            '<h3>%s</h3><span class="grade mono" data-gr="%s">%s</span>'
+                            '<span class="mark mono" data-mark="%d"></span></header>'
+                            % (it["num"], inline(it["title"]), grade, grade, it["num"]))
                 if vis:
                     body.append('<div class="prose qvis">%s</div>' % render(vis))
                 body.append('<button class="reveal" type="button" data-reveal="%d">'
@@ -344,7 +359,8 @@ SCRIPT = r"""<script>
 
   var cards=[];
   var LABEL={"0":"0 — не знаю","1":"1 — плыл","2":"2 — уверенно"};
-  var exam=null, cardsMode=false, filter="all", query="", activeIdx=-1;
+  var exam=null, cardsMode=false, filter="all", gfilter="all", query="", activeIdx=-1;
+  var GRADES=["junior","middle","senior"], GDONE=0.7;
 
   // ── свои вопросы ──
   var EXTRA_TPL=function(n){return '<div class="extras">'
@@ -430,11 +446,25 @@ SCRIPT = r"""<script>
   }
 
   // ── счёт ──
-  function verdictFor(p){
-    if(p<40) return "junior / вход в DevOps — база есть, системы нет";
-    if(p<60) return "junior+ / middle-минус — срезают на глубине";
-    if(p<80) return "middle — целевой уровень, можно торговаться";
-    return "middle+ / senior — вилка выше рынка";
+  // Вердикт в шапке считается по грейдам, а не по общему проценту:
+  // 60% с провалом на junior хуже, чем 45% с закрытым junior.
+  function verdictFor(){
+    var g=gradeStats(), closed=[];
+    for(var i=0;i<GRADES.length;i++){
+      var x=g[GRADES[i]];
+      if(x.tot && x.two/x.tot>=GDONE) closed.push(GRADES[i]); else break;
+    }
+    if(!closed.length) return "junior не закрыт — начни с него";
+    if(closed.length===1) return "junior закрыт · идёшь по middle";
+    if(closed.length===2) return "junior и middle закрыты · идёшь по senior";
+    return "все три грейда закрыты · вилка выше рынка";
+  }
+  // Оценка одного прогона экзамена — здесь общий процент как раз уместен.
+  function examBand(p){
+    if(p<40) return "Провал: больше половины вопросов не закрыто.";
+    if(p<60) return "Слабо: на таком результате срезают на глубине.";
+    if(p<80) return "Норма для middle. Разбери всё, что ниже двойки.";
+    return "Сильно. На собеседовании такой прогон даёт торг по вилке.";
   }
   function dueCount(){ var t=today(),k=0; for(var n in data.d){ if(data.d[n]<=t) k++ } return k }
 
@@ -447,7 +477,7 @@ SCRIPT = r"""<script>
     el("m2").style.width=(c[2]/total*100)+"%";
     el("m1").style.width=(c[1]/total*100)+"%";
     el("m0").style.width=(c[0]/total*100)+"%";
-    el("verdict").textContent=rated?(verdictFor(pct)+" · оценено "+rated+" из "+total):"оцени первый вопрос";
+    el("verdict").textContent=rated?(verdictFor()+" · оценено "+rated+" из "+total):"оцени первый вопрос";
     var d=dueCount(); el("dueN").textContent=d?("· "+d):"";
 
     var per={};
@@ -462,6 +492,59 @@ SCRIPT = r"""<script>
       var f=document.querySelector('[data-secfill="'+sec+'"]'); if(f) f.style.width=(x.two/x.tot*100)+"%";
       var l=document.querySelector('[data-seclabel="'+sec+'"]'); if(l) l.textContent=x.two+" / "+x.tot;
     });
+    recountGrades();
+  }
+
+  // ── счёт по грейдам ──
+  function gradeStats(){
+    var g={};
+    GRADES.forEach(function(k){ g[k]={two:0,rated:0,tot:0} });
+    cards.forEach(function(card){
+      var k=card.getAttribute("data-grade"); if(!g[k]) return;
+      var v=data.v[card.getAttribute("data-q")];
+      g[k].tot++;
+      if(v!==undefined) g[k].rated++;
+      if(v==="2") g[k].two++;
+    });
+    return g;
+  }
+
+  function recountGrades(){
+    if(!el("gradeBox")) return;
+    var g=gradeStats(), current=null;
+    GRADES.forEach(function(k){
+      var x=g[k], r=x.tot?x.two/x.tot:0, done=r>=GDONE;
+      var lb=document.querySelector('[data-glabel="'+k+'"]');
+      if(lb) lb.textContent=x.two+" / "+x.tot+" · "+Math.round(r*100)+"%";
+      var f=document.querySelector('[data-gfill="'+k+'"]'); if(f) f.style.width=(r*100)+"%";
+      var card=document.querySelector('[data-gcard="'+k+'"]');
+      if(card) card.classList.toggle("done",done);
+      var st=document.querySelector('[data-gstate="'+k+'"]');
+      if(st){
+        st.textContent = x.rated===0 ? "не начат — "+x.tot+" вопросов"
+          : done ? "закрыт: двоек "+Math.round(r*100)+"%"
+          : "осталось до 70%: "+Math.max(0,Math.ceil(x.tot*GDONE)-x.two)+" двоек"
+            +", неоценённых "+(x.tot-x.rated);
+      }
+      if(!done && current===null) current=k;
+    });
+    GRADES.forEach(function(k){
+      var card=document.querySelector('[data-gcard="'+k+'"]');
+      if(card) card.classList.toggle("now",k===current);
+    });
+    var v=el("gverdict"); if(!v) return;
+    var anyRated=GRADES.some(function(k){return g[k].rated>0});
+    if(!anyRated){
+      v.textContent="Грейд закрыт, когда двоек в нём 70% и больше. Начни с junior — на нём режут чаще, чем на Kubernetes.";
+    } else if(current===null){
+      v.textContent="Закрыты все три грейда. Дальше растёт не список вопросов, а масштаб задач — иди на собеседования и торгуйся.";
+    } else if(current==="junior"){
+      v.textContent="Идёшь по junior. Пока он не закрыт, глубина по Kubernetes не спасёт: провал на базе выглядит хуже незнания сложного.";
+    } else if(current==="middle"){
+      v.textContent="Junior закрыт, идёшь по middle. Это целевой уровень вакансий — держи фокус здесь, senior не трогай.";
+    } else {
+      v.textContent="Junior и middle закрыты, идёшь по senior. Здесь спрашивают не команды, а решения: деньги, риски, люди, отказоустойчивость.";
+    }
   }
 
   // ── фильтры ──
@@ -475,6 +558,7 @@ SCRIPT = r"""<script>
       else if(filter==="todo") ok=(v===undefined);
       else if(filter==="weak") ok=(v==="0"||v==="1");
       else if(filter==="due") ok=(data.d[n]!==undefined && data.d[n]<=t);
+      if(ok&&gfilter!=="all"&&!exam) ok=(card.getAttribute("data-grade")===gfilter);
       if(ok&&query) ok=card.getAttribute("data-text").indexOf(query)>-1;
       card.classList.toggle("hide",!ok);
       if(ok) shown++;
@@ -482,7 +566,11 @@ SCRIPT = r"""<script>
     var em=el("empty");
     em.hidden=(shown>0);
     if(!em.hidden){
-      em.textContent = (filter==="due"&&!query)
+      em.textContent = (gfilter!=="all"&&filter==="due"&&!query)
+        ? "В грейде "+gfilter+" сегодня повторять нечего."
+        : (gfilter!=="all"&&filter==="todo"&&!query)
+        ? "Грейд "+gfilter+" оценён целиком. Переключись на следующий."
+        : (filter==="due"&&!query)
         ? "Сегодня повторять нечего — очередь пополнится, когда подойдёт срок: ноль через день, единица через три, двойка через две недели."
         : (filter==="todo"&&!query)
           ? "Оценены все вопросы. Дальше — фильтр «повторить» или режим экзамена."
@@ -490,7 +578,7 @@ SCRIPT = r"""<script>
     }
     document.querySelectorAll("section[data-sec]").forEach(function(sec){
       var qs=sec.querySelectorAll(".q");
-      if(!qs.length){ sec.style.display=(filter==="all"&&!query&&!exam&&!cardsMode)?"":"none"; return; }
+      if(!qs.length){ sec.style.display=(filter==="all"&&gfilter==="all"&&!query&&!exam&&!cardsMode)?"":"none"; return; }
       if(sec.id==="mine"&&!data.custom.length){ sec.hidden=true; return; }
       sec.hidden=false;
       var any=Array.prototype.slice.call(qs).some(function(c){return !c.classList.contains("hide")});
@@ -622,6 +710,24 @@ SCRIPT = r"""<script>
       btn.classList.add("on"); filter=btn.getAttribute("data-filter"); activeIdx=-1; applyFilter();
     });
   });
+  document.querySelectorAll("[data-grade-filter]").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      if(exam) return;
+      document.querySelectorAll("[data-grade-filter]").forEach(function(x){x.classList.remove("on")});
+      btn.classList.add("on"); gfilter=btn.getAttribute("data-grade-filter");
+      activeIdx=-1; applyFilter();
+      document.querySelectorAll("[data-gcard]").forEach(function(c){
+        c.classList.toggle("picked",gfilter!=="all"&&c.getAttribute("data-gcard")===gfilter);
+      });
+    });
+  });
+  document.querySelectorAll("[data-gcard]").forEach(function(c){
+    c.addEventListener("click",function(){
+      var g=c.getAttribute("data-gcard");
+      var btn=document.querySelector('[data-grade-filter="'+(gfilter===g?"all":g)+'"]');
+      if(btn) btn.click();
+    });
+  });
   el("search").addEventListener("input",function(e){ query=e.target.value.trim().toLowerCase(); applyFilter() });
 
   el("resume").addEventListener("click",function(){
@@ -637,6 +743,7 @@ SCRIPT = r"""<script>
              : filter==="due"  ? "очередь повторения"
              : filter==="todo" ? "неоценённые"
              : query ? "результаты поиска" : "все вопросы";
+    if(gfilter!=="all") what+=" (грейд "+gfilter+")";
     if(!confirm("Печатать "+what+" — "+n+" шт.? Ответы и заметки будут раскрыты.")) return;
     window.print();
   });
@@ -685,8 +792,14 @@ SCRIPT = r"""<script>
     });
   });
 
+  var examGrade="";
   function startExam(n){
-    var pool=cards.slice();
+    // если выбран грейд — экзамен идёт только по нему
+    examGrade = gfilter==="all" ? "" : gfilter;
+    var pool=cards.filter(function(c){
+      return gfilter==="all" || c.getAttribute("data-grade")===gfilter;
+    });
+    if(pool.length<n){ pool=cards.slice(); examGrade="" }
     for(var i=pool.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=pool[i]; pool[i]=pool[j]; pool[j]=t }
     var chosen=pool.slice(0,Math.min(n,pool.length));
     exam={set:new Set(chosen.map(function(c){return c.getAttribute("data-q")})),total:chosen.length,
@@ -725,7 +838,8 @@ SCRIPT = r"""<script>
       var p=el("resultPanel");
       p.innerHTML='<p class="pt">Результат экзамена</p>'
         +'<p><span class="big2">'+pct+'%</span> уверенных ответов из '+ids.length+' вопросов</p>'
-        +'<p class="pd">'+verdictFor(pct)+'. Уверенно: '+c["2"]+' · плыл: '+c["1"]+' · не знаю: '+c["0"]
+        +'<p class="pd">'+examBand(pct)+(examGrade?' Грейд: '+examGrade+'.':'')
+        +' Уверенно: '+c["2"]+' · плыл: '+c["1"]+' · не знаю: '+c["0"]
         +(unrated?' · не дошёл: '+unrated:'')+'.</p>'
         +'<p class="pd">Всё, что ниже двойки, попало в очередь повторения.</p>'
         +'<div class="prow"><button class="chip" id="resClose" type="button">закрыть</button>'
@@ -1008,6 +1122,24 @@ section{margin:0 0 56px;scroll-margin-top:74px}
   display:flex;align-items:baseline;gap:20px;flex-wrap:wrap}
 .sect-head h2{font-family:var(--serif);font-size:1.5rem;line-height:1.2;font-weight:600;
   letter-spacing:-.01em;margin:0;text-wrap:balance;flex:1;min-width:200px}
+.tsep{width:1px;height:18px;background:var(--line);display:inline-block}
+.grades{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 12px}
+.gcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 15px;
+  box-shadow:var(--shadow);cursor:pointer;transition:border-color .2s ease}
+.gcard:hover{border-color:var(--accent)}
+.gcard.picked{outline:2px solid var(--accent);outline-offset:-2px}
+.gcard .gt{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0 0 9px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2)}
+.gcard .gt .mono{color:var(--muted);letter-spacing:0}
+.gbar{display:block;height:6px;background:var(--line-soft);border-radius:3px;overflow:hidden}
+.gfill{display:block;height:100%;width:0;background:var(--accent);transition:width .3s ease}
+.gcard .gs{margin:9px 0 0;font-size:.8rem;color:var(--muted);line-height:1.35}
+.gcard.done{border-color:var(--s2)}
+.gcard.done .gfill{background:var(--s2)}
+.gcard.done .gt{color:var(--s2)}
+.gcard.now{border-color:var(--accent)}
+.gverdict{margin:0 0 22px;font-size:.9rem;color:var(--ink-2);max-width:var(--measure)}
+@media (max-width:720px){.grades{grid-template-columns:1fr}}
 .sect-score{display:flex;align-items:center;gap:9px;font-size:11px;color:var(--muted)}
 .sect-score .bar{width:88px;height:5px;background:var(--line-soft);border-radius:3px;overflow:hidden;display:block}
 .sect-score .fill{display:block;height:100%;width:0;background:var(--accent);transition:width .3s ease}
@@ -1053,9 +1185,14 @@ tbody tr:last-child td{border-bottom:0}
 .q{background:var(--surface);border:1px solid var(--line);border-radius:10px;
   padding:18px 20px;margin:0 0 14px;box-shadow:var(--shadow);scroll-margin-top:74px}
 .q.hide{display:none}
-.qh{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:12px;align-items:baseline;
+.qh{display:grid;grid-template-columns:34px minmax(0,1fr) auto auto;gap:12px;align-items:baseline;
   margin-bottom:12px}
 .qn{font-size:13px;color:var(--muted)}
+.grade{font-size:10px;letter-spacing:.09em;text-transform:uppercase;padding:2px 7px;
+  border-radius:999px;white-space:nowrap;border:1px solid var(--line);color:var(--muted)}
+.grade[data-gr="junior"]{color:var(--s2);border-color:var(--s2);background:var(--s2b)}
+.grade[data-gr="middle"]{color:var(--s1);border-color:var(--s1);background:var(--s1b)}
+.grade[data-gr="senior"]{color:var(--s0);border-color:var(--s0);background:var(--s0b)}
 .mark{font-size:11px;letter-spacing:.05em;padding:1px 7px;border-radius:4px;white-space:nowrap;
   border:1px solid transparent}
 .q[data-v="0"] .mark{background:var(--s0b);color:var(--s0);border-color:var(--s0)}
@@ -1191,6 +1328,8 @@ body.cards .cardnav{display:flex}
   h2{font-size:13pt;margin:14px 0 0}
   .qh{margin-bottom:6px}
   .mark{display:none}
+  .grades,.gverdict{display:none}
+  .grade{border:1px solid #999;color:#333;background:transparent!important}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
@@ -1210,6 +1349,12 @@ body.cards .cardnav{display:flex}
       <button class="chip" data-filter="todo" type="button">не оценено</button>
       <button class="chip" data-filter="weak" type="button">0 и 1</button>
       <button class="chip" data-filter="due" type="button">повторить <span id="dueN"></span></button>
+      <span class="tsep" aria-hidden="true"></span>
+      <button class="chip gchip on" data-grade-filter="all" type="button">все грейды</button>
+      <button class="chip gchip" data-grade-filter="junior" type="button">junior</button>
+      <button class="chip gchip" data-grade-filter="middle" type="button">middle</button>
+      <button class="chip gchip" data-grade-filter="senior" type="button">senior</button>
+      <span class="tsep" aria-hidden="true"></span>
       <button class="chip" id="resume" type="button">продолжить</button>
       <button class="chip" id="examBtn" type="button">экзамен</button>
       <button class="chip" id="cardsBtn" type="button">карточки</button>
@@ -1235,9 +1380,29 @@ body.cards .cardnav{display:flex}
       <h1>{{TITLE}}</h1>
       <div class="prose lead">{{INTRO}}</div>
     </header>
+
+    <div class="grades" id="gradeBox">
+      <div class="gcard" data-gcard="junior">
+        <p class="gt"><span>junior</span><span class="mono" data-glabel="junior">0 / 0</span></p>
+        <span class="gbar"><span class="gfill" data-gfill="junior"></span></span>
+        <p class="gs" data-gstate="junior">фундамент: отвечать без запинки</p>
+      </div>
+      <div class="gcard" data-gcard="middle">
+        <p class="gt"><span>middle</span><span class="mono" data-glabel="middle">0 / 0</span></p>
+        <span class="gbar"><span class="gfill" data-gfill="middle"></span></span>
+        <p class="gs" data-gstate="middle">рабочий уровень: сюда целиться</p>
+      </div>
+      <div class="gcard" data-gcard="senior">
+        <p class="gt"><span>senior</span><span class="mono" data-glabel="senior">0 / 0</span></p>
+        <span class="gbar"><span class="gfill" data-gfill="senior"></span></span>
+        <p class="gs" data-gstate="senior">масштаб, деньги, люди, риски</p>
+      </div>
+    </div>
+    <p class="gverdict" id="gverdict">Грейд закрыт, когда двоек в нём 70% и больше. Начни с junior — на нём режут чаще, чем на Kubernetes.</p>
+
     <div class="panel" id="examPanel" hidden>
       <p class="pt">Режим экзамена</p>
-      <p class="pd">Случайные вопросы, таймер, ответ открывается только после того, как ты поставил себе оценку. Так же, как на собеседовании: сначала отвечаешь, потом узнаёшь.</p>
+      <p class="pd">Случайные вопросы, таймер, ответ открывается только после того, как ты поставил себе оценку. Так же, как на собеседовании: сначала отвечаешь, потом узнаёшь. Если выбран грейд, вопросы берутся только из него.</p>
       <div class="prow">
         <button class="chip" data-exam="10" type="button">10 вопросов · 10 мин</button>
         <button class="chip" data-exam="20" type="button">20 вопросов · 20 мин</button>

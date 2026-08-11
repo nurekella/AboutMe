@@ -19,6 +19,7 @@ on:
       - 'CV_REVIEW.md'
       - 'RESOURCES.md'
       - 'tools/**'
+      - 'docs/roadmap.html'
   workflow_dispatch:
 
 # Параллельные сборки одной ветки не нужны: последняя всё равно перекрывает предыдущую.
@@ -56,6 +57,39 @@ jobs:
           echo "в markdown: $md, в html: $html"
           test "$md" -eq "$html"
           test "$md" -gt 0
+          # У каждого вопроса должен быть грейд, и он должен доехать до HTML.
+          grades=$(grep -cE '^`Грейд` (junior|middle|senior)$' INTERVIEW_QA.md)
+          hgrades=$(grep -o 'data-grade="' docs/qa-trainer.html | wc -l)
+          echo "грейдов в markdown: $grades, в html: $hgrades"
+          test "$md" -eq "$grades"
+          test "$md" -eq "$hgrades"
+
+      - name: Проверить, что roadmap покрывает все вопросы
+        run: |
+          python3 - <<'EOF'
+          import io, re, collections, sys
+          md = io.open("INTERVIEW_QA.md", encoding="utf-8").read()
+          total = len(re.findall(r"(?m)^### \d+\. ", md))
+          rm = io.open("docs/roadmap.html", encoding="utf-8").read()
+          nums = []
+          for spec in re.findall(r'q:"([^"]+)"', rm):
+              for part in spec.split(","):
+                  part = part.strip()
+                  if "-" in part:
+                      a, b = part.split("-")
+                      nums += list(range(int(a), int(b) + 1))
+                  elif part:
+                      nums.append(int(part))
+          c = collections.Counter(nums)
+          dup = sorted(n for n, k in c.items() if k > 1)
+          miss = [n for n in range(1, total + 1) if n not in c]
+          extra = sorted(n for n in c if n < 1 or n > total)
+          print("вопросов в markdown: %d, разложено по этапам: %d" % (total, len(c)))
+          if dup:   print("дубли в этапах:", dup)
+          if miss:  print("не попали ни в один этап:", miss)
+          if extra: print("номера вне диапазона:", extra)
+          sys.exit(1 if (dup or miss or extra) else 0)
+          EOF
 
       # На pull request только проверяем: расхождение — это ошибка сборки,
       # потому что автор забыл пересобрать перед коммитом.
