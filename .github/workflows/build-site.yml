@@ -1,0 +1,80 @@
+name: Собрать сайт
+
+# Источник правды — markdown в корне. HTML в docs/ генерируется из него.
+# Этот workflow не даёт им разойтись: на push в main пересобирает и коммитит,
+# на pull request просто проверяет, что собранное совпадает с исходниками.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'INTERVIEW_QA.md'
+      - 'CV_REVIEW.md'
+      - 'tools/**'
+      - '.github/workflows/build-site.yml'
+  pull_request:
+    paths:
+      - 'INTERVIEW_QA.md'
+      - 'CV_REVIEW.md'
+      - 'tools/**'
+  workflow_dispatch:
+
+# Параллельные сборки одной ветки не нужны: последняя всё равно перекрывает предыдущую.
+concurrency:
+  group: build-site-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Собрать страницы
+        run: |
+          python3 tools/build_qa.py
+          cd tools
+          python3 build_page.py ../CV_REVIEW.md ../docs/cv-review.html \
+            "Разбор резюме — Нурбол Хамзаулы" cv-review.html
+
+      - name: Проверить, что вопросы не потерялись
+        run: |
+          # Число вопросов в markdown должно совпасть с числом карточек в HTML.
+          md=$(grep -cE '^### [0-9]+\.' INTERVIEW_QA.md)
+          html=$(grep -o 'class="q" id="q' docs/qa-trainer.html | wc -l)
+          echo "в markdown: $md, в html: $html"
+          test "$md" -eq "$html"
+          test "$md" -gt 0
+
+      # На pull request только проверяем: расхождение — это ошибка сборки,
+      # потому что автор забыл пересобрать перед коммитом.
+      - name: Проверить, что docs/ не отстал (pull request)
+        if: github.event_name == 'pull_request'
+        run: |
+          if ! git diff --quiet -- docs/; then
+            echo "::error::docs/ не соответствует markdown. Запусти локально: python3 tools/build_qa.py"
+            git diff --stat -- docs/
+            exit 1
+          fi
+          echo "docs/ актуален"
+
+      # На push в main пересобранное просто коммитим обратно.
+      - name: Закоммитить пересобранное (main)
+        if: github.event_name != 'pull_request'
+        run: |
+          if git diff --quiet -- docs/; then
+            echo "изменений нет"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/
+          git commit -m "Пересобрать сайт из markdown [skip ci]"
+          git push
