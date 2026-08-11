@@ -16,6 +16,7 @@ NAV_ITEMS = [
     ("resume.html", "резюме"),
     ("qa-trainer.html", "тренажёр"),
     ("devops-plan.html", "план"),
+    ("diary.html", "дневник"),
     ("cv-review.html", "разбор резюме"),
 ]
 

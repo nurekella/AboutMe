@@ -301,6 +301,7 @@ def build(doc_title, intro_blocks, sections):
                             '<button type="button" data-v="2">2 — уверенно</button>'
                             '<button type="button" data-v="-" class="clr">×</button>'
                             '</div>' % it["num"])
+                body.append(EXTRAS % {"n": it["num"]})
                 body.append("</article>")
             else:
                 body.append('<div class="sub"><h3>%s</h3><div class="prose">%s</div></div>'
@@ -312,15 +313,549 @@ def build(doc_title, intro_blocks, sections):
     tpl = tpl.replace("{{NAV}}", "\n".join(nav))
     tpl = tpl.replace("{{INTRO}}", render(intro_blocks))
     tpl = tpl.replace("{{BODY}}", "\n".join(body))
+    tpl = tpl.replace("{{SCRIPT}}", SCRIPT)
     tpl = tpl.replace("{{TOTAL}}", str(total_q))
     return tpl
+
+
+SCRIPT = r"""<script>
+(function(){
+  var KEY="qa-study-v3", OLD2="qa-trainer-v2", OLD1="qa-trainer-v1", TOTAL={{TOTAL}};
+  var GAP={"0":1,"1":3,"2":14};
+  var today=function(){return Math.floor(Date.now()/864e5)};
+  var el=function(id){return document.getElementById(id)};
+
+  // ── хранилище ──
+  var data={v:{},d:{},notes:{},custom:[],days:{},diary:[]};
+  function migrate(){
+    try{
+      var raw=localStorage.getItem(KEY);
+      if(raw){ var o=JSON.parse(raw)||{};
+        data={v:o.v||{},d:o.d||{},notes:o.notes||{},custom:o.custom||[],days:o.days||{},diary:o.diary||[]};
+        return; }
+      var v2=localStorage.getItem(OLD2);
+      if(v2){ var b=JSON.parse(v2)||{}; data.v=b.v||{}; data.d=b.d||{}; return; }
+      var v1=localStorage.getItem(OLD1);
+      if(v1){ data.v=JSON.parse(v1)||{}; }
+    }catch(e){}
+  }
+  migrate();
+  function save(){ try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){} }
+
+  var cards=[];
+  var LABEL={"0":"0 — не знаю","1":"1 — плыл","2":"2 — уверенно"};
+  var exam=null, cardsMode=false, filter="all", query="", activeIdx=-1;
+
+  // ── свои вопросы ──
+  var EXTRA_TPL=function(n){return '<div class="extras">'
+    +'<button class="xbtn" type="button" data-note="'+n+'">заметка</button>'
+    +'<button class="xbtn" type="button" data-rec="'+n+'">записать ответ</button>'
+    +'<span class="recinfo mono" data-recinfo="'+n+'"></span></div>'
+    +'<div class="notewrap" data-notewrap="'+n+'" hidden><textarea data-noteta="'+n+'" rows="3" '
+    +'placeholder="Своими словами"></textarea></div>'
+    +'<div class="recwrap" data-recwrap="'+n+'" hidden></div>'};
+
+  function esc(t){ return String(t||"").replace(/[&<>"]/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c] }) }
+
+  function renderCustom(){
+    var box=el("mineList"); if(!box) return;
+    box.innerHTML="";
+    data.custom.forEach(function(item){
+      var n=item.id;
+      var d=document.createElement("article");
+      d.className="q"; d.id="q"+n;
+      d.setAttribute("data-q",n); d.setAttribute("data-sec","mine");
+      d.setAttribute("data-text",(item.q||"").toLowerCase());
+      d.innerHTML='<header class="qh"><span class="qn mono">'+esc(n)+'</span><h3>'+esc(item.q)+'</h3>'
+        +'<span class="mark mono" data-mark="'+n+'"></span></header>'
+        +'<button class="reveal" type="button" data-reveal="'+n+'">Показать ответ</button>'
+        +'<div class="prose ans" data-ans="'+n+'" hidden><p>'+esc(item.a).replace(/\n/g,"<br>")+'</p></div>'
+        +'<div class="rate" data-rate="'+n+'"><span class="rl mono">Оценка</span>'
+        +'<button type="button" data-v="0">0 — не знаю</button>'
+        +'<button type="button" data-v="1">1 — плыл</button>'
+        +'<button type="button" data-v="2">2 — уверенно</button>'
+        +'<button type="button" data-v="-" class="clr">×</button>'
+        +'<button type="button" data-del="'+n+'" class="clr">удалить</button></div>'
+        +EXTRA_TPL(n);
+      box.appendChild(d);
+    });
+    el("mine").hidden=data.custom.length===0;
+    if(el("mineCount")) el("mineCount").textContent=data.custom.length+" шт";
+    collect();
+  }
+
+  function collect(){
+    cards=Array.prototype.slice.call(document.querySelectorAll(".q"));
+    cards.forEach(paint);
+  }
+
+  // ── карточка ──
+  function paint(card){
+    var n=card.getAttribute("data-q"), v=data.v[n];
+    var mark=card.querySelector("[data-mark]");
+    var rev=card.querySelector(".reveal");
+    if(v===undefined){ card.removeAttribute("data-v"); if(mark) mark.textContent=""; }
+    else { card.setAttribute("data-v",v); if(mark) mark.textContent=LABEL[v]; }
+    if(rev){
+      var locked = exam && v===undefined;
+      rev.disabled=!!locked;
+      if(!rev.hidden) rev.textContent = locked ? "Сначала поставь оценку" : "Показать ответ";
+    }
+    card.classList.toggle("hasnote", !!(data.notes[n]&&data.notes[n].trim()));
+    var ta=card.querySelector("[data-noteta]");
+    if(ta && ta.value!==(data.notes[n]||"")) ta.value=data.notes[n]||"";
+  }
+
+  function bumpDay(){
+    var t=String(today());
+    data.days[t]=(data.days[t]||0)+1;
+  }
+
+  function setVal(card,v){
+    var n=card.getAttribute("data-q");
+    if(v===null){ delete data.v[n]; delete data.d[n]; }
+    else { data.v[n]=v; data.d[n]=today()+GAP[v]; bumpDay(); }
+    save(); paint(card); recount();
+  }
+
+  // ── счёт ──
+  function verdictFor(p){
+    if(p<40) return "junior / вход в DevOps — база есть, системы нет";
+    if(p<60) return "junior+ / middle-минус — срезают на глубине";
+    if(p<80) return "middle — целевой уровень, можно торговаться";
+    return "middle+ / senior — вилка выше рынка";
+  }
+  function dueCount(){ var t=today(),k=0; for(var n in data.d){ if(data.d[n]<=t) k++ } return k }
+
+  function recount(){
+    var total=TOTAL+data.custom.length;
+    var c={0:0,1:0,2:0}, rated=0;
+    for(var k in data.v){ if(data.v.hasOwnProperty(k)){ c[data.v[k]]++; rated++ } }
+    var pct=total?Math.round(c[2]/total*100):0;
+    el("pct").textContent=rated?pct+"%":"—";
+    el("m2").style.width=(c[2]/total*100)+"%";
+    el("m1").style.width=(c[1]/total*100)+"%";
+    el("m0").style.width=(c[0]/total*100)+"%";
+    el("verdict").textContent=rated?(verdictFor(pct)+" · оценено "+rated+" из "+total):"оцени первый вопрос";
+    var d=dueCount(); el("dueN").textContent=d?("· "+d):"";
+
+    var per={};
+    cards.forEach(function(card){
+      var sec=card.getAttribute("data-sec"), n=card.getAttribute("data-q");
+      per[sec]=per[sec]||{two:0,tot:0}; per[sec].tot++;
+      if(data.v[n]==="2") per[sec].two++;
+    });
+    Object.keys(per).forEach(function(sec){
+      var x=per[sec];
+      var a=document.querySelector('.nsc[data-sec="'+sec+'"]'); if(a) a.textContent=x.two+"/"+x.tot;
+      var f=document.querySelector('[data-secfill="'+sec+'"]'); if(f) f.style.width=(x.two/x.tot*100)+"%";
+      var l=document.querySelector('[data-seclabel="'+sec+'"]'); if(l) l.textContent=x.two+" / "+x.tot;
+    });
+  }
+
+  // ── фильтры ──
+  function visibleCards(){ return cards.filter(function(c){return !c.classList.contains("hide")}) }
+
+  function applyFilter(){
+    var t=today(), shown=0;
+    cards.forEach(function(card){
+      var n=card.getAttribute("data-q"), v=data.v[n], ok=true;
+      if(exam) ok=exam.set.has(n);
+      else if(filter==="todo") ok=(v===undefined);
+      else if(filter==="weak") ok=(v==="0"||v==="1");
+      else if(filter==="due") ok=(data.d[n]!==undefined && data.d[n]<=t);
+      if(ok&&query) ok=card.getAttribute("data-text").indexOf(query)>-1;
+      card.classList.toggle("hide",!ok);
+      if(ok) shown++;
+    });
+    var em=el("empty");
+    em.hidden=(shown>0);
+    if(!em.hidden){
+      em.textContent = (filter==="due"&&!query)
+        ? "Сегодня повторять нечего — очередь пополнится, когда подойдёт срок: ноль через день, единица через три, двойка через две недели."
+        : (filter==="todo"&&!query)
+          ? "Оценены все вопросы. Дальше — фильтр «повторить» или режим экзамена."
+          : "Ничего не найдено — измени запрос или фильтр.";
+    }
+    document.querySelectorAll("section[data-sec]").forEach(function(sec){
+      var qs=sec.querySelectorAll(".q");
+      if(!qs.length){ sec.style.display=(filter==="all"&&!query&&!exam&&!cardsMode)?"":"none"; return; }
+      if(sec.id==="mine"&&!data.custom.length){ sec.hidden=true; return; }
+      sec.hidden=false;
+      var any=Array.prototype.slice.call(qs).some(function(c){return !c.classList.contains("hide")});
+      sec.style.display=any?"":"none";
+    });
+    if(cardsMode) setActive(activeIdx<0?0:Math.min(activeIdx,visibleCards().length-1),false);
+    updateCardNav();
+  }
+
+  function setActive(i,scroll){
+    var vis=visibleCards();
+    if(!vis.length){ activeIdx=-1; updateCardNav(); return }
+    if(i<0) i=0; if(i>=vis.length) i=vis.length-1;
+    cards.forEach(function(c){c.classList.remove("active")});
+    vis[i].classList.add("active"); activeIdx=i;
+    if(scroll!==false) vis[i].scrollIntoView({block:cardsMode?"start":"center",behavior:"smooth"});
+    updateCardNav();
+  }
+  function activeCard(){ var v=visibleCards(); return (activeIdx>=0&&activeIdx<v.length)?v[activeIdx]:null }
+  function updateCardNav(){
+    if(!cardsMode) return;
+    var v=visibleCards();
+    el("cardPos").textContent=v.length?((activeIdx+1)+" / "+v.length):"—";
+  }
+
+  // ── запись голоса ──
+  var rec={mr:null,n:null,chunks:[],timer:null,left:0};
+  function stopRec(){
+    if(rec.mr && rec.mr.state!=="inactive") rec.mr.stop();
+    clearInterval(rec.timer); rec.timer=null;
+  }
+  function recButton(n){ return document.querySelector('[data-rec="'+n+'"]') }
+  function recInfo(n){ return document.querySelector('[data-recinfo="'+n+'"]') }
+
+  function toggleRecord(n){
+    if(rec.n===n && rec.mr && rec.mr.state==="recording"){ stopRec(); return }
+    if(rec.n!==null) stopRec();
+    if(!navigator.mediaDevices||!window.MediaRecorder){
+      recInfo(n).textContent="браузер не умеет запись"; return;
+    }
+    var b0=recButton(n);
+    b0.disabled=true;
+    recInfo(n).textContent="запрашиваю доступ к микрофону…";
+    navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+      b0.disabled=false;
+      rec.n=n; rec.chunks=[]; rec.left=60;
+      rec.mr=new MediaRecorder(stream);
+      rec.mr.ondataavailable=function(e){ if(e.data.size) rec.chunks.push(e.data) };
+      rec.mr.onstop=function(){
+        stream.getTracks().forEach(function(t){t.stop()});
+        var blob=new Blob(rec.chunks,{type:rec.mr.mimeType||"audio/webm"});
+        var wrap=document.querySelector('[data-recwrap="'+n+'"]');
+        wrap.hidden=false;
+        wrap.innerHTML='<audio controls src="'+URL.createObjectURL(blob)+'"></audio>';
+        var b=recButton(n); b.classList.remove("rec"); b.textContent="записать ответ";
+        recInfo(n).textContent="послушай себя: «ну», паузы, извиняющиеся формулировки";
+        rec.n=null;
+      };
+      rec.mr.start();
+      var b=recButton(n); b.classList.add("rec"); b.textContent="остановить";
+      rec.timer=setInterval(function(){
+        rec.left--; recInfo(n).textContent="идёт запись, "+rec.left+" с";
+        if(rec.left<=0) stopRec();
+      },1000);
+      recInfo(n).textContent="идёт запись, 60 с";
+    }).catch(function(err){
+      b0.disabled=false;
+      recInfo(n).textContent = (err&&err.name==="NotAllowedError")
+        ? "доступ к микрофону запрещён — разреши его в настройках сайта"
+        : "микрофон недоступен на этом устройстве";
+    });
+  }
+
+  // ── клики ──
+  document.addEventListener("click",function(e){
+    var r=e.target.closest(".reveal");
+    if(r&&!r.disabled){
+      document.querySelector('[data-ans="'+r.getAttribute("data-reveal")+'"]').hidden=false;
+      r.hidden=true; return;
+    }
+    var del=e.target.closest("[data-del]");
+    if(del){
+      var id=del.getAttribute("data-del");
+      if(!confirm("Удалить свой вопрос?")) return;
+      data.custom=data.custom.filter(function(x){return x.id!==id});
+      delete data.v[id]; delete data.d[id]; delete data.notes[id];
+      save(); renderCustom(); recount(); applyFilter(); return;
+    }
+    var b=e.target.closest(".rate button");
+    if(b){
+      var card=b.closest(".q"), v=b.getAttribute("data-v");
+      var idx=visibleCards().indexOf(card);
+      setVal(card, v==="-"?null:v);
+      if(!exam&&!cardsMode&&(filter==="todo"||filter==="weak"||filter==="due")){
+        applyFilter(); setActive(Math.min(idx,visibleCards().length-1),false);
+      } else applyFilter();
+      if(exam) maybeFinish();
+      return;
+    }
+    var nb=e.target.closest("[data-note]");
+    if(nb){
+      var n=nb.getAttribute("data-note");
+      var w=document.querySelector('[data-notewrap="'+n+'"]');
+      w.hidden=!w.hidden; nb.classList.toggle("on",!w.hidden);
+      if(!w.hidden) w.querySelector("textarea").focus();
+      return;
+    }
+    var rb=e.target.closest("[data-rec]");
+    if(rb){ toggleRecord(rb.getAttribute("data-rec")); return }
+    var c=e.target.closest(".q");
+    if(c) setActive(visibleCards().indexOf(c),false);
+  });
+
+  document.addEventListener("input",function(e){
+    var ta=e.target.closest("[data-noteta]");
+    if(!ta) return;
+    var n=ta.getAttribute("data-noteta");
+    if(ta.value.trim()) data.notes[n]=ta.value; else delete data.notes[n];
+    save();
+    var card=ta.closest(".q"); if(card) card.classList.toggle("hasnote",!!ta.value.trim());
+  });
+
+  document.querySelectorAll("[data-filter]").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      if(exam) return;
+      document.querySelectorAll("[data-filter]").forEach(function(x){x.classList.remove("on")});
+      btn.classList.add("on"); filter=btn.getAttribute("data-filter"); activeIdx=-1; applyFilter();
+    });
+  });
+  el("search").addEventListener("input",function(e){ query=e.target.value.trim().toLowerCase(); applyFilter() });
+
+  el("resume").addEventListener("click",function(){
+    var vis=visibleCards();
+    for(var i=0;i<vis.length;i++){ if(data.v[vis[i].getAttribute("data-q")]===undefined){ setActive(i); return } }
+    setActive(0);
+  });
+
+  el("collapse").addEventListener("click",function(){
+    document.querySelectorAll("[data-ans]").forEach(function(a){a.hidden=true});
+    document.querySelectorAll(".reveal").forEach(function(x){x.hidden=false});
+    cards.forEach(paint);
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+
+  el("reset").addEventListener("click",function(){
+    if(!confirm("Сбросить оценки, заметки и активность? Свои вопросы и дневник останутся.")) return;
+    data.v={}; data.d={}; data.notes={}; data.days={};
+    save(); collect(); recount(); applyFilter();
+  });
+
+  // ── карточный режим ──
+  el("cardsBtn").addEventListener("click",function(){
+    cardsMode=!cardsMode;
+    document.body.classList.toggle("cards",cardsMode);
+    el("cardsBtn").classList.toggle("on",cardsMode);
+    applyFilter(); setActive(cardsMode?0:activeIdx,cardsMode);
+  });
+  el("cardPrev").addEventListener("click",function(){ setActive(activeIdx-1) });
+  el("cardNext").addEventListener("click",function(){ setActive(activeIdx+1) });
+  var tx=0;
+  document.addEventListener("touchstart",function(e){ tx=e.changedTouches[0].clientX },{passive:true});
+  document.addEventListener("touchend",function(e){
+    if(!cardsMode) return;
+    if(e.target.closest("textarea,audio,input")) return;
+    var dx=e.changedTouches[0].clientX-tx;
+    if(Math.abs(dx)>70) setActive(activeIdx+(dx<0?1:-1));
+  },{passive:true});
+
+  // ── экзамен ──
+  el("examBtn").addEventListener("click",function(){
+    if(exam){ finishExam(true); return }
+    el("examPanel").hidden=!el("examPanel").hidden;
+    el("syncPanel").hidden=true; el("addPanel").hidden=true; el("statsPanel").hidden=true;
+  });
+  document.querySelectorAll("[data-exam]").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      var n=parseInt(btn.getAttribute("data-exam"),10);
+      el("examPanel").hidden=true;
+      if(n>0) startExam(n);
+    });
+  });
+
+  function startExam(n){
+    var pool=cards.slice();
+    for(var i=pool.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=pool[i]; pool[i]=pool[j]; pool[j]=t }
+    var chosen=pool.slice(0,Math.min(n,pool.length));
+    exam={set:new Set(chosen.map(function(c){return c.getAttribute("data-q")})),total:chosen.length,
+          ends:Date.now()+n*60000,tick:null};
+    chosen.forEach(function(c){ var q=c.getAttribute("data-q"); delete data.v[q] });
+    save();
+    document.querySelectorAll("[data-ans]").forEach(function(a){a.hidden=true});
+    document.querySelectorAll(".reveal").forEach(function(x){x.hidden=false});
+    el("examBtn").textContent="завершить"; el("examBtn").classList.add("on");
+    el("resultPanel").hidden=true; query=""; el("search").value="";
+    collect(); recount(); applyFilter(); setActive(0);
+    exam.tick=setInterval(tickTimer,1000); tickTimer();
+  }
+  function tickTimer(){
+    if(!exam) return;
+    var left=Math.max(0,Math.round((exam.ends-Date.now())/1000));
+    var t=el("timer"); t.hidden=false;
+    t.textContent=String(Math.floor(left/60)).padStart(2,"0")+":"+String(left%60).padStart(2,"0");
+    t.classList.toggle("low",left<=60);
+    if(left<=0) finishExam(false);
+  }
+  function maybeFinish(){
+    if(!exam) return;
+    var done=0; exam.set.forEach(function(q){ if(data.v[q]!==undefined) done++ });
+    if(done>=exam.total) finishExam(false);
+  }
+  function finishExam(cancelled){
+    if(!exam) return;
+    clearInterval(exam.tick);
+    var ids=Array.from(exam.set), c={0:0,1:0,2:0}, unrated=0;
+    ids.forEach(function(q){ var v=data.v[q]; if(v===undefined) unrated++; else c[v]++ });
+    var pct=Math.round(c["2"]/ids.length*100);
+    exam=null;
+    el("timer").hidden=true;
+    el("examBtn").textContent="экзамен"; el("examBtn").classList.remove("on");
+    if(!cancelled){
+      var p=el("resultPanel");
+      p.innerHTML='<p class="pt">Результат экзамена</p>'
+        +'<p><span class="big2">'+pct+'%</span> уверенных ответов из '+ids.length+' вопросов</p>'
+        +'<p class="pd">'+verdictFor(pct)+'. Уверенно: '+c["2"]+' · плыл: '+c["1"]+' · не знаю: '+c["0"]
+        +(unrated?' · не дошёл: '+unrated:'')+'.</p>'
+        +'<p class="pd">Всё, что ниже двойки, попало в очередь повторения.</p>'
+        +'<div class="prow"><button class="chip" id="resClose" type="button">закрыть</button>'
+        +'<button class="chip" id="resWeak" type="button">показать провалы</button></div>';
+      p.hidden=false;
+      el("resClose").addEventListener("click",function(){p.hidden=true});
+      el("resWeak").addEventListener("click",function(){
+        p.hidden=true; var w=document.querySelector('[data-filter="weak"]'); if(w) w.click();
+      });
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+    collect(); recount(); applyFilter();
+  }
+
+  // ── свой вопрос ──
+  el("addBtn").addEventListener("click",function(){
+    var p=el("addPanel"); p.hidden=!p.hidden;
+    el("syncPanel").hidden=true; el("examPanel").hidden=true; el("statsPanel").hidden=true;
+    if(!p.hidden) el("addQ").focus();
+  });
+  el("addClose").addEventListener("click",function(){ el("addPanel").hidden=true });
+  el("addSave").addEventListener("click",function(){
+    var q=el("addQ").value.trim(), a=el("addA").value.trim();
+    if(!q){ el("addMsg").textContent="нужен хотя бы вопрос"; return }
+    var maxId=0;
+    data.custom.forEach(function(x){ var m=/^c(\d+)$/.exec(x.id); if(m) maxId=Math.max(maxId,+m[1]) });
+    data.custom.push({id:"c"+(maxId+1),q:q,a:a||"— (ответ пока не записан)"});
+    save(); renderCustom(); recount(); applyFilter();
+    el("addQ").value=""; el("addA").value="";
+    el("addMsg").textContent="добавлено, всего своих: "+data.custom.length;
+  });
+
+  // ── активность по дням ──
+  el("statsBtn").addEventListener("click",function(){
+    var p=el("statsPanel"); p.hidden=!p.hidden;
+    el("syncPanel").hidden=true; el("examPanel").hidden=true; el("addPanel").hidden=true;
+    if(!p.hidden) drawChart();
+  });
+  el("statsClose").addEventListener("click",function(){ el("statsPanel").hidden=true });
+
+  function drawChart(){
+    var t=today(), max=1, bars=[];
+    for(var i=29;i>=0;i--){ var day=t-i, n=data.days[String(day)]||0; max=Math.max(max,n); bars.push([day,n]) }
+    el("chart").innerHTML=bars.map(function(b){
+      var h=Math.round(b[1]/max*100);
+      var dt=new Date(b[0]*864e5);
+      var label=dt.getDate()+"."+(dt.getMonth()+1)+" — "+(b[1]||0);
+      return '<i class="'+(b[1]?"":"zero")+'" style="height:'+(b[1]?Math.max(h,6):4)+'%" data-t="'+label+'"></i>';
+    }).join("");
+    var streak=0;
+    for(var k=0;k<400;k++){ if(data.days[String(t-k)]) streak++; else if(k>0) break; else break }
+    var totalDays=Object.keys(data.days).length;
+    var sum=0; for(var d2 in data.days) sum+=data.days[d2];
+    el("streak").textContent="Серия: "+streak+" дн. подряд · дней с занятиями: "+totalDays
+      +" · всего оценок поставлено: "+sum+". Тридцать дней по 25 минут обгоняют четыре героических выходных.";
+  }
+
+  // ── перенос ──
+  el("syncBtn").addEventListener("click",function(){
+    var p=el("syncPanel"); p.hidden=!p.hidden;
+    el("examPanel").hidden=true; el("addPanel").hidden=true; el("statsPanel").hidden=true;
+    if(!p.hidden){ el("syncBox").value=encodeState(); el("syncMsg").textContent="" }
+  });
+  el("syncClose").addEventListener("click",function(){ el("syncPanel").hidden=true });
+  function encodeState(){
+    try{ return "QA3:"+btoa(unescape(encodeURIComponent(JSON.stringify(data)))) }catch(e){ return "" }
+  }
+  function decodeState(str){
+    str=(str||"").trim();
+    var m=/^QA[23]:/.exec(str); if(m) str=str.slice(m[0].length);
+    var o=JSON.parse(decodeURIComponent(escape(atob(str))));
+    if(!o||typeof o!=="object"||!o.v) throw new Error("формат");
+    return o;
+  }
+  el("syncCopy").addEventListener("click",function(){
+    var box=el("syncBox"); box.value=encodeState(); box.select();
+    var done=function(){ el("syncMsg").textContent="скопировано" };
+    if(navigator.clipboard) navigator.clipboard.writeText(box.value).then(done,function(){document.execCommand("copy");done()});
+    else { document.execCommand("copy"); done() }
+  });
+  el("syncApply").addEventListener("click",function(){
+    try{
+      var o=decodeState(el("syncBox").value);
+      data={v:o.v||{},d:o.d||{},notes:o.notes||{},custom:o.custom||[],days:o.days||{},diary:o.diary||[]};
+      save(); renderCustom(); recount(); applyFilter();
+      el("syncMsg").textContent="применено: "+Object.keys(data.v).length+" оценок, "
+        +Object.keys(data.notes).length+" заметок, "+data.custom.length+" своих вопросов";
+    }catch(err){ el("syncMsg").textContent="не разобрал код" }
+  });
+
+  // ── клавиатура ──
+  document.addEventListener("keydown",function(e){
+    var sb=el("search");
+    var tag=(document.activeElement&&document.activeElement.tagName)||"";
+    if(e.key==="/"&&document.activeElement!==sb&&tag!=="TEXTAREA"&&tag!=="INPUT"){ e.preventDefault(); sb.focus(); return }
+    if(tag==="TEXTAREA"||tag==="INPUT"){ if(e.key==="Escape") document.activeElement.blur(); return }
+    if(e.metaKey||e.ctrlKey||e.altKey) return;
+
+    var k=e.key.toLowerCase();
+    if(k==="j"||e.key==="ArrowRight"){ e.preventDefault(); setActive(activeIdx<0?0:activeIdx+1); return }
+    if(k==="k"||e.key==="ArrowLeft"){ e.preventDefault(); setActive(activeIdx<0?0:activeIdx-1); return }
+
+    var card=activeCard(); if(!card) return;
+    if(e.key===" "||e.key==="Enter"){
+      var btn=card.querySelector(".reveal");
+      if(btn&&!btn.hidden&&!btn.disabled){ e.preventDefault(); btn.click() }
+      return;
+    }
+    if(k==="0"||k==="1"||k==="2"){
+      e.preventDefault();
+      var idx=visibleCards().indexOf(card);
+      setVal(card,k);
+      if(!exam&&!cardsMode&&(filter==="todo"||filter==="weak"||filter==="due")){
+        applyFilter(); setActive(Math.min(idx,visibleCards().length-1));
+      } else { applyFilter(); setActive(idx+1) }
+      if(exam) maybeFinish();
+      return;
+    }
+    if(k==="x"){ e.preventDefault(); setVal(card,null); applyFilter(); return }
+    if(k==="n"){
+      e.preventDefault();
+      var nb=card.querySelector("[data-note]"); if(nb) nb.click();
+      return;
+    }
+    if(k==="r"){
+      e.preventDefault();
+      var rb=card.querySelector("[data-rec]"); if(rb) rb.click();
+    }
+  });
+
+  renderCustom(); collect(); recount(); applyFilter();
+})();
+</script>"""
+
+
+EXTRAS = """<div class="extras">
+  <button class="xbtn" type="button" data-note="%(n)d">заметка</button>
+  <button class="xbtn" type="button" data-rec="%(n)d">записать ответ</button>
+  <span class="recinfo mono" data-recinfo="%(n)d"></span>
+</div>
+<div class="notewrap" data-notewrap="%(n)d" hidden>
+  <textarea data-noteta="%(n)d" rows="3" placeholder="Своими словами: как отвечал, где поплыл, что спросили на собеседовании"></textarea>
+</div>
+<div class="recwrap" data-recwrap="%(n)d" hidden></div>"""
 
 
 SITE_NAV = """<nav class="sitenav"><div class="sitenav-in">
 <a class="sbrand" href="./">nurekella<b>/</b>devops</a>
 <a href="./">главная</a><a href="resume.html">резюме</a>
 <a href="qa-trainer.html" aria-current="page">тренажёр</a>
-<a href="devops-plan.html">план</a><a href="cv-review.html">разбор резюме</a>
+<a href="devops-plan.html">план</a><a href="diary.html">дневник</a><a href="cv-review.html">разбор резюме</a>
 <a href="https://github.com/nurekella">github</a>
 </div></nav>"""
 
@@ -489,6 +1024,28 @@ tbody tr:last-child td{border-bottom:0}
 .q[data-v="0"] .rate button[data-v="0"]{background:var(--s0);border-color:var(--s0);color:var(--surface)}
 .q[data-v="1"] .rate button[data-v="1"]{background:var(--s1);border-color:var(--s1);color:var(--surface)}
 .q[data-v="2"] .rate button[data-v="2"]{background:var(--s2);border-color:var(--s2);color:var(--surface)}
+.extras{display:flex;gap:7px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.xbtn{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;background:none;
+  border:1px solid var(--line);color:var(--muted);padding:4px 9px;border-radius:6px;cursor:pointer}
+.xbtn:hover{border-color:var(--accent);color:var(--accent)}
+.xbtn.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.xbtn.rec{border-color:var(--s0);color:var(--s0);background:var(--s0b)}
+.recinfo{font-size:10.5px;color:var(--muted)}
+.q.hasnote .xbtn[data-note]{border-color:var(--s2);color:var(--s2)}
+.notewrap{margin-top:9px}
+.notewrap[hidden],.recwrap[hidden]{display:none}
+.notewrap textarea{width:100%;font:inherit;font-size:.94rem;background:var(--surface-2);
+  color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:9px 11px;resize:vertical}
+.recwrap{margin-top:9px}
+.recwrap audio{width:100%;height:36px}
+.panel input[type=text]{width:100%;font:inherit;font-size:.96rem;background:var(--surface-2);
+  color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:9px 11px;margin:0 0 9px}
+#chart{display:flex;align-items:flex-end;gap:3px;height:64px;margin:0 0 12px;overflow-x:auto;padding-bottom:2px}
+#chart i{flex:0 0 9px;background:var(--accent);border-radius:2px 2px 0 0;min-height:2px;position:relative}
+#chart i.zero{background:var(--line)}
+#chart i:hover::after{content:attr(data-t);position:absolute;bottom:100%;left:50%;
+  transform:translateX(-50%);white-space:nowrap;font-family:var(--mono);font-size:10px;
+  background:var(--ink);color:var(--bg);padding:2px 6px;border-radius:4px;margin-bottom:4px;z-index:5}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;
   padding:16px 18px;margin:0 0 20px;box-shadow:var(--shadow)}
 .panel[hidden]{display:none}
@@ -569,6 +1126,8 @@ body.cards .cardnav{display:flex}
       <button class="chip" id="resume" type="button">продолжить</button>
       <button class="chip" id="examBtn" type="button">экзамен</button>
       <button class="chip" id="cardsBtn" type="button">карточки</button>
+      <button class="chip" id="addBtn" type="button">+ свой вопрос</button>
+      <button class="chip" id="statsBtn" type="button">активность</button>
       <button class="chip" id="syncBtn" type="button">синхрон</button>
       <button class="chip" id="collapse" type="button">скрыть ответы</button>
       <button class="chip" id="reset" type="button">сбросить</button>
@@ -613,10 +1172,35 @@ body.cards .cardnav{display:flex}
 
     <div class="panel" id="resultPanel" hidden></div>
 
+    <div class="panel" id="addPanel" hidden>
+      <p class="pt">Свой вопрос</p>
+      <p class="pd">Спросили на собеседовании что-то, чего здесь нет — добавь. Попадёт в раздел «Мои вопросы», в оценки, в повторение и в код переноса.</p>
+      <input type="text" id="addQ" placeholder="Вопрос" aria-label="Вопрос">
+      <textarea id="addA" rows="4" placeholder="Ответ, как ты его понял" aria-label="Ответ"></textarea>
+      <div class="prow">
+        <button class="chip" id="addSave" type="button">добавить</button>
+        <button class="chip" id="addClose" type="button">закрыть</button>
+        <span class="pmsg" id="addMsg"></span>
+      </div>
+    </div>
+
+    <div class="panel" id="statsPanel" hidden>
+      <p class="pt">Активность по дням</p>
+      <div id="chart"></div>
+      <p class="pd" id="streak"></p>
+      <div class="prow"><button class="chip" id="statsClose" type="button">закрыть</button></div>
+    </div>
+
     <p class="keyhint">С клавиатуры: <kbd>Space</kbd> показать ответ · <kbd>0</kbd> <kbd>1</kbd> <kbd>2</kbd> оценка ·
       <kbd>J</kbd> / <kbd>K</kbd> следующий и предыдущий вопрос · <kbd>/</kbd> поиск</p>
     <p class="empty" id="empty" hidden>Ничего не найдено — измени запрос или фильтр.</p>
     {{BODY}}
+    <section id="mine" data-sec="mine" hidden>
+      <div class="sect-head"><h2>Мои вопросы</h2>
+        <div class="sect-score"><span class="mono" id="mineCount">0</span></div>
+      </div>
+      <div id="mineList"></div>
+    </section>
     <div class="cardnav" id="cardnav">
       <button type="button" id="cardPrev">← назад</button>
       <span class="pos" id="cardPos">—</span>
@@ -625,354 +1209,7 @@ body.cards .cardnav{display:flex}
   </main>
 </div>
 
-<script>
-(function(){
-  var KEY="qa-trainer-v2", OLD="qa-trainer-v1", TOTAL={{TOTAL}};
-  var GAP={"0":1,"1":3,"2":14};                 // дней до повторения
-  var today=function(){return Math.floor(Date.now()/864e5)};
-
-  // ── хранилище: {v:{n:"0|1|2"}, d:{n:день_повторения}} ──
-  var data={v:{},d:{}};
-  try{
-    var raw=localStorage.getItem(KEY);
-    if(raw){ data=JSON.parse(raw); data.v=data.v||{}; data.d=data.d||{}; }
-    else{
-      var old=localStorage.getItem(OLD);
-      if(old){ data.v=JSON.parse(old)||{}; data.d={}; }
-    }
-  }catch(e){ data={v:{},d:{}} }
-  function save(){ try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){} }
-
-  var cards=Array.prototype.slice.call(document.querySelectorAll(".q"));
-  var LABEL={"0":"0 — не знаю","1":"1 — плыл","2":"2 — уверенно"};
-  var el=function(id){return document.getElementById(id)};
-
-  var exam=null;            // {set:Set, ends:ms, tick:id}
-  var cardsMode=false;
-  var filter="all", query="", activeIdx=-1;
-
-  // ── отрисовка одной карточки ──
-  function paint(card){
-    var n=card.getAttribute("data-q"), v=data.v[n];
-    var mark=card.querySelector("[data-mark]");
-    var rev=card.querySelector(".reveal");
-    if(v===undefined){ card.removeAttribute("data-v"); mark.textContent=""; }
-    else { card.setAttribute("data-v",v); mark.textContent=LABEL[v]; }
-    if(rev){
-      var locked = exam && v===undefined;
-      rev.disabled=!!locked;
-      rev.textContent = locked ? "Сначала поставь оценку" : "Показать ответ";
-    }
-  }
-
-  function setVal(card,v){
-    var n=card.getAttribute("data-q");
-    if(v===null){ delete data.v[n]; delete data.d[n]; }
-    else { data.v[n]=v; data.d[n]=today()+GAP[v]; }
-    save(); paint(card); recount();
-  }
-
-  // ── счёт ──
-  function verdictFor(p){
-    if(p<40) return "junior / вход в DevOps — база есть, системы нет";
-    if(p<60) return "junior+ / middle-минус — срезают на глубине";
-    if(p<80) return "middle — целевой уровень, можно торговаться";
-    return "middle+ / senior — вилка выше рынка";
-  }
-  function dueCount(){
-    var t=today(), k=0;
-    for(var n in data.d){ if(data.d.hasOwnProperty(n) && data.d[n]<=t) k++; }
-    return k;
-  }
-  function recount(){
-    var c={0:0,1:0,2:0}, rated=0;
-    for(var k in data.v){ if(data.v.hasOwnProperty(k)){ c[data.v[k]]++; rated++; } }
-    var pct=TOTAL?Math.round(c[2]/TOTAL*100):0;
-    el("pct").textContent=rated?pct+"%":"—";
-    el("m2").style.width=(c[2]/TOTAL*100)+"%";
-    el("m1").style.width=(c[1]/TOTAL*100)+"%";
-    el("m0").style.width=(c[0]/TOTAL*100)+"%";
-    el("verdict").textContent=rated?(verdictFor(pct)+" · оценено "+rated+" из "+TOTAL):"оцени первый вопрос";
-    var d=dueCount(); el("dueN").textContent=d?("· "+d):"";
-
-    var per={};
-    cards.forEach(function(card){
-      var sec=card.getAttribute("data-sec"), n=card.getAttribute("data-q");
-      per[sec]=per[sec]||{two:0,tot:0}; per[sec].tot++;
-      if(data.v[n]==="2") per[sec].two++;
-    });
-    Object.keys(per).forEach(function(sec){
-      var x=per[sec];
-      var a=document.querySelector('.nsc[data-sec="'+sec+'"]'); if(a) a.textContent=x.two+"/"+x.tot;
-      var f=document.querySelector('[data-secfill="'+sec+'"]'); if(f) f.style.width=(x.two/x.tot*100)+"%";
-      var l=document.querySelector('[data-seclabel="'+sec+'"]'); if(l) l.textContent=x.two+" / "+x.tot;
-    });
-  }
-
-  // ── фильтры ──
-  function visibleCards(){ return cards.filter(function(c){return !c.classList.contains("hide")}) }
-
-  function applyFilter(){
-    var t=today(), shown=0;
-    cards.forEach(function(card){
-      var n=card.getAttribute("data-q"), v=data.v[n], ok=true;
-      if(exam) ok=exam.set.has(n);
-      else if(filter==="todo") ok=(v===undefined);
-      else if(filter==="weak") ok=(v==="0"||v==="1");
-      else if(filter==="due") ok=(data.d[n]!==undefined && data.d[n]<=t);
-      if(ok&&query) ok=card.getAttribute("data-text").indexOf(query)>-1;
-      card.classList.toggle("hide",!ok);
-      if(ok) shown++;
-    });
-    var em=el("empty");
-    em.hidden=(shown>0);
-    if(!em.hidden){
-      em.textContent = (filter==="due" && !query)
-        ? "Сегодня повторять нечего — очередь пополнится, когда подойдёт срок: ноль через день, единица через три, двойка через две недели."
-        : (filter==="todo" && !query)
-          ? "Оценены все вопросы. Дальше — фильтр «повторить» или режим экзамена."
-          : "Ничего не найдено — измени запрос или фильтр.";
-    }
-    document.querySelectorAll("section[data-sec]").forEach(function(sec){
-      var qs=sec.querySelectorAll(".q");
-      if(!qs.length){ sec.style.display=(filter==="all"&&!query&&!exam&&!cardsMode)?"":"none"; return; }
-      var any=Array.prototype.slice.call(qs).some(function(c){return !c.classList.contains("hide")});
-      sec.style.display=any?"":"none";
-    });
-    if(cardsMode) setActive(activeIdx<0?0:Math.min(activeIdx,visibleCards().length-1),false);
-    updateCardNav();
-  }
-
-  // ── активная карточка ──
-  function setActive(i,scroll){
-    var vis=visibleCards();
-    if(!vis.length){ activeIdx=-1; updateCardNav(); return; }
-    if(i<0) i=0; if(i>=vis.length) i=vis.length-1;
-    cards.forEach(function(c){c.classList.remove("active")});
-    vis[i].classList.add("active"); activeIdx=i;
-    if(scroll!==false) vis[i].scrollIntoView({block:cardsMode?"start":"center",behavior:"smooth"});
-    updateCardNav();
-  }
-  function activeCard(){ var vis=visibleCards(); return (activeIdx>=0&&activeIdx<vis.length)?vis[activeIdx]:null }
-  function updateCardNav(){
-    if(!cardsMode) return;
-    var vis=visibleCards();
-    el("cardPos").textContent=vis.length?((activeIdx+1)+" / "+vis.length):"—";
-  }
-
-  // ── клики ──
-  document.addEventListener("click",function(e){
-    var r=e.target.closest(".reveal");
-    if(r&&!r.disabled){
-      document.querySelector('[data-ans="'+r.getAttribute("data-reveal")+'"]').hidden=false;
-      r.hidden=true; return;
-    }
-    var b=e.target.closest(".rate button");
-    if(b){
-      var card=b.closest(".q"), v=b.getAttribute("data-v");
-      setVal(card, v==="-"?null:v);
-      var wasIdx=visibleCards().indexOf(card);
-      if(!exam&&!cardsMode&&(filter==="todo"||filter==="weak"||filter==="due")){
-        applyFilter(); setActive(Math.min(wasIdx,visibleCards().length-1),false);
-      } else { applyFilter(); }
-      if(exam) maybeFinish();
-      return;
-    }
-    var c=e.target.closest(".q");
-    if(c) setActive(visibleCards().indexOf(c),false);
-  });
-
-  document.querySelectorAll("[data-filter]").forEach(function(btn){
-    btn.addEventListener("click",function(){
-      if(exam) return;
-      document.querySelectorAll("[data-filter]").forEach(function(x){x.classList.remove("on")});
-      btn.classList.add("on"); filter=btn.getAttribute("data-filter"); activeIdx=-1; applyFilter();
-    });
-  });
-  el("search").addEventListener("input",function(e){ query=e.target.value.trim().toLowerCase(); applyFilter(); });
-
-  el("resume").addEventListener("click",function(){
-    var vis=visibleCards();
-    for(var i=0;i<vis.length;i++){ if(data.v[vis[i].getAttribute("data-q")]===undefined){ setActive(i); return; } }
-    setActive(0);
-  });
-
-  el("collapse").addEventListener("click",function(){
-    document.querySelectorAll("[data-ans]").forEach(function(a){a.hidden=true});
-    document.querySelectorAll(".reveal").forEach(function(x){x.hidden=false});
-    cards.forEach(paint);
-    window.scrollTo({top:0,behavior:"smooth"});
-  });
-
-  el("reset").addEventListener("click",function(){
-    if(!confirm("Сбросить все оценки?")) return;
-    data={v:{},d:{}}; save(); cards.forEach(paint); recount(); applyFilter();
-  });
-
-  // ── карточный режим ──
-  el("cardsBtn").addEventListener("click",function(){
-    cardsMode=!cardsMode;
-    document.body.classList.toggle("cards",cardsMode);
-    el("cardsBtn").classList.toggle("on",cardsMode);
-    applyFilter(); setActive(cardsMode?0:activeIdx,cardsMode);
-  });
-  el("cardPrev").addEventListener("click",function(){ setActive(activeIdx-1) });
-  el("cardNext").addEventListener("click",function(){ setActive(activeIdx+1) });
-
-  var tx=0;
-  document.addEventListener("touchstart",function(e){ tx=e.changedTouches[0].clientX },{passive:true});
-  document.addEventListener("touchend",function(e){
-    if(!cardsMode) return;
-    var dx=e.changedTouches[0].clientX-tx;
-    if(Math.abs(dx)>70) setActive(activeIdx+(dx<0?1:-1));
-  },{passive:true});
-
-  // ── экзамен ──
-  el("examBtn").addEventListener("click",function(){
-    if(exam){ finishExam(true); return; }
-    el("examPanel").hidden=!el("examPanel").hidden;
-    el("syncPanel").hidden=true;
-  });
-  document.querySelectorAll("[data-exam]").forEach(function(btn){
-    btn.addEventListener("click",function(){
-      var n=parseInt(btn.getAttribute("data-exam"),10);
-      el("examPanel").hidden=true;
-      if(n>0) startExam(n);
-    });
-  });
-
-  function startExam(n){
-    var pool=cards.slice();
-    for(var i=pool.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=pool[i]; pool[i]=pool[j]; pool[j]=t; }
-    var chosen=pool.slice(0,Math.min(n,pool.length));
-    exam={set:new Set(chosen.map(function(c){return c.getAttribute("data-q")})), total:chosen.length,
-          ends:Date.now()+n*60000, tick:null, start:{}};
-    chosen.forEach(function(c){ var q=c.getAttribute("data-q"); exam.start[q]=data.v[q]; delete data.v[q]; });
-    save();
-    document.querySelectorAll("[data-ans]").forEach(function(a){a.hidden=true});
-    document.querySelectorAll(".reveal").forEach(function(x){x.hidden=false});
-    el("examBtn").textContent="завершить"; el("examBtn").classList.add("on");
-    el("resultPanel").hidden=true;
-    query=""; el("search").value="";
-    cards.forEach(paint); recount(); applyFilter(); setActive(0);
-    exam.tick=setInterval(tickTimer,1000); tickTimer();
-  }
-
-  function tickTimer(){
-    if(!exam) return;
-    var left=Math.max(0,Math.round((exam.ends-Date.now())/1000));
-    var t=el("timer"); t.hidden=false;
-    t.textContent=String(Math.floor(left/60)).padStart(2,"0")+":"+String(left%60).padStart(2,"0");
-    t.classList.toggle("low",left<=60);
-    if(left<=0) finishExam(false);
-  }
-
-  function maybeFinish(){
-    if(!exam) return;
-    var done=0;
-    exam.set.forEach(function(q){ if(data.v[q]!==undefined) done++; });
-    if(done>=exam.total) finishExam(false);
-  }
-
-  function finishExam(cancelled){
-    if(!exam) return;
-    clearInterval(exam.tick);
-    var ids=Array.from(exam.set), c={0:0,1:0,2:0}, unrated=0;
-    ids.forEach(function(q){ var v=data.v[q]; if(v===undefined) unrated++; else c[v]++; });
-    var answered=ids.length-unrated;
-    var pct=answered?Math.round(c[2]/ids.length*100):0;
-    exam=null;
-    el("timer").hidden=true;
-    el("examBtn").textContent="экзамен"; el("examBtn").classList.remove("on");
-
-    if(!cancelled){
-      var p=el("resultPanel");
-      p.innerHTML='<p class="pt">Результат экзамена</p>'
-        +'<p><span class="big2">'+pct+'%</span> уверенных ответов из '+ids.length+' вопросов</p>'
-        +'<p class="pd">'+verdictFor(pct)+'. Уверенно: '+c["2"]+' · плыл: '+c["1"]+' · не знаю: '+c["0"]
-        +(unrated?' · не дошёл: '+unrated:'')+'.</p>'
-        +'<p class="pd">Всё, что ниже двойки, попало в очередь повторения — фильтр «повторить».</p>'
-        +'<div class="prow"><button class="chip" id="resClose" type="button">закрыть</button>'
-        +'<button class="chip" data-filter-jump="weak" type="button">показать провалы</button></div>';
-      p.hidden=false;
-      el("resClose").addEventListener("click",function(){p.hidden=true});
-      p.querySelector("[data-filter-jump]").addEventListener("click",function(){
-        p.hidden=true;
-        var w=document.querySelector('[data-filter="weak"]'); if(w) w.click();
-      });
-      window.scrollTo({top:0,behavior:"smooth"});
-    }
-    cards.forEach(paint); recount(); applyFilter();
-  }
-
-  // ── перенос прогресса ──
-  el("syncBtn").addEventListener("click",function(){
-    var p=el("syncPanel"); p.hidden=!p.hidden; el("examPanel").hidden=true;
-    if(!p.hidden){ el("syncBox").value=encodeState(); el("syncMsg").textContent=""; }
-  });
-  el("syncClose").addEventListener("click",function(){ el("syncPanel").hidden=true });
-
-  function encodeState(){
-    try{ return "QA2:"+btoa(unescape(encodeURIComponent(JSON.stringify(data)))); }
-    catch(e){ return "" }
-  }
-  function decodeState(str){
-    str=(str||"").trim();
-    if(str.indexOf("QA2:")===0) str=str.slice(4);
-    var obj=JSON.parse(decodeURIComponent(escape(atob(str))));
-    if(!obj||typeof obj!=="object"||!obj.v) throw new Error("формат");
-    return obj;
-  }
-  el("syncCopy").addEventListener("click",function(){
-    var box=el("syncBox"); box.value=encodeState(); box.select();
-    var done=function(){ el("syncMsg").textContent="скопировано" };
-    if(navigator.clipboard) navigator.clipboard.writeText(box.value).then(done,function(){ document.execCommand("copy"); done(); });
-    else { document.execCommand("copy"); done(); }
-  });
-  el("syncApply").addEventListener("click",function(){
-    try{
-      var obj=decodeState(el("syncBox").value);
-      var n=Object.keys(obj.v).length;
-      data={v:obj.v||{},d:obj.d||{}}; save();
-      cards.forEach(paint); recount(); applyFilter();
-      el("syncMsg").textContent="применено: "+n+" оценок";
-    }catch(err){ el("syncMsg").textContent="не разобрал код"; }
-  });
-
-  // ── клавиатура ──
-  document.addEventListener("keydown",function(e){
-    var sb=el("search");
-    if(e.key==="/"&&document.activeElement!==sb){ e.preventDefault(); sb.focus(); return; }
-    if(document.activeElement===sb){ if(e.key==="Escape") sb.blur(); return; }
-    if(document.activeElement===el("syncBox")) return;
-    if(e.metaKey||e.ctrlKey||e.altKey) return;
-
-    var k=e.key.toLowerCase();
-    if(k==="j"||e.key==="ArrowRight"){ e.preventDefault(); setActive(activeIdx<0?0:activeIdx+1); return; }
-    if(k==="k"||e.key==="ArrowLeft"){ e.preventDefault(); setActive(activeIdx<0?0:activeIdx-1); return; }
-
-    var card=activeCard(); if(!card) return;
-    if(e.key===" "||e.key==="Enter"){
-      var btn=card.querySelector(".reveal");
-      if(btn&&!btn.hidden&&!btn.disabled){ e.preventDefault(); btn.click(); }
-      return;
-    }
-    if(k==="0"||k==="1"||k==="2"){
-      e.preventDefault();
-      var idx=visibleCards().indexOf(card);
-      setVal(card,k);
-      if(!exam&&!cardsMode&&(filter==="todo"||filter==="weak"||filter==="due")){
-        applyFilter(); setActive(Math.min(idx,visibleCards().length-1));
-      } else { applyFilter(); setActive(idx+1); }
-      if(exam) maybeFinish();
-      return;
-    }
-    if(k==="x"){ e.preventDefault(); setVal(card,null); applyFilter(); }
-  });
-
-  cards.forEach(paint); recount(); applyFilter();
-})();
-</script>
+{{SCRIPT}}
 """
 
 
