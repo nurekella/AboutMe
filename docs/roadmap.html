@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Roadmap: путь к middle DevOps</title>
-<meta name="description" content="Карта пути в DevOps по этапам: Linux, Docker, Kubernetes, GitOps, IaC, SRE, безопасность. С живым прогрессом из тренажёра.">
+<title>Roadmap: от junior до senior DevOps</title>
+<meta name="description" content="Карта пути в DevOps по трём грейдам — junior, middle, senior. Этапы, навыки, материалы и живой прогресс из тренажёра на 250 вопросов.">
 <meta name="theme-color" content="#EFF1F3" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0F1319" media="(prefers-color-scheme: dark)">
 <link rel="stylesheet" href="style.css">
@@ -20,6 +20,23 @@
   .track{position:relative;padding-left:34px}
   .track::before{content:"";position:absolute;left:9px;top:6px;bottom:34px;width:2px;background:var(--line)}
 
+  .gradehead{position:relative;margin:30px 0 14px;padding:0}
+  .gradehead:first-child{margin-top:0}
+  .gradehead::before{content:"";position:absolute;left:-30px;top:7px;width:12px;height:12px;
+    border-radius:3px;background:var(--bg);border:2px solid var(--line)}
+  .gradehead.done::before{background:var(--s2,#1C6B4B);border-color:var(--s2,#1C6B4B)}
+  .gradehead.now::before{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+  .gradehead h2{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    margin:0 0 4px;color:var(--ink-2)}
+  .gradehead.done h2{color:var(--s2,#1C6B4B)}
+  .gradehead.now h2{color:var(--accent)}
+  .gradehead .gmeta{display:flex;align-items:center;gap:11px;flex-wrap:wrap;font-size:.88rem;color:var(--muted)}
+  .gradehead .gbar{flex:1;min-width:110px;max-width:280px;height:6px;background:var(--line-soft);
+    border-radius:3px;overflow:hidden;display:block}
+  .gradehead .gfill{display:block;height:100%;width:0;background:var(--accent);transition:width .3s ease}
+  .gradehead.done .gfill{background:var(--s2,#1C6B4B)}
+  .gradehead .gnote{font-size:.9rem;color:var(--ink-2);margin:7px 0 0;max-width:var(--measure)}
+
   .stage{position:relative;margin:0 0 12px;background:var(--surface);border:1px solid var(--line);
     border-radius:11px;padding:18px 20px;box-shadow:var(--shadow)}
   .stage::before{content:"";position:absolute;left:-30px;top:24px;width:12px;height:12px;border-radius:50%;
@@ -30,12 +47,12 @@
   .stage.here{border-color:var(--accent)}
 
   .shead{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 12px;margin-bottom:6px}
-  .shead h2{font-size:1.16rem;margin:0;flex:1;min-width:180px}
+  .shead h3{font-size:1.13rem;margin:0;flex:1;min-width:180px}
   .lvl{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
-    padding:2px 7px;border-radius:4px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
-  .lvl.base{border-color:var(--muted)}
-  .lvl.mid{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
-  .lvl.plus{border-color:var(--s2,#1C6B4B);color:var(--s2,#1C6B4B);background:var(--s2b,#E1F0E8)}
+    padding:2px 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+  .lvl.jr{border-color:var(--s2,#1C6B4B);color:var(--s2,#1C6B4B);background:var(--s2b,#E1F0E8)}
+  .lvl.md{border-color:var(--s1,#8A6A17);color:var(--s1,#8A6A17);background:var(--s1b,#FBF0D8)}
+  .lvl.sr{border-color:var(--s0,#A33A32);color:var(--s0,#A33A32);background:var(--s0b,#FBE6E4)}
   .youare{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
     background:var(--accent);color:var(--surface);padding:2px 8px;border-radius:4px;white-space:nowrap}
   .stage > p{margin:0 0 12px;color:var(--ink-2);font-size:.96rem}
@@ -69,7 +86,8 @@
   .top .mfill{display:block;height:100%;width:0;background:var(--accent)}
   .top .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
   .top .verdict{font-size:.9rem;color:var(--ink-2)}
-  @media (max-width:640px){ .track{padding-left:22px} .track::before{left:5px} .stage::before{left:-22px;width:10px;height:10px} }
+  @media (max-width:640px){ .track{padding-left:22px} .track::before{left:5px}
+    .stage::before{left:-22px;width:10px;height:10px} .gradehead::before{left:-22px;width:10px;height:10px} }
   @media print{ .topnav,.links{display:none} .stage{break-inside:avoid} body{background:#fff;color:#000} }
 </style>
 </head>
@@ -92,29 +110,29 @@
 
   <header class="masthead">
     <p class="eyebrow">Roadmap</p>
-    <h1>Путь к middle DevOps</h1>
-    <p class="lede">Одиннадцать этапов от базы до уровня, на котором можно торговаться за вилку. Прогресс не декоративный: он считается из твоих оценок в <a href="qa-trainer.html">тренажёре</a> — этап считается закрытым, когда 70% его вопросов отмечены как «уверенно».</p>
+    <h1>От junior до senior</h1>
+    <p class="lede">Три грейда, двадцать пять этапов, все 250 вопросов <a href="qa-trainer.html">тренажёра</a> разложены по этапам без остатка. Прогресс не декоративный: этап закрыт, когда 70% его вопросов отмечены как «уверенно», грейд закрыт, когда закрыты все его этапы. Порядок именно такой: провал на junior-вопросе выглядит на собеседовании хуже, чем незнание senior-темы.</p>
   </header>
 
   <div class="top">
     <span class="lbl">Пройдено</span>
     <span class="big" id="pct">0%</span>
     <span class="meter"><span class="mfill" id="mfill"></span></span>
-    <span class="lbl" id="stages">0 / 11 этапов</span>
+    <span class="lbl" id="stages">0 / 25 этапов</span>
     <span class="verdict" id="verdict"></span>
   </div>
 
   <div class="legend">
-    <div><b>база</b>ожидается от любого инженера инфраструктуры</div>
-    <div><b>middle</b>то, что спрашивают на целевых вакансиях</div>
-    <div><b>middle+</b>то, что отличает и позволяет торговаться</div>
+    <div><b>junior</b>фундамент — отвечать быстро и без запинки</div>
+    <div><b>middle</b>целевой уровень вакансий, сюда бить</div>
+    <div><b>senior</b>масштаб, деньги, риски, люди</div>
     <div><b>◉ ты здесь</b>первый незакрытый этап</div>
   </div>
 
   <div class="track" id="track"></div>
 
   <footer class="site">
-    <p>Порядок не догма: если на собеседовании спросили то, чего ещё нет в пройденных этапах — это важнее плана, вписывай в ближайшие дни. Материалы к каждому этапу — на странице <a href="resources.html">материалов</a>.</p>
+    <p>Порядок не догма: если на собеседовании спросили то, чего ещё нет в пройденных этапах — это важнее плана, вписывай в ближайшие дни. Материалы к каждому этапу — на странице <a href="resources.html">материалов</a>, вопросы этапа открываются по ссылке «вопросы» и фильтруются в тренажёре по грейду.</p>
   </footer>
 
 </div>
@@ -124,62 +142,143 @@
   var KEY="qa-study-v3", DONE=0.7;
   var el=function(id){return document.getElementById(id)};
 
+  // q — список номеров вопросов в компактной записи: "166-173,3,7,10"
   var STAGES=[
-    { t:"Готовность к рынку", lvl:"база", q:null,
-      d:"Не технический этап, но первый по отдаче: пока в резюме стоит «системный инженер», по запросу «DevOps» тебя не находят вообще.",
-      skills:["позиционирование","теги навыков","вилка","портфолио"],
+    // ───────── junior ─────────
+    { g:"junior", t:"Готовность к рынку", q:null,
+      d:"Не технический этап, но первый по отдаче: пока в резюме стоит «системный инженер», по запросу «DevOps» тебя не находят вообще. Отметь галочкой, когда резюме и заголовок приведены в порядок.",
+      skills:["позиционирование","теги навыков","вилка","отклики"],
       links:[["Разбор резюме","cv-review.html"],["Чеклист","checklist.html"]] },
 
-    { t:"Linux и сети", lvl:"база", q:[1,34],
-      d:"Фундамент, на котором стоит всё остальное. Спрашивают не «знаешь ли Linux», а конкретное: сигналы, systemd, диагностика, что происходит при вводе адреса в браузере.",
-      skills:["процессы и сигналы","systemd","права и SUID","диски и inode","OOM killer","strace","TCP и TLS","DNS","маршрутизация","балансировка L4/L7"],
-      links:[["escbash: Linux","https://www.escbash.com/"],["Julia Evans","https://jvns.ca/"]] },
+    { g:"junior", t:"Linux: ежедневная работа", q:"166-173,3,7,10,16,18,20,23,24",
+      d:"То, что делаешь руками каждый день и о чём спрашивают в первые пять минут: где что лежит, как найти, как посмотреть, как не уронить. Отвечать надо на скорости, без раздумий.",
+      skills:["FHS","find","grep/awk/sed","пакеты","tar и rsync","du и df","сигналы","cron","journalctl","sudo"],
+      links:[["escbash: Linux","https://www.escbash.com/"],["Вопросы этапа","qa-trainer.html#q166"]] },
 
-    { t:"Git и Docker", lvl:"база", q:[35,57],
-      d:"Git спрашивают в 100% случаев и отвечают плохо в половине. Docker — до уровня «почему образ жирный и почему нельзя от root».",
-      skills:["merge vs rebase","reflog","cherry-pick","namespaces и cgroups","multi-stage","слои и кэш","volumes","сети Docker","non-root"],
-      links:[["Nana: Docker","https://www.youtube.com/results?search_query=techworld+with+nana+docker+tutorial+for+beginners"],["Практика: задача 152","qa-trainer.html#q152"]] },
+    { g:"junior", t:"Сети без магии", q:"174-178,192,27,33",
+      d:"Минимум, ниже которого нельзя: модель, адресация, порты, и главное — как проверять доступность, когда ICMP закрыт, а «просто не работает».",
+      skills:["OSI","маска подсети","порты наизусть","curl и telnet","ss и tcpdump","DNS","TCP vs UDP"],
+      links:[["Вопросы этапа","qa-trainer.html#q174"]] },
 
-    { t:"Kubernetes: эксплуатация", lvl:"middle", q:[58,74],
-      d:"Главный этап всего пути. Кластер поднять умеют многие — спрашивают про то, что происходит после: probes, лимиты, RBAC, разбор падений.",
-      skills:["архитектура кластера","probes","requests/limits и QoS","RBAC","scheduling","rolling update и PDB","CrashLoopBackOff","Pending","Service и endpoints"],
-      links:[["Nana: Kubernetes","https://www.youtube.com/results?search_query=techworld+with+nana+kubernetes+tutorial+for+beginners"],["Killercoda CKA","https://killercoda.com/"],["Вопросы 58–74","qa-trainer.html#q58"]] },
+    { g:"junior", t:"Сервер и сервисы", q:"179-191",
+      d:"Администрирование, которое от DevOps по-прежнему ждут: поднять сервис, выпустить сертификат, разобраться с диском, закрыть SSH. Твоя сильная сторона — прогони на скорость и иди дальше.",
+      skills:["systemd","SSH-ключи","nginx reverse proxy","TLS и certbot","RAID","LVM","диск и I/O","ulimits","iptables/nftables","NAT"],
+      links:[["Вопросы этапа","qa-trainer.html#q179"]] },
 
-    { t:"Kubernetes: внутренности и Helm", lvl:"middle", q:[75,91],
-      d:"То, что отличает «настроил по гайду» от «понимаю, что происходит». Здесь же Helm — без него не обходится ни один деплой.",
-      skills:["kubectl apply по шагам","etcd и кворум","операторы и CRD","NetworkPolicy","обновление кластера","бэкапы","Helm-чарт с нуля","hooks"],
-      links:[["kubernetes-the-hard-way","https://github.com/kelseyhightower/kubernetes-the-hard-way"],["what-happens-when-k8s","https://github.com/jamiehannaford/what-happens-when-k8s"],["Вопросы 75–91","qa-trainer.html#q75"]] },
+    { g:"junior", t:"Git на автомате", q:"193,194,37,38,41,42,43",
+      d:"Git спрашивают почти всегда и отвечают плохо в половине случаев. На этом уровне достаточно уверенно объяснить, что делают базовые команды и как откатить ошибку.",
+      skills:["add/commit/push","restore и stash","fetch vs pull","конфликты","cherry-pick","blame","теги"],
+      links:[["Вопросы этапа","qa-trainer.html#q193"]] },
 
-    { t:"CI/CD и GitOps", lvl:"middle", q:[92,100],
-      d:"Jenkins в резюме считают легаси. Нужен YAML-пайплайн и понимание GitOps: этого в опыте обычно нет, а спрашивают сразу после Kubernetes.",
-      skills:["пайплайн от коммита до прода","секреты и OIDC","blue-green / canary","ArgoCD","дрейф и self-heal","SOPS","откат"],
-      links:[["gitops-patterns","https://github.com/cloudogu/gitops-patterns"],["ArgoCD docs","https://argo-cd.readthedocs.io/en/stable/"],["Вопросы 92–100","qa-trainer.html#q92"]] },
+    { g:"junior", t:"Контейнеры: первые шаги", q:"195,196,44,47,49,55",
+      d:"Различать образ и контейнер, понимать, куда девается записанное, и уметь поднять пару сервисов через compose. Без этого дальше в Kubernetes идти бессмысленно.",
+      skills:["образ vs контейнер","docker compose","контейнер vs ВМ","COPY vs ADD","тома","stop vs kill"],
+      links:[["Nana: Docker","https://www.youtube.com/results?search_query=techworld+with+nana+docker+tutorial+for+beginners"],["Вопросы этапа","qa-trainer.html#q195"]] },
 
-    { t:"IaC: Terraform и Ansible", lvl:"middle", q:[101,115],
-      d:"Второй по частоте пункт в вакансиях. Провижинить умеешь — спрашивают про state в команде, модули, plan в CI, дрейф.",
-      skills:["state и locking","count vs for_each","модули","plan в CI","дрейф","идемпотентность","роли и handlers","vault"],
-      links:[["Terraform: Up & Running","https://github.com/brikis98/terraform-up-and-running"],["localstack","https://github.com/localstack/localstack"],["Вопросы 101–115","qa-trainer.html#q101"]] },
+    { g:"junior", t:"Kubernetes: первый контакт", q:"197-200,66,75",
+      d:"Не внутренности, а рабочий минимум: что такое Pod, какими командами живёшь каждый день, как передать конфиг и секрет, зачем Deployment, если есть Pod.",
+      skills:["Pod","kubectl каждый день","ConfigMap и Secret","Deployment","типы контроллеров","init и sidecar"],
+      links:[["Nana: Kubernetes","https://www.youtube.com/results?search_query=techworld+with+nana+kubernetes+tutorial+for+beginners"],["Вопросы этапа","qa-trainer.html#q197"]] },
 
-    { t:"Observability и SRE", lvl:"middle+", q:[116,126],
-      d:"Твоя сильная сторона, которой не хватает словаря. Три вечера с SRE Workbook превращают четыре года дежурств в «владел надёжностью с измеримым SLO».",
-      skills:["PromQL","типы метрик","кардинальность","SLI/SLO/error budget","алертинг без шума","golden signals","toil","postmortem"],
-      links:[["Google SRE Book","https://sre.google/books/"],["prometheus-training","https://github.com/acend/prometheus-training"],["Вопросы 116–126","qa-trainer.html#q116"]] },
+    { g:"junior", t:"Инструменты и разговор о себе", q:"87,96,109,110,112,134,148,149,151",
+      d:"Что вообще за инструменты в вакансии и почему их столько. Плюс три вопроса, которые задают всем и на которых сыпятся из-за отсутствия заготовки.",
+      skills:["зачем Helm","артефакт vs кэш","Terraform vs Ansible","OpenTofu","структура плейбука","IAM: роль vs пользователь","почему уходишь","что автоматизировал","вопросы интервьюеру"],
+      links:[["Вопросы этапа","qa-trainer.html#q87"]] },
 
-    { t:"Данные, облака, безопасность", lvl:"middle+", q:[127,141],
-      d:"Три темы, тонко покрытые у большинства кандидатов. С банковским бэкграундом security — твоё естественное преимущество, а не слабое место.",
-      skills:["репликация","PITR","пул соединений","миграции без простоя","VPC и IAM","FinOps","supply chain","Kyverno","секреты"],
-      links:[["kubernetes-goat","https://github.com/madhuakula/kubernetes-goat"],["awesome-devsecops-russia","https://github.com/Swordfish-Security/awesome-devsecops-russia"],["Вопросы 127–141","qa-trainer.html#q127"]] },
+    // ───────── middle ─────────
+    { g:"middle", t:"Linux и сети глубже", q:"1,2,4,5,6,8,9,11,12,13,14,15,17,19,21,22,26,29,30,31,34",
+      d:"Здесь начинается разница между «знаю команды» и «понимаю систему»: загрузка, память, OOM, strace, namespaces, и диагностика по шагам вместо перебора.",
+      skills:["загрузка системы","df против du","load average","OOM killer","strace","namespaces и cgroups","inode","unit-файл","stateful фильтрация","маршрутизация","L4 vs L7"],
+      links:[["Julia Evans","https://jvns.ca/"],["Вопросы этапа","qa-trainer.html#q1"]] },
 
-    { t:"Архитектура и разговор о себе", lvl:"middle+", q:[142,151],
-      d:"Решение о найме часто принимается здесь, а готовятся к этому меньше всего. Шесть историй по STAR — обязательная часть.",
-      skills:["отказоустойчивый сервис","монолит vs микросервисы","отказ зависимости","кэширование","истории по STAR","зарплатный разговор"],
-      links:[["system-design-101","https://github.com/ByteByteGoHq/system-design-101"],["Вопросы 142–151","qa-trainer.html#q142"]] },
+    { g:"middle", t:"Docker как рабочий инструмент", q:"45,46,48,50,51,52,53,54,56,57",
+      d:"Уровень, на котором спрашивают «почему образ жирный», «почему нельзя от root» и «почему работает у тебя, но не в CI». Это уже про эксплуатацию, а не про запуск.",
+      skills:["docker run по шагам","CMD vs ENTRYPOINT","multi-stage","сети Docker","non-root","секреты","слои и кэш","отладка","registry и digest"],
+      links:[["Практика: задача 152","qa-trainer.html#q152"],["Вопросы этапа","qa-trainer.html#q45"]] },
 
-    { t:"Практика под собеседование", lvl:"middle+", q:[152,165],
-      d:"Финальный этап: не вопросы, а задачи. Переписать Dockerfile, найти ошибки в манифесте, написать PromQL, разобрать вывод команды — то, что реально дают делать.",
-      skills:["Dockerfile","ошибки в манифесте","PromQL","разбор describe","bash без багов","NetworkPolicy","RBAC","error budget","первые 5 минут аварии"],
-      links:[["Задачи 152–165","qa-trainer.html#q152"],["Мок CKA","https://killercoda.com/"]] }
+    { g:"middle", t:"Kubernetes: эксплуатация", q:"58,60,61,62,63,65,67,68,69,70,71,72,73,74,80,82",
+      d:"Главный этап всего пути. Кластер поднять умеют многие — спрашивают про то, что происходит после: probes, лимиты, RBAC, разбор падений, обновление без простоя.",
+      skills:["архитектура кластера","probes","requests/limits и QoS","CrashLoopBackOff","Pending","Service и Ingress","rolling update","RBAC","scheduling","автоскейлинг","NetworkPolicy","PV/PVC","квоты"],
+      links:[["Killercoda CKA","https://killercoda.com/"],["Вопросы этапа","qa-trainer.html#q58"]] },
+
+    { g:"middle", t:"Helm и CI/CD", q:"88,89,90,91,92,93,94,95,98,99,100",
+      d:"Jenkins в резюме считают легаси. Нужен YAML-пайплайн, понимание GitOps и внятный ответ про откат — этого в опыте обычно нет, а спрашивают сразу после Kubernetes.",
+      skills:["helm upgrade","hooks","чарты по окружениям","пайплайн от коммита до прода","секреты и OIDC","blue-green и canary","ArgoCD","ускорение сборки","self-hosted runner","откат"],
+      links:[["gitops-patterns","https://github.com/cloudogu/gitops-patterns"],["ArgoCD docs","https://argo-cd.readthedocs.io/en/stable/"],["Вопросы этапа","qa-trainer.html#q88"]] },
+
+    { g:"middle", t:"IaC: Terraform и Ansible", q:"101,102,103,104,106,107,108,111,113,115",
+      d:"Второй по частоте пункт в вакансиях. Провижинить умеешь — спрашивают про state в команде, модули, plan в CI, дрейф и идемпотентность.",
+      skills:["state и locking","count vs for_each","дрейф","секреты в .tf","версии провайдеров","plan в CI","идемпотентность","Vault","почему Ansible победил"],
+      links:[["Terraform: Up & Running","https://github.com/brikis98/terraform-up-and-running"],["localstack","https://github.com/localstack/localstack"],["Вопросы этапа","qa-trainer.html#q101"]] },
+
+    { g:"middle", t:"Observability и SRE", q:"116,117,118,119,121,123,124,126",
+      d:"Твоя сильная сторона, которой не хватает словаря. Три вечера с SRE Workbook превращают годы дежурств в «владел надёжностью с измеримым SLO».",
+      skills:["pull vs push","типы метрик","PromQL","SLI/SLO/error budget","метрики, логи, трейсы","кто тормозит","postmortem","golden signals"],
+      links:[["Google SRE Book","https://sre.google/books/"],["prometheus-training","https://github.com/acend/prometheus-training"],["Вопросы этапа","qa-trainer.html#q116"]] },
+
+    { g:"middle", t:"Данные и облака", q:"127,128,129,132,133,135,201,202,203,204,207,208,209",
+      d:"Базы и облако глазами эксплуатации: репликация, PITR, пул соединений, VPC, IAM и правильный ответ на «managed или своё».",
+      skills:["репликация","PITR","PgBouncer","медленный запрос","VPC и подсети","managed vs своё","классы хранения","IRSA/OIDC","MySQL vs PostgreSQL","Redis","Kafka vs RabbitMQ"],
+      links:[["Вопросы этапа","qa-trainer.html#q127"]] },
+
+    { g:"middle", t:"Безопасность и работа в команде", q:"137,138,35,36,39,40",
+      d:"Базовая гигиена прода плюс Git на командном уровне: ветвление, откаты, что делать, если в репозиторий уехал секрет.",
+      skills:["безопасность контейнеров","хранение секретов и ротация","merge vs rebase","reset и revert","модель ветвления","утёкший секрет"],
+      links:[["Вопросы этапа","qa-trainer.html#q35"]] },
+
+    { g:"middle", t:"Архитектура, поведение, практика", q:"145,146,147,150,152,153,154,155,156,158,160,162,164",
+      d:"Не вопросы, а задачи: переписать Dockerfile, найти ошибки в манифесте, написать PromQL, разобрать вывод. Плюс истории по STAR — решение о найме часто принимается именно здесь.",
+      skills:["кэширование","истории по STAR","инцидент","деплой в пятницу","Dockerfile","ошибки в манифесте","PromQL","разбор describe","bash без багов","error budget"],
+      links:[["Задачи 152–165","qa-trainer.html#q152"],["Вопросы этапа","qa-trainer.html#q145"]] },
+
+    { g:"middle", t:"Платформа, железо, процессы", q:"205,206,210-225",
+      d:"То, что в вакансиях идёт мелким шрифтом, а на собеседовании занимает половину времени: Jenkins, реестр артефактов, виртуализация, балансировщики, скрипты, DORA, платформа для разработчиков.",
+      skills:["Jenkins и JCasC","artifact registry","гипервизоры","Proxmox","Windows Server","Python для API","bash healthcheck","keepalived","HAProxy","нагрузочное тестирование","capacity planning","DORA","self-service"],
+      links:[["Вопросы этапа","qa-trainer.html#q205"]] },
+
+    // ───────── senior ─────────
+    { g:"senior", t:"Kubernetes: внутренности", q:"59,64,76,77,78,79,81,83,84,85,86",
+      d:"То, что отличает «настроил по гайду» от «понимаю, что происходит»: путь запроса, кворум etcd, операторы, обновление кластера, отладка сети между подами.",
+      skills:["kubectl apply по шагам","путь трафика ClusterIP","CRD и операторы","бэкап кластера","etcd и кворум","отладка сети","обновление кластера","смерть узла","service mesh"],
+      links:[["kubernetes-the-hard-way","https://github.com/kelseyhightower/kubernetes-the-hard-way"],["what-happens-when-k8s","https://github.com/jamiehannaford/what-happens-when-k8s"],["Вопросы этапа","qa-trainer.html#q59"]] },
+
+    { g:"senior", t:"Надёжность и её цена", q:"120,122,125,136,226,229,239,243,247",
+      d:"Senior-разговор о надёжности идёт в деньгах и людях: сколько стоит девятка, кто дежурит, что считать toil, как объяснить бизнесу расходы на то, что «и так работает».",
+      skills:["алертинг без шума","кардинальность","toil","FinOps","DR, RTO и RPO","дежурства без выгорания","наблюдаемость на десятки сервисов","процесс инцидентов","обоснование расходов"],
+      links:[["SRE Workbook","https://sre.google/workbook/table-of-contents/"],["Вопросы этапа","qa-trainer.html#q120"]] },
+
+    { g:"senior", t:"Эксплуатация без простоя", q:"25,28,32,97,105,114,130,131,238",
+      d:"Как менять живое: обновить сотню серверов, накатить миграцию, поднять версию того, что нельзя останавливать. Плюс редкие, но показательные вещи вроде TIME_WAIT и MTU.",
+      skills:["обновление парка серверов","TIME_WAIT","MTU","нестабильный пайплайн","структура модулей","Ansible на 100 серверов","миграции БД","VACUUM","обновление без остановки"],
+      links:[["Вопросы этапа","qa-trainer.html#q25"]] },
+
+    { g:"senior", t:"Безопасность и комплаенс", q:"139,140,141,233,246",
+      d:"С банковским бэкграундом это твоё естественное преимущество: supply chain, выдача доступов, защита пайплайна, требования регулятора и аудит доставшейся инфраструктуры.",
+      skills:["supply chain и SBOM","выдача доступов","защита CI/CD","регулируемая отрасль","аудит новой инфраструктуры"],
+      links:[["kubernetes-goat","https://github.com/madhuakula/kubernetes-goat"],["awesome-devsecops-russia","https://github.com/Swordfish-Security/awesome-devsecops-russia"],["Вопросы этапа","qa-trainer.html#q139"]] },
+
+    { g:"senior", t:"Архитектура и решения", q:"142,143,144,227,228,230,232,235,236,237,244",
+      d:"Здесь спрашивают не команды, а решения и их обоснование: строить или купить, менять архитектуру или тюнить, один кластер или много, куда деваться при отказе зависимости.",
+      skills:["отказоустойчивый сервис","монолит vs микросервисы","отказ зависимости","миграция в облако","мультитенантность","build vs buy","медленно при нормальных метриках","chaos engineering","мультиклауд","что автоматизировать"],
+      links:[["system-design-101","https://github.com/ByteByteGoHq/system-design-101"],["Вопросы этапа","qa-trainer.html#q142"]] },
+
+    { g:"senior", t:"Практика senior-уровня", q:"157,159,161,163,165",
+      d:"Задачи, где мало знать синтаксис: найти причину по данным, написать NetworkPolicy и RBAC с нуля, провести первые пять минут аварии вслух.",
+      skills:["дрейф в Terraform","Service без трафика","NetworkPolicy","минимальные права","первые 5 минут аварии"],
+      links:[["Вопросы этапа","qa-trainer.html#q157"]] },
+
+    { g:"senior", t:"Люди, влияние, зрелость", q:"231,234,240,241,242,245,248,249,250",
+      d:"Финальный блок, который решает вилку: техдолг на языке бизнеса, внедрение изменений через несколько команд, передача системы, первые 90 дней, честный рассказ о своей ошибке.",
+      skills:["техдолг для бизнеса","кросс-командные изменения","передача системы","первые 90 дней","развитие инженеров","отказ делать неправильное","своя ошибка","куда движется профессия","вопросы интервьюеру"],
+      links:[["Вопросы этапа","qa-trainer.html#q231"]] }
   ];
+
+  var GRADES=["junior","middle","senior"];
+  var GNOTE={
+    junior:"Фундамент. Пока он не закрыт, глубина по Kubernetes не спасёт: провал на базовом вопросе выглядит хуже, чем незнание сложного.",
+    middle:"Целевой уровень вакансий. Здесь надо жить дольше всего — именно этот блок определяет, дадут ли оффер и по какой вилке.",
+    senior:"Разговор про масштаб, деньги, риски и людей. Технические ответы здесь уже недостаточны, нужны решения и их обоснование."
+  };
 
   var data={v:{}};
   try{ var o=JSON.parse(localStorage.getItem(KEY)); if(o&&o.v) data=o }catch(e){}
@@ -189,11 +288,26 @@
   try{ manual=JSON.parse(localStorage.getItem(MKEY))||{} }catch(e){ manual={} }
   function saveManual(){ try{localStorage.setItem(MKEY,JSON.stringify(manual))}catch(e){} }
 
-  function score(range){
-    if(!range) return null;
-    var two=0, tot=0;
-    for(var n=range[0]; n<=range[1]; n++){ tot++; if(data.v[String(n)]==="2") two++ }
-    return {two:two, tot:tot, r:tot?two/tot:0};
+  // "166-173,3,7" → [166,...,173,3,7]
+  function nums(spec){
+    if(!spec) return null;
+    var out=[];
+    spec.split(",").forEach(function(part){
+      part=part.trim();
+      if(part.indexOf("-")>0){
+        var ab=part.split("-"), a=+ab[0], b=+ab[1];
+        for(var n=a;n<=b;n++) out.push(n);
+      } else if(part) out.push(+part);
+    });
+    return out;
+  }
+
+  function score(spec){
+    var list=nums(spec);
+    if(!list) return null;
+    var two=0;
+    list.forEach(function(n){ if(data.v[String(n)]==="2") two++ });
+    return {two:two, tot:list.length, r:list.length?two/list.length:0};
   }
 
   var results=STAGES.map(function(st){ return score(st.q) });
@@ -204,21 +318,50 @@
   var hereIdx=-1;
   for(var i=0;i<STAGES.length;i++){ if(!isDone(i)){ hereIdx=i; break } }
 
-  el("track").innerHTML=STAGES.map(function(st,i){
+  // ── грейд закрыт, когда закрыты все его этапы ──
+  function gradeStat(g){
+    var two=0, tot=0, all=true;
+    STAGES.forEach(function(st,i){
+      if(st.g!==g) return;
+      var r=results[i];
+      if(r){ two+=r.two; tot+=r.tot }
+      if(!isDone(i)) all=false;
+    });
+    return {two:two, tot:tot, r:tot?two/tot:0, done:all};
+  }
+  var gstat={}; GRADES.forEach(function(g){ gstat[g]=gradeStat(g) });
+  var curGrade=null;
+  for(var gi=0;gi<GRADES.length;gi++){ if(!gstat[GRADES[gi]].done){ curGrade=GRADES[gi]; break } }
+
+  function lvlCls(g){ return g==="junior"?"jr":(g==="middle"?"md":"sr") }
+
+  var html="", seen={}, no=0, lastG=null;
+  STAGES.forEach(function(st,i){
+    if(st.g!==lastG){
+      lastG=st.g; no=0;
+      var s=gstat[st.g];
+      var cnt=STAGES.filter(function(x){return x.g===st.g}).length;
+      html+='<div class="gradehead'+(s.done?" done":"")+(st.g===curGrade?" now":"")+'">'
+        +'<h2>Грейд '+st.g+'</h2>'
+        +'<div class="gmeta"><span>'+cnt+' этапов · '+s.tot+' вопросов</span>'
+        +'<span class="gbar"><span class="gfill" style="width:'+Math.round(s.r*100)+'%"></span></span>'
+        +'<span>'+s.two+' / '+s.tot+' уверенно'+(s.done?" · закрыт":"")+'</span></div>'
+        +'<p class="gnote">'+GNOTE[st.g]+'</p></div>';
+    }
+    no++;
     var r=results[i];
-    var done = isDone(i);
+    var done=isDone(i);
     var cls="stage"+(done?" done":"")+(i===hereIdx?" here":"");
-    var lvlCls = st.lvl==="база" ? "base" : (st.lvl==="middle" ? "mid" : "plus");
     var prog = r
       ? '<div class="prog"><span class="bar"><span class="fill" style="width:'+Math.round(r.r*100)+'%"></span></span>'
         +'<span class="num">'+r.two+' / '+r.tot+' уверенно</span></div>'
       : '<div class="prog"><label class="manual"><input type="checkbox" data-manual="'+i+'"'
         +(manual["s"+i]?" checked":"")+'><span>'+(manual["s"+i]?"сделано":"отметить, когда резюме приведено в порядок")
         +'</span></label></div>';
-    return '<div class="'+cls+'">'
-      +'<div class="shead"><h2>'+(i)+'. '+st.t+'</h2>'
+    html+='<div class="'+cls+'">'
+      +'<div class="shead"><h3>'+st.g.charAt(0).toUpperCase()+no+'. '+st.t+'</h3>'
       +(i===hereIdx?'<span class="youare">◉ ты здесь</span>':'')
-      +'<span class="lvl '+lvlCls+'">'+st.lvl+'</span></div>'
+      +'<span class="lvl '+lvlCls(st.g)+'">'+st.g+'</span></div>'
       +'<p>'+st.d+'</p>'
       + prog
       +'<ul class="skills">'+st.skills.map(function(s){return '<li>'+s+'</li>'}).join("")+'</ul>'
@@ -228,7 +371,8 @@
             +(ext?' target="_blank" rel="noopener"':'')+'>'+l[0]+(ext?' ↗':'')+'</a>';
         }).join("")+'</div>'
       +'</div>';
-  }).join("");
+  });
+  el("track").innerHTML=html;
 
   document.addEventListener("change",function(e){
     var b=e.target.closest("[data-manual]");
@@ -247,11 +391,13 @@
   el("pct").textContent=pct+"%";
   el("mfill").style.width=pct+"%";
   el("stages").textContent=doneCount+" / "+STAGES.length+" этапов";
-  el("verdict").textContent = pct<40
-    ? "Начни с этапа, отмеченного «ты здесь» — и с резюме, оно нулевой этап не случайно."
-    : pct<60 ? "Проходишь собеседования, но срезают на глубине. Дальше — middle-этапы."
-    : pct<80 ? "Уровень middle. Пора откликаться активно и не соглашаться на первую цифру."
-    : "Уровень middle+. Смотри на Platform Engineer и SRE, там вилка выше.";
+  el("verdict").textContent = curGrade===null
+    ? "Закрыты все три грейда. Дальше растёт не список вопросов, а масштаб задач — иди на собеседования и торгуйся."
+    : curGrade==="junior"
+      ? "Идёшь по junior. Начни с этапа «ты здесь» — и с резюме, оно нулевой этап не случайно."
+      : curGrade==="middle"
+        ? "Junior закрыт, идёшь по middle. Это уровень целевых вакансий — держи фокус здесь, senior пока не трогай."
+        : "Junior и middle закрыты, идёшь по senior. Смотри на Platform Engineer и SRE, там вилка выше.";
 })();
 </script>
 </body>

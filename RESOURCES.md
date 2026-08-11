@@ -161,6 +161,28 @@ Terraform Associate и AWS SAA не нужны: дешевле показать 
 
 ---
 
+## Банки вопросов: что я сверял при составлении тренажёра
+
+[Тренажёр](https://nurekella.github.io/AboutMe/qa-trainer.html) написан своими формулировками, но покрытие тем я сверял по открытым банкам вопросов — чтобы не осталось дыр там, где спрашивают чаще всего. Полезно открыть их и самому: другие формулировки одного и того же вопроса — лучшая проверка, что понял, а не запомнил.
+
+| Репозиторий | Чем полезен |
+|---|---|
+| [`trimstray/test-your-sysadmin-skills`](https://github.com/trimstray/test-your-sysadmin-skills) | 284 вопроса по Linux, разбитые на junior / regular / senior / guru. Именно отсюда идея делить тренажёр по грейдам. Ответов нет — это плюс: заставляет формулировать. |
+| [`rmntrvn/adm_linux_ops_questions`](https://github.com/rmntrvn/adm_linux_ops_questions) | **На русском.** Ближе всего к тому, как спрашивают на рынке КЗ и РФ: администрирование, сети, виртуализация, Windows. |
+| [`Sagar2366/linux_the_final_boss`](https://github.com/Sagar2366/linux_the_final_boss) | Linux вглубь, с упором на то, что реально спрашивают на инфраструктурных интервью. |
+| [`Swfuse/devops-interview`](https://github.com/Swfuse/devops-interview) | **На русском.** Вопросы по всему стеку DevOps, полезно как второй проход. |
+| [`litu54/DevOps-Interview-Guide`](https://github.com/litu54/DevOps-Interview-Guide) | Структурированный гайд по разделам: контейнеры, оркестрация, CI/CD, облака. |
+| [`NotHarshhaa/into-the-devops`](https://github.com/NotHarshhaa/into-the-devops) | Большой сборник вопросов по всем инструментам, удобно как чек на пробелы. |
+| [`milanm/DevOps-Roadmap`](https://github.com/milanm/DevOps-Roadmap) | Карта того, что вообще входит в профессию. Сверял по ней, что ничего крупного не пропущено. |
+| [`Lets-DevOps/awesome-learning`](https://github.com/Lets-DevOps/awesome-learning) | Подборка материалов по темам, полезна для добора теории. |
+| [`codeaprendiz/learn-devops`](https://github.com/codeaprendiz/learn-devops) | Практические сценарии с кодом — хорошо ложится на этапы roadmap. |
+| [`NotHarshhaa/DevOps-Projects`](https://github.com/NotHarshhaa/DevOps-Projects) | Готовые идеи проектов. Отсюда стоит брать один и доводить до конца — портфолио весит больше сертификата. |
+| [`bregman-arie/devops-exercises`](https://github.com/bregman-arie/devops-exercises) | Самый большой открытый банк. Когда закроешь 250 вопросов тренажёра — идти сюда за объёмом. |
+
+Как этим пользоваться правильно: **не читать подряд**. Взять раздел, по которому у тебя в тренажёре стоят нули и единицы, прогнать чужие формулировки того же вопроса вслух, и вернуться в тренажёр переставить оценку. Чтение чужих ответов без проговаривания своих даёт ощущение прогресса без прогресса.
+
+---
+
 ## Чего не надо
 
 Не менее полезно, чем список того, что брать — потому что распыление здесь главный риск.
