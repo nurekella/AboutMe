@@ -1,0 +1,1046 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#EFF1F3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1319" media="(prefers-color-scheme: dark)">
+<meta name="description" content="Восьминедельный план подготовки: Kubernetes, GitOps, SRE, Terraform, платформенная инженерия, портфолио и CKA.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#9096;</text></svg>">
+<title>План: DevOps / SRE / Platform Engineer — 8 недель</title>
+
+<style>
+  :root {
+    --bg: #EFF1F3;
+    --surface: #FFFFFF;
+    --surface-2: #F7F8FA;
+    --line: #D5DBE1;
+    --line-soft: #E5E9ED;
+    --ink: #131920;
+    --ink-2: #3C4753;
+    --muted: #6B7684;
+    --accent: #0E6285;
+    --accent-2: #0A4C68;
+    --accent-soft: #E2EDF3;
+    --crit: #9E2B22;
+    --crit-soft: #F6E5E2;
+    --good: #1C6B4B;
+    --good-soft: #E1F0E8;
+    --shadow: 0 1px 2px rgba(19, 25, 32, .05), 0 8px 24px -12px rgba(19, 25, 32, .12);
+
+    --serif: ui-serif, Georgia, "Iowan Old Style", "Times New Roman", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+    --measure: 68ch;
+    --rail: 236px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0F1319;
+      --surface: #161B23;
+      --surface-2: #1C232D;
+      --line: #2A323D;
+      --line-soft: #212932;
+      --ink: #E7ECF2;
+      --ink-2: #B8C3CF;
+      --muted: #8593A2;
+      --accent: #6BB8DA;
+      --accent-2: #9CD3EA;
+      --accent-soft: #16303D;
+      --crit: #F0897B;
+      --crit-soft: #33201D;
+      --good: #6DC59B;
+      --good-soft: #162C23;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px -12px rgba(0, 0, 0, .6);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0F1319;
+    --surface: #161B23;
+    --surface-2: #1C232D;
+    --line: #2A323D;
+    --line-soft: #212932;
+    --ink: #E7ECF2;
+    --ink-2: #B8C3CF;
+    --muted: #8593A2;
+    --accent: #6BB8DA;
+    --accent-2: #9CD3EA;
+    --accent-soft: #16303D;
+    --crit: #F0897B;
+    --crit-soft: #33201D;
+    --good: #6DC59B;
+    --good-soft: #162C23;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px -12px rgba(0, 0, 0, .6);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16.5px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:hover { color: var(--accent-2); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+
+  .shell {
+    display: grid;
+    grid-template-columns: var(--rail) minmax(0, 1fr);
+    gap: 48px;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 28px 96px;
+    align-items: start;
+  }
+
+  .rail { position: sticky; top: 0; padding: 40px 0; max-height: 100vh; overflow-y: auto; }
+  .rail-title {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .13em;
+    text-transform: uppercase; color: var(--muted); margin: 0 0 12px;
+  }
+  .rail nav { display: flex; flex-direction: column; gap: 1px; }
+  .rail a {
+    display: flex; align-items: baseline; gap: 9px;
+    padding: 5px 9px; border-radius: 5px;
+    color: var(--ink-2); text-decoration: none; font-size: 14px; line-height: 1.35;
+  }
+  .rail a:hover { background: var(--surface); color: var(--ink); }
+  .rail a .n {
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+    font-variant-numeric: tabular-nums; min-width: 1.4em;
+  }
+  .rail hr { border: 0; border-top: 1px solid var(--line-soft); margin: 11px 9px; }
+
+  .main { padding: 40px 0 0; min-width: 0; }
+
+  .masthead { border-bottom: 2px solid var(--ink); padding-bottom: 26px; margin-bottom: 34px; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .15em;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 16px;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-size: clamp(2.05rem, 4.4vw, 3.05rem);
+    line-height: 1.08; letter-spacing: -.015em; font-weight: 600;
+    margin: 0 0 18px; text-wrap: balance; max-width: 28ch;
+  }
+  .lede { font-size: 1.06rem; color: var(--ink-2); max-width: var(--measure); margin: 0 0 24px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 26px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .meta b { color: var(--ink); font-weight: 600; }
+
+  section { margin: 0 0 62px; scroll-margin-top: 24px; }
+  h2 {
+    font-family: var(--serif); font-size: 1.62rem; line-height: 1.2;
+    font-weight: 600; letter-spacing: -.01em; margin: 0 0 6px; text-wrap: balance;
+  }
+  .sect-head { border-top: 1px solid var(--line); padding-top: 14px; margin-bottom: 26px; }
+  .sect-head .kicker {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--muted); margin: 0 0 12px;
+  }
+  .sect-head p { margin: 8px 0 0; color: var(--ink-2); max-width: var(--measure); }
+
+  h3 { font-family: var(--sans); font-size: 1.02rem; font-weight: 650; margin: 0 0 10px; letter-spacing: -.005em; }
+
+  p { max-width: var(--measure); }
+  p, ul, ol { margin: 0 0 14px; }
+  ul, ol { padding-left: 1.25em; max-width: var(--measure); }
+  li { margin-bottom: 6px; }
+  li::marker { color: var(--muted); }
+  strong { font-weight: 650; }
+
+  code, .repo { font-family: var(--mono); font-size: .855em; }
+  .repo {
+    background: var(--surface-2); border: 1px solid var(--line-soft); border-radius: 4px;
+    padding: .1em .38em; text-decoration: none; color: var(--accent); white-space: nowrap;
+  }
+  .repo:hover { border-color: var(--accent); background: var(--accent-soft); }
+
+  .cols { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(268px, 1fr)); }
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 9px;
+    padding: 20px 22px; box-shadow: var(--shadow);
+  }
+  .card h3 { margin-bottom: 12px; }
+  .card > :last-child { margin-bottom: 0; }
+  .card ul { padding-left: 1.1em; }
+  .card p, .card ul { max-width: none; }
+  .tight { font-size: .945rem; }
+
+  .scroller { overflow-x: auto; margin: 0 0 16px; border-radius: 9px; }
+  table { border-collapse: collapse; width: 100%; font-size: .93rem; background: var(--surface); }
+  caption { caption-side: bottom; text-align: left; color: var(--muted); font-size: .84rem; padding-top: 10px; }
+  th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  thead th {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--muted); font-weight: 500;
+    border-bottom: 1px solid var(--line); white-space: nowrap;
+  }
+  tbody tr:last-child td { border-bottom: 0; }
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--muted); width: 1px; white-space: nowrap; }
+  td.skill { font-weight: 600; }
+
+  .sev {
+    display: inline-block; font-family: var(--mono); font-size: 10.5px;
+    letter-spacing: .06em; text-transform: uppercase; padding: 2px 7px;
+    border-radius: 3px; white-space: nowrap; border: 1px solid transparent;
+  }
+  .sev.block { background: var(--crit-soft); color: var(--crit); border-color: var(--crit); font-weight: 700; }
+  .sev.high { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+  .sev.mid { background: var(--surface-2); color: var(--muted); border-color: var(--line); }
+  .sev.ok { background: var(--good-soft); color: var(--good); border-color: var(--good); }
+
+  .track {
+    display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 20px;
+    padding: 16px 0; border-top: 1px solid var(--line-soft); align-items: baseline;
+  }
+  .track:first-of-type { border-top: 1px solid var(--line); }
+  .track:last-of-type { border-bottom: 1px solid var(--line); }
+  .track .letter { font-family: var(--serif); font-size: 2.1rem; line-height: 1; color: var(--accent); font-weight: 600; }
+  .track .letter span {
+    display: block; font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em;
+    color: var(--muted); margin-top: 6px; text-transform: uppercase;
+  }
+  .track p { margin: 0; }
+  .track h3 { margin-bottom: 4px; }
+
+  .week {
+    display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 22px;
+    padding: 24px 0; border-top: 1px solid var(--line);
+  }
+  .week:last-of-type { border-bottom: 1px solid var(--line); }
+  .week-num {
+    font-family: var(--mono); font-size: 2.15rem; line-height: .95;
+    font-variant-numeric: tabular-nums; color: var(--accent); letter-spacing: -.03em;
+  }
+  .week-num .dates {
+    display: block; font-size: 10.5px; letter-spacing: .04em; color: var(--muted);
+    margin-top: 8px; line-height: 1.35; text-transform: uppercase;
+  }
+  .week-body { min-width: 0; }
+  .week-body h3 { font-size: 1.14rem; margin-bottom: 4px; }
+  .week-body h3 .flag {
+    color: var(--crit); font-family: var(--mono); font-size: 11px; letter-spacing: .06em;
+    text-transform: uppercase; margin-left: 8px; white-space: nowrap;
+  }
+  .week-goal { color: var(--muted); font-size: .93rem; margin: 0 0 14px; }
+  .week-body > :last-child { margin-bottom: 0; }
+
+  .sub {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--muted); margin: 18px 0 8px;
+  }
+
+  .check { list-style: none; padding: 0; margin: 0 0 14px; max-width: var(--measure); }
+  .check li { margin: 0; border-bottom: 1px solid var(--line-soft); }
+  .check li:last-child { border-bottom: 0; }
+  .check label {
+    display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 11px;
+    align-items: start; padding: 8px 0; cursor: pointer; font-size: .96rem;
+  }
+  .check input {
+    appearance: none; -webkit-appearance: none; width: 16px; height: 16px;
+    margin: 3px 0 0; border: 1.5px solid var(--line); border-radius: 4px;
+    background: var(--surface); cursor: pointer; position: relative; flex: none;
+  }
+  .check input:hover { border-color: var(--accent); }
+  .check input:checked { background: var(--accent); border-color: var(--accent); }
+  .check input:checked::after {
+    content: ""; position: absolute; left: 4.5px; top: 1.5px;
+    width: 4px; height: 8px; border: solid var(--surface);
+    border-width: 0 1.8px 1.8px 0; transform: rotate(45deg);
+  }
+  .check input:checked ~ .txt { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line); }
+  .txt { min-width: 0; }
+
+  .progress {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 9px;
+    padding: 13px 18px; margin: 0 0 30px; box-shadow: var(--shadow);
+  }
+  .progress .bar { flex: 1; height: 5px; background: var(--line-soft); border-radius: 3px; overflow: hidden; }
+  .progress .fill { height: 100%; width: 0; background: var(--accent); border-radius: 3px; transition: width .28s ease; }
+  .progress .count { font-family: var(--mono); font-size: 12.5px; font-variant-numeric: tabular-nums; color: var(--ink-2); white-space: nowrap; }
+  .progress .lbl { font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+  .progress button {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .04em;
+    background: none; border: 1px solid var(--line); color: var(--muted);
+    padding: 4px 9px; border-radius: 5px; cursor: pointer;
+  }
+  .progress button:hover { border-color: var(--accent); color: var(--accent); }
+
+  .note {
+    border-left: 2px solid var(--accent); background: var(--accent-soft);
+    padding: 14px 18px; border-radius: 0 7px 7px 0; margin: 0 0 18px;
+    font-size: .96rem; max-width: var(--measure);
+  }
+  .note > :last-child { margin-bottom: 0; }
+  .note.warn { border-left-color: var(--crit); background: var(--crit-soft); }
+  .note.good { border-left-color: var(--good); background: var(--good-soft); }
+  .note .tag {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 6px;
+  }
+  .note.warn .tag { color: var(--crit); }
+  .note.good .tag { color: var(--good); }
+
+  details {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 8px; margin-bottom: 9px; overflow: hidden;
+  }
+  details[open] { box-shadow: var(--shadow); }
+  summary {
+    cursor: pointer; padding: 12px 18px; font-weight: 620; font-size: .97rem;
+    display: flex; justify-content: space-between; gap: 14px; align-items: baseline; list-style: none;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; font-family: var(--mono); color: var(--muted); font-weight: 400; flex: none; }
+  details[open] summary::after { content: "–"; }
+  details[open] summary { border-bottom: 1px solid var(--line-soft); }
+  summary:hover { color: var(--accent); }
+  .q-body { padding: 14px 18px 16px; }
+  .q-body ul { margin: 0; padding-left: 1.15em; max-width: none; font-size: .95rem; }
+  .q-body li { margin-bottom: 8px; }
+  .q-body p { max-width: none; }
+
+  .proj { border-top: 1px solid var(--line); padding: 20px 0; }
+  .proj:last-of-type { border-bottom: 1px solid var(--line); }
+  .proj-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; margin-bottom: 4px; }
+  .proj-head .name { font-family: var(--mono); font-size: 1.02rem; font-weight: 600; color: var(--ink); }
+  .proj-head .when { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .proj-head .star {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--accent); border: 1px solid var(--accent); border-radius: 3px; padding: 1px 6px;
+  }
+  .proj > p:first-of-type { color: var(--ink-2); margin-bottom: 10px; }
+
+  .rules { list-style: none; padding: 0; counter-reset: r; max-width: var(--measure); }
+  .rules li {
+    counter-increment: r; display: grid; grid-template-columns: 30px minmax(0, 1fr);
+    gap: 14px; padding: 13px 0; border-top: 1px solid var(--line-soft);
+  }
+  .rules li:first-child { border-top: 1px solid var(--line); }
+  .rules li:last-child { border-bottom: 1px solid var(--line); }
+  .rules li::before {
+    content: counter(r); font-family: var(--mono); font-size: 12px;
+    color: var(--accent); font-variant-numeric: tabular-nums; padding-top: 3px;
+  }
+
+  .routine {
+    font-family: var(--mono); font-size: .87rem; background: var(--surface-2);
+    border: 1px solid var(--line-soft); border-radius: 8px; padding: 16px 18px; margin: 0 0 16px;
+  }
+  .routine div { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; padding: 3px 0; }
+  .routine .t { color: var(--accent); font-variant-numeric: tabular-nums; }
+
+  .star-list { list-style: none; padding: 0; counter-reset: s; max-width: var(--measure); }
+  .star-list li {
+    counter-increment: s; display: grid; grid-template-columns: 26px minmax(0, 1fr);
+    gap: 13px; padding: 10px 0; border-top: 1px solid var(--line-soft); font-size: .96rem;
+  }
+  .star-list li:first-child { border-top: 0; }
+  .star-list li::before {
+    content: counter(s); font-family: var(--mono); font-size: 11.5px; color: var(--muted);
+    font-variant-numeric: tabular-nums; padding-top: 4px;
+  }
+
+  footer { border-top: 1px solid var(--line); padding-top: 20px; color: var(--muted); font-size: .87rem; max-width: var(--measure); }
+
+  @media (max-width: 880px) {
+    .shell { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 0 20px 72px; }
+    .rail { position: static; max-height: none; padding: 26px 0 0; border-bottom: 1px solid var(--line); margin-bottom: 4px; }
+    .rail nav { flex-direction: row; overflow-x: auto; gap: 4px; padding-bottom: 14px; }
+    .rail a { white-space: nowrap; background: var(--surface); border: 1px solid var(--line-soft); }
+    .rail a .n { display: none; }
+    .rail hr { display: none; }
+    .main { padding-top: 30px; }
+    .week { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    .week-num { font-size: 1.5rem; display: flex; align-items: baseline; gap: 14px; }
+    .week-num .dates { margin-top: 0; }
+    .track { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+    .track .letter { font-size: 1.5rem; }
+    .track .letter span { display: inline; margin-left: 10px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; scroll-behavior: auto !important; }
+  }
+</style>
+
+<style>
+.sitenav{border-bottom:1px solid var(--line);background:var(--bg)}
+.sitenav-in{max-width:1180px;margin:0 auto;padding:12px 28px;display:flex;align-items:center;
+  gap:6px 18px;flex-wrap:wrap;font-family:var(--mono);font-size:12px}
+.sitenav .sbrand{margin-right:auto;color:var(--ink);text-decoration:none;letter-spacing:.04em}
+.sitenav .sbrand b{color:var(--accent)}
+.sitenav a{color:var(--muted);text-decoration:none;padding:4px 8px;border-radius:6px;letter-spacing:.04em}
+.sitenav a:hover{background:var(--surface);color:var(--accent)}
+.sitenav a[aria-current="page"]{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.rail{top:0!important}
+@media (max-width:880px){.sitenav-in{padding:10px 18px}}
+</style>
+</head>
+<body>
+<nav class="sitenav"><div class="sitenav-in">
+<a class="sbrand" href="index.html">nurekella<b>/</b>devops</a>
+<a href="index.html">главная</a><a href="resume.html">резюме</a>
+<a href="qa-trainer.html">тренажёр</a><a href="devops-plan.html" aria-current="page">план</a>
+<a href="cv-review.html">разбор резюме</a><a href="https://github.com/nurekella">github</a>
+</div></nav>
+<div class="shell">
+
+  <aside class="rail">
+    <p class="rail-title">Содержание</p>
+    <nav>
+      <a href="#diag"><span class="n">01</span>Диагностика</a>
+      <a href="#strat"><span class="n">02</span>Стратегия</a>
+      <a href="#w0"><span class="n">03</span>Неделя 0</a>
+      <hr>
+      <a href="#w1"><span class="n">1</span>K8s: эксплуатация</a>
+      <a href="#w2"><span class="n">2</span>K8s: внутри + Helm</a>
+      <a href="#w3"><span class="n">3</span>GitOps</a>
+      <a href="#w4"><span class="n">4</span>SRE + PromQL</a>
+      <a href="#w5"><span class="n">5</span>Terraform + CI/CD</a>
+      <a href="#w6"><span class="n">6</span>Platform Eng</a>
+      <a href="#w7"><span class="n">7</span>Security</a>
+      <a href="#w8"><span class="n">8</span>CKA + собесы</a>
+      <hr>
+      <a href="#articulation"><span class="n">04</span>Артикуляция</a>
+      <a href="#portfolio"><span class="n">05</span>Портфолио</a>
+      <a href="#cert"><span class="n">06</span>Сертификация</a>
+      <a href="#routine"><span class="n">07</span>Рутина</a>
+      <a href="#rules"><span class="n">08</span>Правила</a>
+      <a href="#checkpoints"><span class="n">09</span>Точки</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <header class="masthead">
+      <p class="eyebrow">Версия 2 · после разбора резюме</p>
+      <h1>Ты уже сильнее, чем твоё резюме</h1>
+      <p class="lede">Восемь недель до оффера на позиции DevOps, SRE или Platform Engineer. План построен на анализе 546 starred-репозиториев и актуального резюме от 15 июля 2026. Задача — не догнать рынок, а перестать себя недопродавать.</p>
+      <div class="meta">
+        <span><b>11 августа — 5 октября 2026</b></span>
+        <span>Нагрузка <b>≈17 ч/нед</b></span>
+        <span>Цель <b>DevOps · SRE · Platform</b></span>
+        <span>CKA <b>конец октября</b></span>
+      </div>
+    </header>
+
+    <div class="note warn">
+      <span class="tag">Что изменилось от версии 1</span>
+      <p>Первая версия строилась на README репозитория, где текущим местом работы указан Kaspi Bank. Резюме показало другое: <strong>Kubernetes, Terraform, Ansible, GitLab CI, Yandex Cloud и Proxmox уже в работе</strong>, плюс два года руководства управлением IT-инфраструктуры в банке. Диагноз «нет Kubernetes, нет Terraform — блокеры» был неверен и снят. План переписан: меньше основ, больше глубины, портфолио и умения об этом говорить.</p>
+    </div>
+
+    <!-- ══════════ 01 ДИАГНОСТИКА ══════════ -->
+    <section id="diag">
+      <div class="sect-head">
+        <p class="kicker">01 · Диагностика</p>
+        <h2>Где ты на самом деле</h2>
+        <p>Профиль middle+ / senior инфраструктурного инженера с банковским продакшном. Изучать с нуля почти нечего — мешает другое.</p>
+      </div>
+
+      <div class="scroller">
+        <table>
+          <thead><tr><th>Направление</th><th>Где и сколько</th></tr></thead>
+          <tbody>
+            <tr><td class="skill">Kubernetes</td><td>Alif Islamic Bank — развёртывание и настройка кластеров</td></tr>
+            <tr><td class="skill">Terraform</td><td>Alif — провижининг серверов</td></tr>
+            <tr><td class="skill">Ansible</td><td>Alif, Товарная биржа Alan — конфигурация и обновления</td></tr>
+            <tr><td class="skill">GitLab CI</td><td>Alif — пайплайны CI/CD</td></tr>
+            <tr><td class="skill">Облака</td><td>Yandex Cloud, PrimeCloud, PS Cloud, on-premise Proxmox</td></tr>
+            <tr><td class="skill">Мониторинг и логи</td><td>Prometheus, Grafana, Zabbix, Loki, Graylog, Wazuh, ELK — четыре места работы</td></tr>
+            <tr><td class="skill">Базы</td><td>PostgreSQL, MS SQL Server</td></tr>
+            <tr><td class="skill">Сети и доступы</td><td>FortiGate и VDOM, WireGuard, FreeIPA как LDAP, Cisco</td></tr>
+            <tr><td class="skill">Виртуализация</td><td>Proxmox, VMware ESXi, Hyper-V</td></tr>
+            <tr><td class="skill">Руководство</td><td>2 года — руководитель управления IT-инфраструктуры и операций</td></tr>
+            <tr><td class="skill">Отрасль</td><td>8 лет из 10 в финансовом секторе, доступность 24/7</td></tr>
+            <tr><td class="skill">Языки</td><td>Казахский родной, русский C2, английский B2</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="margin-top: 28px;">Что реально мешает</h3>
+      <div class="scroller">
+        <table>
+          <thead><tr><th>№</th><th>Проблема</th><th>Суть</th><th>Приоритет</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td class="skill">Позиционирование в резюме</td><td>Желаемая должность «Системный инженер». Kubernetes отсутствует в тегах навыков. Terraform и K8s — однострочниками. По запросу «DevOps» тебя не находят.</td><td><span class="sev block">главный рычаг</span></td></tr>
+            <tr><td class="num">2</td><td class="skill">Портфолио</td><td>В GitHub только README с устаревшим резюме. Показать Kubernetes и IaC вне слов нечем.</td><td><span class="sev block">высокий</span></td></tr>
+            <tr><td class="num">3</td><td class="skill">Артикуляция</td><td>Делаешь больше, чем можешь внятно рассказать. «Настроил кластер» вместо истории с масштабом и результатом.</td><td><span class="sev block">высокий</span></td></tr>
+            <tr><td class="num">4</td><td class="skill">K8s: эксплуатация</td><td>Кластер поднять умеешь. Спрашивают про probes, QoS, RBAC, scheduling, разбор CrashLoopBackOff и Pending.</td><td><span class="sev high">высокий</span></td></tr>
+            <tr><td class="num">5</td><td class="skill">Helm и GitOps</td><td>Ни Helm, ни ArgoCD в резюме нет. Спрашивают сразу после базового Kubernetes.</td><td><span class="sev high">высокий</span></td></tr>
+            <tr><td class="num">6</td><td class="skill">SRE-словарь</td><td>Практика есть — дежурства 24/7, инциденты. Терминов нет: SLI, SLO, error budget, toil.</td><td><span class="sev mid">быстро</span></td></tr>
+            <tr><td class="num">7</td><td class="skill">PromQL</td><td>Prometheus давно, но запрос на собеседовании пишут с нуля.</td><td><span class="sev mid">средний</span></td></tr>
+            <tr><td class="num">8</td><td class="skill">Terraform: state</td><td>Провижинить умеешь. Спрашивают про state в команде, locking, модули, plan в CI, дрейф.</td><td><span class="sev mid">средний</span></td></tr>
+            <tr><td class="num">9</td><td class="skill">Platform Engineering</td><td>Целевая роль. Фактически строишь платформу, но не говоришь на этом языке: self-service, DX, Backstage.</td><td><span class="sev mid">средний</span></td></tr>
+            <tr><td class="num">10</td><td class="skill">CKA</td><td>Образование непрофильное. Сертификат снимает вопрос «откуда он это знает» на HR-фильтре.</td><td><span class="sev mid">к концу окт</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note warn">
+        <span class="tag">Проблема со звёздами</span>
+        <p>546 звёзд — склад, а не план. Около 70% — self-hosted приложения, файловые менеджеры, PDF-инструменты, iOS-твики. Релевантных примерно 60. Главный риск плана — <strong>распыление</strong>, а не нехватка материала. Остальные 480 не открывать до оффера.</p>
+      </div>
+    </section>
+
+    <!-- ══════════ 02 СТРАТЕГИЯ ══════════ -->
+    <section id="strat">
+      <div class="sect-head">
+        <p class="kicker">02 · Стратегия</p>
+        <h2>Четыре трека</h2>
+        <p>Веса изменены относительно версии 1: базы учить почти не надо, поэтому практики меньше, а артикуляции и портфолио больше. Бюджет ≈17 часов в неделю, ≈135 за восемь недель.</p>
+      </div>
+
+      <div class="track">
+        <div class="letter">A<span>60 мин/день</span></div>
+        <div><h3>Практика</h3><p>Глубина там, где спрашивают. Не основы — их ты знаешь.</p></div>
+      </div>
+      <div class="track">
+        <div class="letter">B<span>40 мин/день</span></div>
+        <div><h3>Артикуляция</h3><p>Вопросы вслух плюс истории по STAR из своего опыта. Главный недооценённый трек.</p></div>
+      </div>
+      <div class="track">
+        <div class="letter">C<span>3–4 ч/выходной</span></div>
+        <div><h3>Портфолио</h3><p>Четыре проекта. Единственный способ показать навык до звонка.</p></div>
+      </div>
+      <div class="track">
+        <div class="letter">D<span>30 мин/пятница</span></div>
+        <div><h3>Поиск</h3><p>Отклики, письма, ретро по вопросам с собеседований.</p></div>
+      </div>
+
+      <div class="note" style="margin-top: 24px;">
+        <span class="tag">Правило одного источника</span>
+        <p>На тему — один основной материал. Остальное только справочник, когда застрял. Начал Fast-Kubernetes — не переключайся на третий день.</p>
+      </div>
+    </section>
+
+    <!-- ══════════ 03 НЕДЕЛЯ 0 ══════════ -->
+    <section id="w0">
+      <div class="sect-head">
+        <p class="kicker">03 · Неделя 0 — до 11 августа</p>
+        <h2>Резюме, стенд, первые отклики</h2>
+        <p>Самая высокая отдача на вложенное время во всём плане — здесь. Правки в hh дают больше, чем любая изученная тема: тебя перестают отсеивать до прочтения.</p>
+      </div>
+
+      <p class="sub">Резюме на hh — 20 минут</p>
+      <ul class="check">
+        <li><label><input type="checkbox" data-k="r-1"><span class="txt">Желаемая должность → <strong>DevOps Engineer</strong>; специализации → DevOps-инженер / SRE / Системный инженер</span></label></li>
+        <li><label><input type="checkbox" data-k="r-2"><span class="txt"><strong>Kubernetes в теги навыков</strong> — сейчас его там нет — и переписать блок навыков целиком</span></label></li>
+        <li><label><input type="checkbox" data-k="r-3"><span class="txt">Указать зарплату</span></label></li>
+        <li><label><input type="checkbox" data-k="r-4"><span class="txt">Формат работы → в офисе, гибрид, удалённо</span></label></li>
+      </ul>
+
+      <p class="sub">Резюме — на этой неделе</p>
+      <ul class="check">
+        <li><label><input type="checkbox" data-k="r-5"><span class="txt">Пометки о совмещении: B2M, Alan, Improvado, Ниет — «частичная занятость, совмещение»</span></label></li>
+        <li><label><input type="checkbox" data-k="r-6"><span class="txt">Переписать блок Alif Bank: IaC, Kubernetes и CI/CD первыми пунктами, со цифрами</span></label></li>
+        <li><label><input type="checkbox" data-k="r-7"><span class="txt">Раскрыть Improvado, сократить блоки 2015–2020, убрать картриджи и обжим кабеля</span></label></li>
+        <li><label><input type="checkbox" data-k="r-8"><span class="txt">Обновить README репозитория — он показывает Kaspi Bank как текущее место четвёртый год</span></label></li>
+      </ul>
+
+      <p class="sub">Стенд</p>
+      <ul class="check">
+        <li><label><input type="checkbox" data-k="s-1"><span class="txt">Кластер: <a class="repo" href="https://github.com/k3d-io/k3d">k3d</a> локально или <a class="repo" href="https://github.com/k3s-io/k3s">k3s</a> на VM</span></label></li>
+        <li><label><input type="checkbox" data-k="s-2"><span class="txt"><a class="repo" href="https://github.com/derailed/k9s">k9s</a>, <a class="repo" href="https://github.com/ahmetb/kubectx">kubectx</a>, <a class="repo" href="https://github.com/nicolaka/netshoot">netshoot</a>, <a class="repo" href="https://github.com/swade1987/kubernetes-toolkit">kubernetes-toolkit</a></span></label></li>
+        <li><label><input type="checkbox" data-k="s-3"><span class="txt">helm, terraform или <a class="repo" href="https://github.com/opentofu/opentofu">opentofu</a>, argocd CLI</span></label></li>
+      </ul>
+
+      <p class="sub">Поиск</p>
+      <ul class="check">
+        <li><label><input type="checkbox" data-k="s-4"><span class="txt">4 пустых публичных репозитория под проекты</span></label></li>
+        <li><label><input type="checkbox" data-k="s-5"><span class="txt"><strong>Начать откликаться.</strong> 5–10 вакансий в неделю с этого момента, не «когда буду готов»</span></label></li>
+      </ul>
+    </section>
+
+    <!-- ══════════ НЕДЕЛИ ══════════ -->
+    <section id="weeks">
+      <div class="sect-head">
+        <p class="kicker">Трек A · Практика</p>
+        <h2>Восемь недель</h2>
+        <p>Ни одной недели «с нуля». Каждая берёт то, что ты уже применяешь, и добирает слой, о котором спрашивают на собеседовании.</p>
+      </div>
+
+      <div class="progress" id="progress">
+        <span class="lbl">Прогресс</span>
+        <div class="bar"><div class="fill" id="fill"></div></div>
+        <span class="count" id="count">0 / 0</span>
+        <button type="button" id="reset">Сбросить</button>
+      </div>
+
+      <div class="week" id="w1">
+        <div class="week-num">01<span class="dates">11–17 авг</span></div>
+        <div class="week-body">
+          <h3>Kubernetes: эксплуатация вместо установки</h3>
+          <p class="week-goal">Кластер поднять умеешь. Собеседуют по тому, что происходит после.</p>
+          <p class="tight">Источник: <a class="repo" href="https://github.com/omerbsezer/Fast-Kubernetes">Fast-Kubernetes</a> — точечно по темам ниже, не подряд. Сверка полноты: <a class="repo" href="https://github.com/techiescamp/kubernetes-learning-path">kubernetes-learning-path</a>.</p>
+          <ul class="check">
+            <li><label><input type="checkbox" data-k="w1-1"><span class="txt">Probes: liveness / readiness / startup — что сломается, если перепутать</span></label></li>
+            <li><label><input type="checkbox" data-k="w1-2"><span class="txt">Resources: requests vs limits, QoS-классы, OOMKilled, кого убьют первым</span></label></li>
+            <li><label><input type="checkbox" data-k="w1-3"><span class="txt">RBAC: ServiceAccount, Role, RoleBinding, ClusterRole — минимальные права на практике</span></label></li>
+            <li><label><input type="checkbox" data-k="w1-4"><span class="txt">Scheduling: nodeSelector, affinity и anti-affinity, taints и tolerations, topology spread</span></label></li>
+            <li><label><input type="checkbox" data-k="w1-5"><span class="txt">Rolling update без простоя: maxSurge, maxUnavailable, PDB</span></label></li>
+            <li><label><input type="checkbox" data-k="w1-6"><span class="txt">Deployment vs StatefulSet vs DaemonSet — когда что и почему</span></label></li>
+            <li><label><input type="checkbox" data-k="w1-7"><span class="txt">Troubleshooting своими руками: CrashLoopBackOff, ImagePullBackOff, Pending, Evicted</span></label></li>
+            <li><label><input type="checkbox" data-k="w1-8"><span class="txt">Практика: <a class="repo" href="https://github.com/Manoj-engineer/k8squest">k8squest</a> — задачи ровно в формате живого собеседования</span></label></li>
+            <li><label><input type="checkbox" data-k="w1-9"><span class="txt"><a class="repo" href="https://github.com/robusta-dev/krr">krr</a> и <a class="repo" href="https://github.com/stackrox/kube-linter">kube-linter</a> — готовый ответ на «как вы подбираете limits»</span></label></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="week" id="w2">
+        <div class="week-num">02<span class="dates">18–24 авг</span></div>
+        <div class="week-body">
+          <h3>Kubernetes: внутренности + Helm</h3>
+          <p class="week-goal">Неделя, которая отличает «настроил по гайду» от «понимаю, что происходит».</p>
+          <ul class="check">
+            <li><label><input type="checkbox" data-k="w2-1"><span class="txt"><a class="repo" href="https://github.com/jamiehannaford/what-happens-when-k8s">what-happens-when-k8s</a> — прочитать полностью и уметь рассказать. Прямой вопрос на собеседовании</span></label></li>
+            <li><label><input type="checkbox" data-k="w2-2"><span class="txt"><a class="repo" href="https://github.com/kelseyhightower/kubernetes-the-hard-way">kubernetes-the-hard-way</a> — кластер вручную. Ты ставил кластеры инструментами; это даёт слой под ними. <strong>Не пропускать</strong></span></label></li>
+            <li><label><input type="checkbox" data-k="w2-3"><span class="txt">NetworkPolicy на практике; <a class="repo" href="https://github.com/cilium/cilium">cilium</a> — что такое eBPF и зачем, базово</span></label></li>
+            <li><label><input type="checkbox" data-k="w2-4"><span class="txt"><strong>Helm:</strong> свой чарт с нуля — values, templates, helpers, зависимости, hooks</span></label></li>
+            <li><label><input type="checkbox" data-k="w2-5"><span class="txt"><a class="repo" href="https://github.com/helm/chart-testing">chart-testing</a> для линта, <a class="repo" href="https://github.com/helmfile/helmfile">helmfile</a> для множества релизов</span></label></li>
+            <li><label><input type="checkbox" data-k="w2-6"><span class="txt">Диагностика трафика: <a class="repo" href="https://github.com/eldadru/ksniff">ksniff</a>, <a class="repo" href="https://github.com/kubeshark/kubeshark">kubeshark</a>, <a class="repo" href="https://github.com/inspektor-gadget/inspektor-gadget">inspektor-gadget</a></span></label></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="week" id="w3">
+        <div class="week-num">03<span class="dates">25–31 авг</span></div>
+        <div class="week-body">
+          <h3>GitOps <span class="flag">нет в резюме</span></h3>
+          <p class="week-goal">Этого нет вообще, а спрашивают почти всегда после Kubernetes. Стандарт деплоя.</p>
+          <ul class="check">
+            <li><label><input type="checkbox" data-k="w3-1"><span class="txt">ArgoCD в свой кластер: приложение из Git, App-of-Apps, self-heal, drift, rollback</span></label></li>
+            <li><label><input type="checkbox" data-k="w3-2"><span class="txt"><a class="repo" href="https://github.com/cloudogu/gitops-patterns">gitops-patterns</a> — паттерны и антипаттерны процесса, читать обязательно</span></label></li>
+            <li><label><input type="checkbox" data-k="w3-3"><span class="txt">Продвижение релизов dev→stage→prod: <a class="repo" href="https://github.com/akuity/kargo">kargo</a>; проверки до кластера: <a class="repo" href="https://github.com/zapier/kubechecks">kubechecks</a></span></label></li>
+            <li><label><input type="checkbox" data-k="w3-4"><span class="txt"><strong>Секреты в Git</strong> — обязательный вопрос: SOPS через <a class="repo" href="https://github.com/isindir/sops-secrets-operator">sops-secrets-operator</a>, либо <a class="repo" href="https://github.com/Infisical/infisical">Infisical</a>, либо Vault</span></label></li>
+            <li><label><input type="checkbox" data-k="w3-5"><span class="txt">Policy as code: <a class="repo" href="https://github.com/kyverno/kyverno">kyverno</a> + Pod Security Standards</span></label></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="week" id="w4">
+        <div class="week-num">04<span class="dates">1–7 сен</span></div>
+        <div class="week-body">
+          <h3>Observability и SRE</h3>
+          <p class="week-goal">Твоя сильная сторона. Здесь она переводится на язык, которым спрашивают.</p>
+          <ul class="check">
+            <li><label><input type="checkbox" data-k="w4-1"><span class="txt"><strong>PromQL</strong> — главное за неделю. <a class="repo" href="https://github.com/acend/prometheus-training">prometheus-training</a>: <code>rate</code>, <code>increase</code>, <code>histogram_quantile</code>, агрегации; counter / gauge / histogram / summary</span></label></li>
+            <li><label><input type="checkbox" data-k="w4-2"><span class="txt">Алерты из <a class="repo" href="https://github.com/samber/awesome-prometheus-alerts">awesome-prometheus-alerts</a>, дашборды из <a class="repo" href="https://github.com/dotdc/grafana-dashboards-kubernetes">grafana-dashboards-kubernetes</a></span></label></li>
+            <li><label><input type="checkbox" data-k="w4-3"><span class="txt">У тебя есть Loki, ELK и Graylog — уметь сравнить и обосновать выбор</span></label></li>
+            <li><label><input type="checkbox" data-k="w4-4"><span class="txt">Пробы извне: <a class="repo" href="https://github.com/prometheus/blackbox_exporter">blackbox_exporter</a>, <a class="repo" href="https://github.com/ribbybibby/ssl_exporter">ssl_exporter</a></span></label></li>
+            <li><label><input type="checkbox" data-k="w4-5"><span class="txt">Трейсинг базово: OpenTelemetry, поставить <a class="repo" href="https://github.com/SigNoz/signoz">signoz</a> или <a class="repo" href="https://github.com/coroot/coroot">coroot</a></span></label></li>
+            <li><label><input type="checkbox" data-k="w4-6"><span class="txt"><strong>SRE-словарь</strong> — <a class="repo" href="https://github.com/dastergon/awesome-sre">awesome-sre</a>: SLI, SLO, error budget, toil, MTTR, blameless postmortem. Два вечера, после которых четыре года дежурств звучат как SRE-опыт, а не «сидел на телефоне»</span></label></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="week" id="w5">
+        <div class="week-num">05<span class="dates">8–14 сен</span></div>
+        <div class="week-body">
+          <h3>Terraform и CI/CD — глубина</h3>
+          <p class="week-goal">Только то, что отличает «применял» от «владею».</p>
+          <p class="sub">Terraform</p>
+          <ul class="check">
+            <li><label><input type="checkbox" data-k="w5-1"><span class="txt"><strong>State:</strong> remote backend, locking, потеря state, <code>import</code>, <code>state mv</code>, дрейф после ручных правок в консоли</span></label></li>
+            <li><label><input type="checkbox" data-k="w5-2"><span class="txt">Модули: свой переиспользуемый, версионирование, <a class="repo" href="https://github.com/terraform-docs/terraform-docs">terraform-docs</a></span></label></li>
+            <li><label><input type="checkbox" data-k="w5-3"><span class="txt">Окружения: workspaces против отдельных каталогов и почему второе обычно лучше</span></label></li>
+            <li><label><input type="checkbox" data-k="w5-4"><span class="txt"><code>plan</code> в CI как процесс review: <a class="repo" href="https://github.com/runatlantis/atlantis">atlantis</a>; best practices — <a class="repo" href="https://github.com/brikis98/terraform-up-and-running">terraform-up-and-running</a></span></label></li>
+          </ul>
+          <p class="sub">CI/CD — второй пайплайн к твоему GitLab CI</p>
+          <ul class="check">
+            <li><label><input type="checkbox" data-k="w5-5"><span class="txt">GitHub Actions: <a class="repo" href="https://github.com/nektos/act">act</a> локально, <a class="repo" href="https://github.com/zizmorcore/zizmor">zizmor</a> для безопасности workflow</span></label></li>
+            <li><label><input type="checkbox" data-k="w5-6"><span class="txt">Разобрать построчно <a class="repo" href="https://github.com/cicd-excellence/app">cicd-excellence/app</a> + <a class="repo" href="https://github.com/cicd-excellence/infra">infra</a> — шаблон для флагманского проекта</span></label></li>
+            <li><label><input type="checkbox" data-k="w5-7"><span class="txt">Self-hosted runners в K8s: <a class="repo" href="https://github.com/actions/actions-runner-controller">actions-runner-controller</a> — сильный пункт в резюме</span></label></li>
+            <li><label><input type="checkbox" data-k="w5-8"><span class="txt">GitLab CI глубже: DAG через <code>needs</code>, <code>rules</code>, cache, matrix, шаблоны и <code>include</code>, environments</span></label></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="week" id="w6">
+        <div class="week-num">06<span class="dates">15–21 сен</span></div>
+        <div class="week-body">
+          <h3>Platform Engineering <span class="flag">целевая роль</span></h3>
+          <p class="week-goal">Этого в версии 1 не было вовсе. Здесь твой опыт из Alif читается лучше всего.</p>
+          <ul class="check">
+            <li><label><input type="checkbox" data-k="w6-1"><span class="txt">Идея платформы: внутренняя платформа как продукт для команд разработки, self-service вместо тикетов, golden path</span></label></li>
+            <li><label><input type="checkbox" data-k="w6-2"><span class="txt"><a class="repo" href="https://github.com/backstage/backstage">backstage</a> — поставить, собрать каталог сервисов, шаблон нового сервиса. Де-факто стандарт developer portal</span></label></li>
+            <li><label><input type="checkbox" data-k="w6-3"><span class="txt">Абстракции над K8s: <a class="repo" href="https://github.com/score-spec/spec">score</a>, <a class="repo" href="https://github.com/radius-project/radius">radius</a>, <a class="repo" href="https://github.com/cyclops-ui/cyclops">cyclops</a>, <a class="repo" href="https://github.com/kubernetes-sigs/kro">kro</a></span></label></li>
+            <li><label><input type="checkbox" data-k="w6-4"><span class="txt">Gateway API: <a class="repo" href="https://github.com/nginx/nginx-gateway-fabric">nginx-gateway-fabric</a>, <a class="repo" href="https://github.com/kgateway-dev/kgateway">kgateway</a>, миграция с ingress-nginx</span></label></li>
+            <li><label><input type="checkbox" data-k="w6-5"><span class="txt">Автоскейлинг и эффективность: <a class="repo" href="https://github.com/kedacore/keda">keda</a>, <a class="repo" href="https://github.com/aws/karpenter-provider-aws">karpenter</a>, <a class="repo" href="https://github.com/ctrox/zeropod">zeropod</a></span></label></li>
+            <li><label><input type="checkbox" data-k="w6-6"><span class="txt">FinOps — на платформенных вакансиях спрашивают про стоимость: <a class="repo" href="https://github.com/WozzHQ/wozz">wozz</a>, <a class="repo" href="https://github.com/ravikiranvm/aws-finops-dashboard">aws-finops-dashboard</a></span></label></li>
+            <li><label><input type="checkbox" data-k="w6-7"><span class="txt"><a class="repo" href="https://github.com/cloudnative-pg/cloudnative-pg">cloudnative-pg</a> — при твоём опыте с PostgreSQL это быстрый и сильный пункт</span></label></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="week" id="w7">
+        <div class="week-num">07<span class="dates">22–28 сен</span></div>
+        <div class="week-body">
+          <h3>Security в Kubernetes + доводка портфолио</h3>
+          <p class="week-goal">Банк, FortiGate, FreeIPA — DevSecOps твоё естественное продолжение и отличие от кандидатов из продуктовых компаний.</p>
+          <ul class="check">
+            <li><label><input type="checkbox" data-k="w7-1"><span class="txt"><a class="repo" href="https://github.com/madhuakula/kubernetes-goat">kubernetes-goat</a> — уязвимый по дизайну кластер. Несколько сценариев: лучший способ понять K8s security и получить живые истории</span></label></li>
+            <li><label><input type="checkbox" data-k="w7-2"><span class="txt"><a class="repo" href="https://github.com/aquasecurity/trivy">trivy</a> и <a class="repo" href="https://github.com/deepfence/SecretScanner">SecretScanner</a> в пайплайн</span></label></li>
+            <li><label><input type="checkbox" data-k="w7-3"><span class="txt">Kyverno-политики в проекте, <a class="repo" href="https://github.com/kubearmor/KubeArmor">kubearmor</a> для рантайма</span></label></li>
+            <li><label><input type="checkbox" data-k="w7-4"><span class="txt"><a class="repo" href="https://github.com/Swordfish-Security/awesome-devsecops-russia">awesome-devsecops-russia</a> — на русском; аудит nginx: <a class="repo" href="https://github.com/MegaManSec/Gixy-Next">Gixy-Next</a></span></label></li>
+            <li><label><input type="checkbox" data-k="w7-5"><span class="txt"><strong>Вторая половина недели:</strong> доводка всех четырёх проектов и README к каждому</span></label></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="week" id="w8">
+        <div class="week-num">08<span class="dates">29 сен — 5 окт</span></div>
+        <div class="week-body">
+          <h3>CKA и интенсив собеседований</h3>
+          <p class="week-goal">Новых тем нет.</p>
+          <ul class="check">
+            <li><label><input type="checkbox" data-k="w8-1"><span class="txt">Мок-экзамены с таймером: <a class="repo" href="https://github.com/sailor-sh/CK-X">CK-X</a>, несколько прогонов</span></label></li>
+            <li><label><input type="checkbox" data-k="w8-2"><span class="txt">Скорость с kubectl: <a class="repo" href="https://github.com/dgkanatsios/CKAD-exercises">CKAD-exercises</a></span></label></li>
+            <li><label><input type="checkbox" data-k="w8-3"><span class="txt">Прогон всех вопросов трека B вслух, с таймером</span></label></li>
+            <li><label><input type="checkbox" data-k="w8-4"><span class="txt">Собеседования каждый день</span></label></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 04 АРТИКУЛЯЦИЯ ══════════ -->
+    <section id="articulation">
+      <div class="sect-head">
+        <p class="kicker">04 · Трек B</p>
+        <h2>Артикуляция</h2>
+        <p>Самый недооценённый трек. Ты делаешь больше, чем можешь внятно рассказать — это и есть разрыв между твоим настоящим уровнем и тем, как он читается.</p>
+      </div>
+
+      <div class="note good">
+        <span class="tag">Твоё преимущество</span>
+        <p>У тебя редкий по нынешним временам материал: реальный прод банка, дежурства 24/7, инциденты, миграции, руководство командой. Большинство кандидатов рассказывают про домашние лабы. <strong>Готовь истории первым делом, а не в последний вечер.</strong></p>
+      </div>
+
+      <h3>Шесть историй по STAR</h3>
+      <p class="tight" style="color: var(--muted);">Письменно, по схеме «ситуация → задача → что сделал → результат».</p>
+      <ol class="star-list">
+        <li><span>Самый серьёзный инцидент, который разбирал. Что упало, как локализовал, чем починил, что изменил потом, чтобы не повторилось</span></li>
+        <li><span>Что автоматизировал через Ansible или Terraform, и сколько времени это сэкономило</span></li>
+        <li><span>Как строил CI/CD в GitLab CI: что было до, что стало, сколько занимает релиз теперь</span></li>
+        <li><span>Зачем понадобился Kubernetes и что он изменил</span></li>
+        <li><span>Случай, когда сломал прод: как чинил и какие выводы</span></li>
+        <li><span>Как руководил командой: что поменял в процессах, найме, дежурствах</span></li>
+      </ol>
+
+      <h3 style="margin-top: 26px;">Тренажёр вопросов</h3>
+      <p class="tight">Метод: 20 вопросов в день <strong>вслух</strong> по <a class="repo" href="https://github.com/bregman-arie/devops-exercises">devops-exercises</a>, потом сверка. Не глазами — на собеседовании ты говоришь.</p>
+      <div class="scroller">
+        <table>
+          <thead><tr><th>Репозиторий</th><th>Что даёт</th></tr></thead>
+          <tbody>
+            <tr><td><a class="repo" href="https://github.com/bregman-arie/devops-exercises">devops-exercises</a></td><td>Основной тренажёр, все темы</td></tr>
+            <tr><td><a class="repo" href="https://github.com/rmntrvn/adm_linux_ops_questions">adm_linux_ops_questions</a></td><td><strong>На русском</strong> — близко к рынку КЗ и РФ</td></tr>
+            <tr><td><a class="repo" href="https://github.com/moabukar/tech-vault">tech-vault</a></td><td>Вопросы плюс практические челленджи</td></tr>
+            <tr><td><a class="repo" href="https://github.com/trimstray/test-your-sysadmin-skills">test-your-sysadmin-skills</a></td><td>284 вопроса по Linux — проверка глубины</td></tr>
+            <tr><td><a class="repo" href="https://github.com/ByteByteGoHq/system-design-101">system-design-101</a></td><td>Архитектурные вопросы, картинками</td></tr>
+            <tr><td><a class="repo" href="https://github.com/alex/what-happens-when">what-happens-when</a></td><td>Классика: что происходит при вводе google.com</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="margin-top: 26px;">Вопросы, которые спросят почти наверняка</h3>
+
+      <details>
+        <summary><span>Kubernetes</span></summary>
+        <div class="q-body">
+          <ul>
+            <li>Опиши архитектуру кластера. За что отвечает каждый компонент?</li>
+            <li>Что происходит по шагам при <code>kubectl apply -f deployment.yaml</code>?</li>
+            <li>Pod в CrashLoopBackOff — действия по шагам? В Pending — причины?</li>
+            <li>Liveness vs readiness vs startup. Что сломается, если перепутать?</li>
+            <li>requests vs limits, QoS-классы. Кого убьют первым при нехватке памяти?</li>
+            <li>Обновление без простоя: rolling update, maxSurge, maxUnavailable, PDB</li>
+            <li>Service ClusterIP — как трафик доходит до Pod?</li>
+            <li>Deployment vs StatefulSet — когда нужен второй?</li>
+            <li>Как правильно хранить секреты? <em>(Secret в etcd — base64, а не шифрование)</em></li>
+          </ul>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>GitOps и Helm</span></summary>
+        <div class="q-body">
+          <ul>
+            <li>Что такое GitOps и чем отличается от «CI деплоит через kubectl»?</li>
+            <li>Как ArgoCD понимает, что состояние разошлось? Что такое self-heal и drift?</li>
+            <li>Как хранить секреты в Git-репозитории?</li>
+            <li>Helm: что такое release, чем <code>upgrade</code> отличается от <code>apply</code>, как откатиться?</li>
+          </ul>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>Terraform</span></summary>
+        <div class="q-body">
+          <ul>
+            <li>Зачем state и что будет, если его потерять? Как работать с ним в команде?</li>
+            <li>Что делать, если ресурс поменяли руками в консоли?</li>
+            <li><code>import</code> — зачем? Как не хранить пароли в <code>.tf</code>?</li>
+          </ul>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>SRE и мониторинг</span></summary>
+        <div class="q-body">
+          <ul>
+            <li>Pull vs push. Почему Prometheus — pull?</li>
+            <li>Counter vs gauge vs histogram. Напиши запрос: доля ошибок 5xx за 5 минут</li>
+            <li>SLI, SLO, error budget — что это и как считается?</li>
+            <li>Как строишь алертинг, чтобы не было alert fatigue?</li>
+            <li>Сервис лёг. Действия в первые пять минут?</li>
+          </ul>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>Platform Engineering</span></summary>
+        <div class="q-body">
+          <ul>
+            <li>Что такое внутренняя платформа и зачем она, если есть Kubernetes?</li>
+            <li>Что такое golden path и self-service для разработчиков?</li>
+            <li>Как измерить, что платформа полезна? <em>(DORA: частота деплоя, lead time, MTTR, доля неудачных изменений)</em></li>
+          </ul>
+        </div>
+      </details>
+
+      <details>
+        <summary><span>Linux, сети, Docker, Git</span></summary>
+        <div class="q-body">
+          <ul>
+            <li>SIGTERM vs SIGKILL. <code>df</code> показывает 100%, <code>du</code> — 50%, почему?</li>
+            <li>Как найти, что съело диск, память, CPU? Пошагово</li>
+            <li>Что происходит при загрузке от BIOS до shell? Какой процесс слушает порт?</li>
+            <li>Namespaces и cgroups. Контейнер vs VM. COPY vs ADD, CMD vs ENTRYPOINT</li>
+            <li>Как уменьшить образ? Почему нельзя запускать от root?</li>
+            <li>merge vs rebase. <code>revert</code> vs <code>reset --hard</code> vs <code>reset --soft</code></li>
+            <li>Blue-green vs canary vs rolling — что выберешь и почему?</li>
+          </ul>
+        </div>
+      </details>
+    </section>
+
+    <!-- ══════════ 05 ПОРТФОЛИО ══════════ -->
+    <section id="portfolio">
+      <div class="sect-head">
+        <p class="kicker">05 · Трек C</p>
+        <h2>Четыре проекта</h2>
+        <p>В GitHub-профиле сейчас нет ничего, кроме README. Проекты подобраны под целевые роли и опираются на то, что ты уже умеешь — это не учебные лабы, а витрина.</p>
+      </div>
+
+      <div class="proj">
+        <div class="proj-head"><span class="name">k8s-production-stack</span><span class="when">недели 1–2</span></div>
+        <p>Приложение в Kubernetes так, как это делают в проде.</p>
+        <ul class="check">
+          <li><label><input type="checkbox" data-k="p1-1"><span class="txt">Свой Helm-чарт: deployment, service, ingress, configmap, secret, HPA, PDB</span></label></li>
+          <li><label><input type="checkbox" data-k="p1-2"><span class="txt">Probes осознанно, requests и limits с обоснованием откуда цифры</span></label></li>
+          <li><label><input type="checkbox" data-k="p1-3"><span class="txt">NetworkPolicy, RBAC с минимальными правами, отдельный ServiceAccount, non-root</span></label></li>
+          <li><label><input type="checkbox" data-k="p1-4"><span class="txt">kube-linter и trivy в проверках</span></label></li>
+          <li><label><input type="checkbox" data-k="p1-5"><span class="txt">Раздел README <strong>«Troubleshooting»</strong> — какие проблемы ловил и как решил. Это читают внимательнее всего</span></label></li>
+        </ul>
+      </div>
+
+      <div class="proj">
+        <div class="proj-head"><span class="name">gitops-platform</span><span class="when">недели 3–4</span><span class="star">флагман</span></div>
+        <p>Полный путь от коммита до прода. Показываешь первым.</p>
+        <ul class="check">
+          <li><label><input type="checkbox" data-k="p2-1"><span class="txt">Два репозитория — приложение и инфраструктура, по образцу cicd-excellence</span></label></li>
+          <li><label><input type="checkbox" data-k="p2-2"><span class="txt">CI: тесты → сборка → trivy → push в registry → bump тега в infra-репо</span></label></li>
+          <li><label><input type="checkbox" data-k="p2-3"><span class="txt">CD: ArgoCD, App-of-Apps, три окружения</span></label></li>
+          <li><label><input type="checkbox" data-k="p2-4"><span class="txt">Секреты через SOPS, политики Kyverno</span></label></li>
+          <li><label><input type="checkbox" data-k="p2-5"><span class="txt">Схема архитектуры в README</span></label></li>
+          <li><label><input type="checkbox" data-k="p2-6"><span class="txt"><strong>Демонстрация rollback:</strong> сломать релиз, откатить, приложить лог</span></label></li>
+        </ul>
+      </div>
+
+      <div class="proj">
+        <div class="proj-head"><span class="name">terraform-platform-modules</span><span class="when">неделя 5</span></div>
+        <p>IaC как это выглядит у зрелой команды.</p>
+        <ul class="check">
+          <li><label><input type="checkbox" data-k="p3-1"><span class="txt">Модули network / compute / k8s, remote state с locking, окружения dev и prod</span></label></li>
+          <li><label><input type="checkbox" data-k="p3-2"><span class="txt">Ansible-роли для базовой настройки и харденинга</span></label></li>
+          <li><label><input type="checkbox" data-k="p3-3"><span class="txt">CI: <code>fmt</code> → <code>validate</code> → <code>tflint</code> → <code>plan</code> на PR → <code>apply</code> на merge</span></label></li>
+          <li><label><input type="checkbox" data-k="p3-4"><span class="txt">terraform-docs; работает на LocalStack или Hetzner за 5–10 € в месяц</span></label></li>
+        </ul>
+      </div>
+
+      <div class="proj">
+        <div class="proj-head"><span class="name">observability-stack</span><span class="when">недели 6–7</span></div>
+        <p>Играет на твоей сильнейшей стороне и закрывает SRE-вакансии.</p>
+        <ul class="check">
+          <li><label><input type="checkbox" data-k="p4-1"><span class="txt">Prometheus, Grafana, Loki, alertmanager в Kubernetes через Helm</span></label></li>
+          <li><label><input type="checkbox" data-k="p4-2"><span class="txt">Свои PromQL-запросы и алерты, не только готовые дашборды</span></label></li>
+          <li><label><input type="checkbox" data-k="p4-3"><span class="txt"><strong>Дашборд SLO с error budget</strong> — именно это отличает «мониторинг» от SRE</span></label></li>
+          <li><label><input type="checkbox" data-k="p4-4"><span class="txt">Blackbox и ssl_exporter, трейсинг через OpenTelemetry</span></label></li>
+          <li><label><input type="checkbox" data-k="p4-5"><span class="txt">README с разбором: какие алерты шумели и как чинил</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ══════════ 06 СЕРТИФИКАЦИЯ ══════════ -->
+    <section id="cert">
+      <div class="sect-head">
+        <p class="kicker">06 · Сертификация</p>
+        <h2>CKA — единственная, которая нужна</h2>
+        <p>Образование непрофильное: магистр экономики, бакалавр по транспорту. Формальный сертификат снимает вопрос «откуда он это знает» на уровне HR-фильтра, а экзамен практический — подготовка совпадает с навыком.</p>
+      </div>
+
+      <div class="cols">
+        <div class="card">
+          <h3>Путь к CKA</h3>
+          <ul class="tight">
+            <li>Цель: конец октября, после недели 8</li>
+            <li>Программа: <a class="repo" href="https://github.com/cncf/curriculum">cncf/curriculum</a></li>
+            <li>Моки с таймером: <a class="repo" href="https://github.com/sailor-sh/CK-X">CK-X</a></li>
+            <li>Скорость с kubectl: <a class="repo" href="https://github.com/dgkanatsios/CKAD-exercises">CKAD-exercises</a></li>
+            <li><strong>Купоны:</strong> <a class="repo" href="https://github.com/techiescamp/linux-foundation-coupon">linux-foundation-coupon</a> — часто на 40–50% дешевле. Не покупай по полной цене</li>
+            <li>Бейджи в профиль: <a class="repo" href="https://github.com/CloudNativeStudyGroup/Free-Credly-Badges">Free-Credly-Badges</a></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Остальное — потом или никогда</h3>
+          <p class="tight"><strong>CKS</strong> — когда будет работа. С банковским профилем это сильный долгосрочный вектор: <a class="repo" href="https://github.com/madhuakula/kubernetes-goat">kubernetes-goat</a>, <a class="repo" href="https://github.com/ViktorUJ/cks">cks</a>, <a class="repo" href="https://github.com/thiago4he/kubernetes-security-kcsa-mock">kcsa-mock</a>.</p>
+          <p class="tight"><strong>Terraform Associate и AWS SAA</strong> — не нужны. Дешевле показать проект.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 07 РУТИНА ══════════ -->
+    <section id="routine">
+      <div class="sect-head">
+        <p class="kicker">07 · Рутина</p>
+        <h2>День и неделя</h2>
+      </div>
+
+      <p class="sub">Рабочий день — 1 ч 40 мин</p>
+      <div class="routine">
+        <div><span class="t">40 мин</span><span>Трек B — 20 вопросов вслух или одна история по STAR письменно</span></div>
+        <div><span class="t">60 мин</span><span>Трек A — тема недели, руками в кластере</span></div>
+      </div>
+
+      <p class="sub">Выходной — 3–4 часа</p>
+      <div class="routine">
+        <div><span class="t">3 часа</span><span>Трек C — проект</span></div>
+        <div><span class="t">1 час</span><span>Повторение вопросов, где плыл</span></div>
+      </div>
+
+      <p class="sub">Пятница — 30 минут, трек D</p>
+      <ul>
+        <li>Что из недели не закрыл? Переносим или выкидываем?</li>
+        <li>Сколько откликов, сколько собеседований?</li>
+        <li><strong>Что спросили, чего я не знал?</strong> → в план приоритетно, поверх всего остального</li>
+      </ul>
+    </section>
+
+    <!-- ══════════ 08 ПРАВИЛА ══════════ -->
+    <section id="rules">
+      <div class="sect-head">
+        <p class="kicker">08 · Правила</p>
+        <h2>Без чего план не сработает</h2>
+      </div>
+      <ol class="rules">
+        <li><span><strong>Не открывай остальные 480 звёзд до оффера.</strong> Главный риск — распыление, а не нехватка материала.</span></li>
+        <li><span><strong>Один источник на тему.</strong> Начал Fast-Kubernetes — не переключайся на третий день.</span></li>
+        <li><span><strong>Руками, а не глазами.</strong> Просмотренный туториал не равен навыку.</span></li>
+        <li><span><strong>Резюме важнее учёбы на первой неделе.</strong> Правки в hh дают больше отдачи, чем любая изученная тема: тебя перестают отсеивать до прочтения.</span></li>
+        <li><span><strong>Ты уже сильнее, чем твоё резюме.</strong> Задача плана — не догнать рынок, а перестать себя недопродавать. Kubernetes, Terraform, GitLab CI, облака, руководство командой, банковский прод, 24/7 — это уже есть.</span></li>
+        <li><span><strong>Собеседования параллельно.</strong> Каждое возвращает точный список пробелов — точнее любого плана, включая этот.</span></li>
+      </ol>
+    </section>
+
+    <!-- ══════════ 09 ТОЧКИ ══════════ -->
+    <section id="checkpoints">
+      <div class="sect-head">
+        <p class="kicker">09 · Контрольные точки</p>
+        <h2>Что должно быть сделано к дате</h2>
+      </div>
+      <div class="scroller">
+        <table>
+          <thead><tr><th>Дата</th><th>Состояние</th></tr></thead>
+          <tbody>
+            <tr><td class="num">11 авг</td><td><strong>Резюме на hh переписано, откликов пошло</strong>, стенд работает, 4 репозитория созданы</td></tr>
+            <tr><td class="num">17 авг</td><td>K8s-эксплуатация: уверенно про probes, QoS, RBAC, troubleshooting. Проект 1 в работе</td></tr>
+            <tr><td class="num">31 авг</td><td>the-hard-way пройден, свой Helm-чарт, ArgoCD в кластере. Проекты 1–2 готовы</td></tr>
+            <tr><td class="num">14 сен</td><td>SRE-словарь и PromQL, Terraform-глубина, второй пайплайн. Проект 3 готов</td></tr>
+            <tr><td class="num">28 сен</td><td>Platform-темы, K8s security, проект 4 готов, 400+ вопросов пройдено</td></tr>
+            <tr><td class="num">5 окт</td><td>Моки CKA сданы, четыре проекта отполированы, идут финальные этапы собеседований</td></tr>
+            <tr><td class="num">конец окт</td><td>CKA</td></tr>
+          </tbody>
+        </table>
+        <caption>Если точка не закрыта — не двигай дату, а сокращай объём следующей недели. Сдвиг дат обычно означает конец плана.</caption>
+      </div>
+    </section>
+
+    <footer>
+      <p>Версия 2, после разбора резюме от 15 июля 2026. Источник — starred-репозитории профиля <a href="https://github.com/nurekella">@nurekella</a>: 546 звёзд, из них 60 релевантных. Обновляй план каждую пятницу по итогам ретро и по вопросам с реальных собеседований: живой план обгоняет правильный.</p>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  (function () {
+    var KEY = "devops-plan-progress-v2";
+    var boxes = Array.prototype.slice.call(document.querySelectorAll('.check input[type="checkbox"]'));
+    var fill = document.getElementById("fill");
+    var count = document.getElementById("count");
+    var reset = document.getElementById("reset");
+
+    function load() {
+      try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; }
+    }
+    function save(state) {
+      try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* без хранилища — только текущая сессия */ }
+    }
+
+    var state = load();
+
+    function render() {
+      var done = boxes.filter(function (b) { return b.checked; }).length;
+      var pct = boxes.length ? (done / boxes.length) * 100 : 0;
+      fill.style.width = pct.toFixed(1) + "%";
+      count.textContent = done + " / " + boxes.length;
+    }
+
+    boxes.forEach(function (box) {
+      var k = box.getAttribute("data-k");
+      if (k && state[k]) box.checked = true;
+      box.addEventListener("change", function () {
+        if (k) {
+          if (box.checked) state[k] = 1; else delete state[k];
+          save(state);
+        }
+        render();
+      });
+    });
+
+    reset.addEventListener("click", function () {
+      boxes.forEach(function (b) { b.checked = false; });
+      state = {};
+      save(state);
+      render();
+    });
+
+    render();
+  })();
+</script>
+</body>
+</html>
