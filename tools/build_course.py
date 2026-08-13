@@ -46,6 +46,7 @@ NAV = """<nav class="topnav"><div class="topnav-in">
 <a class="nl" href="index.html">главная</a>
 <a class="nl" href="qa-trainer.html">тренажёр</a>
 <a class="nl" href="course.html" aria-current="page">курсы</a>
+<a class="nl" href="jobs.html">вакансии</a>
 <a class="nl" href="roadmap.html">roadmap</a>
 <a class="nl" href="resources.html">материалы</a>
 <a class="nl" href="repos.html">репозитории</a>
