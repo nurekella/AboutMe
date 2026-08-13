@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Вакансии: живой поиск и карта требований рынка</title>
+<meta name="description" content="Живой поиск DevOps-вакансий по Алматы через открытый API hh, скоринг под свой стек, карта требований рынка со связкой в тренажёр и уроки, ссылки-запросы на LinkedIn, Habr Career и Djinni.">
+<meta name="theme-color" content="#EFF1F3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1319" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="theme.js"></script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⎈</text></svg>">
+<style>
+  .bar{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+  .bar-in{max-width:1240px;margin:0 auto;padding:11px 28px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+  .chip{font-family:var(--mono);font-size:11px;letter-spacing:.04em;background:var(--surface);
+    border:1px solid var(--line);color:var(--muted);padding:6px 11px;border-radius:7px;cursor:pointer}
+  .chip:hover{border-color:var(--accent);color:var(--accent)}
+  .chip.on{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+  .chip[disabled]{opacity:.5;cursor:default}
+  .chip.act{border-color:var(--accent);color:var(--accent)}
+  .status{font-family:var(--mono);font-size:11px;color:var(--muted);margin-right:auto;letter-spacing:.04em}
+  .status b{color:var(--accent);font-weight:500}
+  .tsep{width:1px;height:18px;background:var(--line);display:inline-block}
+
+  .note{background:var(--surface);border:1px solid var(--line);border-left:2px solid var(--accent);
+    border-radius:0 10px 10px 0;padding:14px 18px;margin:0 0 22px;box-shadow:var(--shadow);font-size:.92rem;
+    color:var(--ink-2);max-width:var(--measure)}
+  .note b{color:var(--ink)}
+  .err{border-left-color:var(--s0,#A33A32)}
+  .err[hidden]{display:none}
+
+  .market{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:18px 20px;
+    margin:0 0 24px;box-shadow:var(--shadow)}
+  .market h2{margin:0 0 4px;font-size:1.12rem}
+  .market .sub{margin:0 0 16px;font-size:.88rem;color:var(--muted);max-width:var(--measure)}
+  .market[hidden]{display:none}
+  table.mk{width:100%;border-collapse:collapse;font-size:.9rem}
+  table.mk th{text-align:left;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--muted);font-weight:500;padding:0 10px 7px 0;border-bottom:1px solid var(--line)}
+  table.mk td{padding:7px 10px 7px 0;border-bottom:1px solid var(--line-soft);vertical-align:middle}
+  table.mk tr:last-child td{border-bottom:0}
+  .tech{font-family:var(--mono);font-size:11.5px;color:var(--ink)}
+  .demand{display:flex;align-items:center;gap:8px;min-width:130px}
+  .demand .db{flex:1;height:5px;background:var(--line-soft);border-radius:3px;overflow:hidden;display:block;max-width:110px}
+  .demand .df{display:block;height:100%;background:var(--accent)}
+  .demand .dn{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .gap{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+    padding:2px 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+  .gap.hole{border-color:var(--s0,#A33A32);color:var(--s0,#A33A32);background:var(--s0b,#FBE6E4)}
+  .gap.weak{border-color:var(--s1,#8A6A17);color:var(--s1,#8A6A17);background:var(--s1b,#FBF0D8)}
+  .gap.ok{border-color:var(--s2,#1C6B4B);color:var(--s2,#1C6B4B);background:var(--s2b,#E1F0E8)}
+  .go2{font-family:var(--mono);font-size:10.5px;text-decoration:none;border:1px solid var(--line);
+    color:var(--muted);padding:3px 8px;border-radius:6px;white-space:nowrap}
+  .go2:hover{border-color:var(--accent);color:var(--accent)}
+
+  .job{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:16px 18px;
+    margin:0 0 10px;box-shadow:var(--shadow)}
+  .job[hidden]{display:none}
+  .job.applied{border-color:var(--s2,#1C6B4B)}
+  .job.hidden-job{opacity:.55}
+  .jh{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}
+  .jt{flex:1;min-width:220px}
+  .jt h3{margin:0;font-size:1.04rem;line-height:1.3}
+  .jt h3 a{color:var(--ink);text-decoration:none}
+  .jt h3 a:hover{color:var(--accent);text-decoration:underline}
+  .jmeta{display:flex;flex-wrap:wrap;gap:5px 10px;margin:6px 0 0;font-size:.86rem;color:var(--muted)}
+  .jmeta .sal{color:var(--s2,#1C6B4B);font-family:var(--mono);font-size:11.5px}
+  .jmeta .nosal{font-family:var(--mono);font-size:11px}
+  .fresh{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+    background:var(--accent);color:var(--surface);padding:2px 7px;border-radius:999px}
+  .score{font-family:var(--mono);text-align:right;min-width:64px}
+  .score .sv{font-size:1.3rem;color:var(--accent);letter-spacing:-.02em}
+  .score .sl{display:block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .kind{display:inline-block;margin-top:5px;font-size:9px;letter-spacing:.08em;text-transform:uppercase;
+    padding:2px 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+  .kind.k-target{border-color:var(--s2,#1C6B4B);color:var(--s2,#1C6B4B);background:var(--s2b,#E1F0E8)}
+  .kind.k-grow{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .kind.k-admin{border-color:var(--s1,#8A6A17);color:var(--s1,#8A6A17);background:var(--s1b,#FBF0D8)}
+  .jstack{display:flex;flex-wrap:wrap;gap:4px;margin:11px 0 0;padding:0;list-style:none}
+  .jstack li{font-family:var(--mono);font-size:10px;letter-spacing:.04em;border-radius:999px;padding:2px 8px;
+    border:1px solid var(--line-soft);color:var(--muted)}
+  .jstack li.have{border-color:var(--s2,#1C6B4B);color:var(--s2,#1C6B4B);background:var(--s2b,#E1F0E8)}
+  .jstack li.miss{border-color:var(--s0,#A33A32);color:var(--s0,#A33A32);background:var(--s0b,#FBE6E4)}
+  .jsnip{margin:11px 0 0;font-size:.89rem;color:var(--ink-2);line-height:1.45;max-width:var(--measure)}
+  .jsnip b{color:var(--ink);font-weight:600}
+  .jacts{display:flex;flex-wrap:wrap;gap:6px;margin:13px 0 0;padding-top:11px;border-top:1px solid var(--line-soft)}
+  .jacts a,.jacts button{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-decoration:none;
+    border:1px solid var(--line);color:var(--muted);padding:5px 10px;border-radius:6px;background:var(--surface);cursor:pointer}
+  .jacts a:hover,.jacts button:hover{border-color:var(--accent);color:var(--accent)}
+  .jacts button.on{border-color:var(--s2,#1C6B4B);color:var(--s2,#1C6B4B);background:var(--s2b,#E1F0E8)}
+
+  .links{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:18px 20px;
+    margin:28px 0 0;box-shadow:var(--shadow)}
+  .links h2{margin:0 0 4px;font-size:1.12rem}
+  .links .sub{margin:0 0 14px;font-size:.88rem;color:var(--muted);max-width:var(--measure)}
+  .lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:9px}
+  .lcard{border:1px solid var(--line);border-radius:9px;padding:11px 13px;text-decoration:none;display:block}
+  .lcard:hover{border-color:var(--accent)}
+  .lcard .n{font-family:var(--mono);font-size:11.5px;color:var(--ink);display:block}
+  .lcard .d{font-size:.83rem;color:var(--muted);margin:4px 0 0;display:block;line-height:1.35}
+  .empty{color:var(--muted);font-size:.94rem;margin:20px 0}
+  .empty[hidden]{display:none}
+  @media (max-width:900px){ .bar-in{padding:10px 18px} }
+  @media print{ .bar,.topnav,.jacts,.links{display:none} .job{break-inside:avoid} body{background:#fff;color:#000} }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-in">
+    <a class="brand" href="index.html">nurekella<b>/</b>devops</a>
+    <a class="nl" href="index.html">главная</a>
+    <a class="nl" href="qa-trainer.html">тренажёр</a>
+    <a class="nl" href="course.html">курсы</a>
+    <a class="nl" href="jobs.html" aria-current="page">вакансии</a>
+    <a class="nl" href="roadmap.html">roadmap</a>
+    <a class="nl" href="resources.html">материалы</a>
+    <a class="nl" href="repos.html">репозитории</a>
+    <a class="nl" href="devops-plan.html">план</a>
+    <a class="nl" href="checklist.html">чеклист</a>
+    <a class="nl" href="diary.html">дневник</a>
+  </div>
+</nav>
+
+<div class="bar">
+  <div class="bar-in">
+    <span class="status" id="status">нажми «искать» — запрос уйдёт с твоего браузера прямо в hh</span>
+    <button class="chip on" data-preset="core" type="button">devops · sre · platform</button>
+    <button class="chip" data-preset="k8s" type="button">kubernetes · инфраструктура</button>
+    <button class="chip" data-preset="lead" type="button">руководящие</button>
+    <span class="tsep" aria-hidden="true"></span>
+    <button class="chip act" id="search" type="button">искать</button>
+    <button class="chip" id="deep" type="button" disabled>разобрать требования</button>
+    <span class="tsep" aria-hidden="true"></span>
+    <button class="chip" id="withSalary" type="button">только с вилкой</button>
+    <button class="chip" id="withRemote" type="button">включая удалёнку</button>
+    <button class="chip" id="hideApplied" type="button">скрыть отклики</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Вакансии</p>
+    <h1>Что просит рынок Алматы</h1>
+    <p class="lede">Запросы уходят в открытый API hh <b>прямо из твоего браузера</b> — ни сервера, ни ключей, ни моего участия. Дальше страница делает то, чего hh не делает: вытаскивает из вакансий технологии, считает, как часто каждую требуют, и сопоставляет это с твоими оценками в <a href="qa-trainer.html">тренажёре</a>. Получается не «модно учить ArgoCD», а «его требуют в тридцати из пятидесяти вакансий, а у тебя по нему нули — вот урок».</p>
+  </header>
+
+  <div class="note err" id="err" hidden></div>
+
+  <div class="note">
+    <b>Как читать метки.</b> Процент — это <b>сколько требований вакансии ты закрываешь</b>, а не «насколько она хорошая». Сто процентов часто означает вакансию ниже твоего уровня: если весь список требований — Proxmox, VMware, Zabbix и Windows, ты закроешь его целиком, но она ведёт назад. Поэтому есть вторая метка: <b>целевая</b> — есть современный стек и ты его в основном закрываешь, <b>рост</b> — стек целевой, но нового много, <b>сисадминская</b> — Kubernetes, IaC и наблюдаемости в требованиях нет вообще. Сортировка идёт по этой метке, а не по проценту: сверху целевые, потом дающие рост, сисадминские — в конце.
+  </div>
+
+  <div class="note">
+    <b>Почему запрос идёт из браузера, а не с сервера.</b> hh блокирует облачные адреса: из дата-центра его API отдаёт <code>403</code>, а обычная страница поиска — капчу. С домашнего адреса в Казахстане всё проходит. Побочный плюс: данные всегда свежие, ничего не кэшируется в репозитории. Если запрос не пройдёт — ниже появится ошибка и ссылка на обычный поиск hh, а не пустой экран.
+  </div>
+
+  <section class="market" id="market" hidden>
+    <h2>Карта требований</h2>
+    <p class="sub" id="marketSub"></p>
+    <div style="overflow-x:auto">
+      <table class="mk">
+        <thead><tr><th>Технология</th><th>Спрос</th><th>Твой уровень</th><th>Где закрыть</th></tr></thead>
+        <tbody id="marketBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <div id="list"></div>
+  <p class="empty" id="empty" hidden>Ничего не нашлось. Сними фильтры или попробуй другой набор запросов.</p>
+
+  <section class="links">
+    <h2>Где ещё смотреть</h2>
+    <p class="sub">У этих сайтов нет открытого API для поиска: у LinkedIn его нет вовсе и вакансии спрятаны за входом, у остальных поиск открыт, но только в браузере. Поэтому здесь честные ссылки с уже подставленными фильтрами — открываются там, где ты уже залогинен.</p>
+    <div class="lgrid" id="links"></div>
+  </section>
+
+  <footer class="site">
+    <p>Отклики отмечаются здесь и живут в браузере. Кнопка «в дневник» создаёт заготовку записи на странице <a href="diary.html">дневника</a> — туда потом дописываются вопросы и результат. Что подтянуть по требованиям рынка — в <a href="course.html">курсах</a> и <a href="qa-trainer.html">тренажёре</a>.</p>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var KEY="qa-jobs-v1", STUDY="qa-study-v3";
+  var el=function(id){return document.getElementById(id)};
+  var AREA_ALMATY=160;             // Алматы в справочнике областей hh
+  var API="https://api.hh.ru/vacancies";
+
+  // ── наборы запросов ──
+  var PRESETS={
+    core:["devops","sre","site reliability","platform engineer","инженер инфраструктуры"],
+    k8s: ["kubernetes","docker","terraform","ansible","ci/cd"],
+    lead:["руководитель отдела инфраструктуры","начальник отдела эксплуатации","team lead devops","devops lead","руководитель devops"]
+  };
+
+  // ── стек: что у тебя есть по резюме ──
+  var MINE=["linux","kubernetes","docker","helm","terraform","ansible","gitlab ci","jenkins","git","bash",
+    "prometheus","grafana","zabbix","loki","graylog","elk","postgresql","ms sql","proxmox","vmware","hyper-v",
+    "yandex cloud","nginx","iis","wireguard","fortigate","freeipa","dns","veeam","windows server","active directory"];
+
+  // ── словарь технологий: как искать в тексте, вопросы тренажёра, урок курса ──
+  var TECH=[
+    ["Kubernetes",     ["kubernetes","k8s","кубернет"],            [58,60,61,62],  12],
+    ["Docker",         ["docker","контейнериз"],                   [44,45,48,54],  11],
+    ["Helm",           ["helm"],                                   [87,88,90],     20],
+    ["Terraform",      ["terraform","opentofu"],                   [101,102,104],  23],
+    ["Ansible",        ["ansible"],                                [111,112,113],  24],
+    ["GitLab CI",      ["gitlab ci","gitlab-ci","gitlab"],         [92,93,98],     21],
+    ["GitHub Actions", ["github actions","github-actions"],        [92,99],        21],
+    ["Jenkins",        ["jenkins"],                                [205],          21],
+    ["ArgoCD",         ["argocd","argo cd","argo"],                [95,225,103],   22],
+    ["FluxCD",         ["fluxcd","flux cd"],                       [95],           22],
+    ["Prometheus",     ["prometheus","прометей"],                  [116,117,118],  25],
+    ["Grafana",        ["grafana","графана"],                      [118,126],      25],
+    ["Loki / ELK",     ["loki","elk","elasticsearch","opensearch","graylog"], [121], 32],
+    ["SRE / SLO",      ["sre","slo","sla","error budget"],         [119,120,162],  26],
+    ["Linux",          ["linux","линукс"],                         [1,6,9,11],      4],
+    ["Bash",           ["bash","shell","скрипт"],                  [19,156,214],    3],
+    ["Python",         ["python","питон"],                         [213],           3],
+    ["Go",             ["golang"," go "],                          [],             13],
+    ["PostgreSQL",     ["postgresql","postgres","патрони","patroni"], [127,129,131], 19],
+    ["MySQL",          ["mysql","mariadb"],                        [207],          19],
+    ["Redis",          ["redis"],                                  [208],          19],
+    ["Kafka",          ["kafka","rabbitmq","брокер"],              [209],          19],
+    ["Nginx",          ["nginx","haproxy","балансир"],             [34,181,216],    8],
+    ["AWS",            ["aws","amazon web"],                       [133,134,201],  23],
+    ["Yandex Cloud",   ["yandex cloud","яндекс облак","yc "],      [133,135],      23],
+    ["Azure / GCP",    ["azure","gcp","google cloud"],             [133,135],      23],
+    ["Vault",          ["vault","хранилищ секрет"],                [106,138],      17],
+    ["Service mesh",   ["istio","linkerd","service mesh"],         [85],           27],
+    ["Proxmox / KVM",  ["proxmox","kvm","qemu","libvirt"],         [210,211],      11],
+    ["VMware",         ["vmware","esxi","vsphere"],                [210],          11],
+    ["Windows",        ["windows server","active directory"," ad ","iis"], [185,212], 9],
+    ["Сети",           ["tcp","dns","vlan","bgp","маршрутиз","сетев"], [26,30,33,174], 7],
+    ["Безопасность",   ["безопасн","security","devsecops","waf","pci dss","iso 27001"], [137,139,233], 17],
+    ["Мониторинг",     ["мониторинг","zabbix","observability","наблюдаем"], [116,126,239], 25],
+    ["Бэкапы / DR",    ["бэкап","backup","veeam","disaster recovery","восстановлен"], [128,226],  30],
+    ["IaC",            ["iac","infrastructure as code","инфраструктура как код"], [101,109], 23],
+    ["GitOps",         ["gitops"],                                 [95,225],       22],
+    ["Автоскейлинг",   ["hpa","автоскейл","autoscal","keda"],      [71],           14],
+    ["CI/CD",          ["ci/cd","cicd","пайплайн","pipeline"],     [92,94,100],    21]
+  ];
+
+  // ── состояние ──
+  var marks={};
+  try{ marks=JSON.parse(localStorage.getItem(KEY))||{} }catch(e){ marks={} }
+  function saveMarks(){ try{localStorage.setItem(KEY,JSON.stringify(marks))}catch(e){} }
+
+  var study={v:{}};
+  try{ var s=JSON.parse(localStorage.getItem(STUDY)); if(s&&s.v) study=s }catch(e){}
+
+  var jobs=[], preset="core", onlySalary=false, withRemote=false, hideApplied=false, deepDone=false;
+  var KIND_CLS={"целевая":"k-target","рост":"k-grow","сисадминская":"k-admin","неясная":"k-none"};
+
+  function esc(t){ return String(t==null?"":t).replace(/[&<>"]/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c] }) }
+  function strip(t){ return String(t||"").replace(/<[^>]+>/g," ").replace(/&[a-z]+;/gi," ").replace(/\s+/g," ").trim() }
+
+  function money(s){
+    if(!s || (!s.from && !s.to)) return null;
+    var cur={RUR:"₽",RUB:"₽",KZT:"₸",USD:"$",EUR:"€"}[s.currency]||s.currency||"";
+    var f=function(n){ return n ? String(n).replace(/\B(?=(\d{3})+(?!\d))/g," ") : "" };
+    var v = s.from && s.to ? f(s.from)+"–"+f(s.to) : (s.from ? "от "+f(s.from) : "до "+f(s.to));
+    return v+" "+cur+(s.gross===false?" на руки":"");
+  }
+
+  function daysAgo(iso){
+    if(!iso) return null;
+    var d=Math.floor((Date.now()-new Date(iso).getTime())/864e5);
+    return d;
+  }
+  function whenText(iso){
+    var d=daysAgo(iso);
+    if(d===null) return "";
+    if(d<=0) return "сегодня";
+    if(d===1) return "вчера";
+    if(d<5) return d+" дня назад";
+    return d+" дней назад";
+  }
+
+  // ── извлечение технологий ──
+  function techOf(text){
+    var t=" "+String(text||"").toLowerCase().replace(/[«»"'()]/g," ")+" ";
+    var out=[];
+    TECH.forEach(function(row){
+      for(var i=0;i<row[1].length;i++){ if(t.indexOf(row[1][i])>-1){ out.push(row[0]); return } }
+    });
+    return out;
+  }
+  function haveTech(name){
+    var keys=null;
+    for(var i=0;i<TECH.length;i++) if(TECH[i][0]===name) keys=TECH[i][1];
+    if(!keys) return false;
+    for(var j=0;j<MINE.length;j++)
+      for(var k=0;k<keys.length;k++)
+        if(MINE[j].indexOf(keys[k].trim())>-1 || keys[k].trim().indexOf(MINE[j])>-1) return true;
+    return false;
+  }
+
+  // средняя оценка в тренажёре по вопросам технологии: 0..2, null если не оценивал
+  function levelOf(qs){
+    var sum=0,n=0;
+    (qs||[]).forEach(function(q){ var v=study.v[String(q)]; if(v!==undefined){ sum+=+v; n++ } });
+    return n? sum/n : null;
+  }
+
+  // Целевой стек: то, ради чего ты уходишь из системного администрирования.
+  // Без этого различения вакансия «Proxmox, Zabbix, Windows» набирала 100% и всплывала
+  // первой — она закрыта твоим текущим стеком, но ведёт назад, а не вперёд.
+  var TARGET={"Kubernetes":1,"Helm":1,"ArgoCD":1,"FluxCD":1,"GitOps":1,"Terraform":1,"IaC":1,
+    "Prometheus":1,"SRE / SLO":1,"Service mesh":1,"CI/CD":1,"GitLab CI":1,"GitHub Actions":1,
+    "Vault":1,"Автоскейлинг":1,"AWS":1,"Azure / GCP":1};
+  // «Мониторинг» намеренно не в целевом стеке: Zabbix — это администрирование,
+  // целевое здесь — Prometheus и SLO, они учтены отдельно.
+
+  function scoreOf(job){
+    var need=job.tech;
+    if(!need.length){ job.fit=null; job.grow=0; job.kind="неясная"; return null }
+    var have=need.filter(haveTech);
+    var miss=need.filter(function(t){return !haveTech(t)});
+    job.fit=Math.round(have.length/need.length*100);
+    job.grow=miss.filter(function(t){return TARGET[t]}).length;      // сколько нового из целевого стека
+    var targetCount=need.filter(function(t){return TARGET[t]}).length;
+    job.kind = targetCount===0 ? "сисадминская"
+             : (job.fit>=60 ? "целевая" : "рост");
+    return job.fit;
+  }
+
+  // Порядок: сначала целевые вакансии, которые ты проходишь, потом те, что дают рост,
+  // и только в конце те, где целевого стека нет вообще.
+  function rank(j){
+    var base={"целевая":3000,"рост":2000,"сисадминская":500,"неясная":0}[j.kind]||0;
+    return base + (j.fit||0) + Math.min(j.grow,4)*20;
+  }
+
+  // ── запросы к hh ──
+  function fetchJson(url){
+    return fetch(url,{headers:{}}).then(function(r){
+      if(!r.ok) throw new Error("hh ответил "+r.status);
+      return r.json();
+    });
+  }
+
+  function search(){
+    var texts=PRESETS[preset];
+    el("err").hidden=true;
+    el("search").disabled=true; el("search").textContent="ищу…";
+    el("status").innerHTML="запрашиваю hh: <b>"+texts.length+"</b> запросов по Алматы";
+    var urls=texts.map(function(t){
+      return API+"?text="+encodeURIComponent(t)
+        +"&area="+AREA_ALMATY+"&per_page=100&page=0&order_by=publication_time&search_field=name&search_field=description";
+    });
+    Promise.all(urls.map(function(u){
+      return fetchJson(u).catch(function(e){ return {items:[],error:String(e.message||e)} });
+    })).then(function(res){
+      var errs=res.filter(function(r){return r.error}).length;
+      if(errs===res.length){
+        fail(res[0].error||"запрос не прошёл");
+        return;
+      }
+      var seen={}, list=[];
+      res.forEach(function(r){
+        (r.items||[]).forEach(function(v){
+          if(seen[v.id]) return;
+          seen[v.id]=1;
+          var snip=(v.snippet||{});
+          var text=[v.name,strip(snip.requirement),strip(snip.responsibility)].join(" ");
+          list.push({
+            id:v.id, name:v.name,
+            employer:(v.employer||{}).name||"без названия",
+            area:(v.area||{}).name||"",
+            salary:money(v.salary),
+            published:v.published_at,
+            schedule:((v.schedule||{}).id||""),
+            scheduleName:((v.schedule||{}).name||""),
+            experience:((v.experience||{}).name||""),
+            url:v.alternate_url,
+            req:strip(snip.requirement), resp:strip(snip.responsibility),
+            full:"", text:text, tech:techOf(text)
+          });
+        });
+      });
+      jobs=list;
+      jobs.forEach(function(j){ j.score=scoreOf(j) });
+      sortJobs();
+      render();
+      el("deep").disabled=jobs.length===0;
+      deepDone=false;
+      lastErrs=errs;
+      statusLine("требования пока по кратким описаниям");
+    }).catch(function(e){ fail(String(e.message||e)) })
+    .then(function(){ el("search").disabled=false; el("search").textContent="искать заново" });
+  }
+
+  var lastErrs=0, lastNote="";
+  function statusLine(note){
+    if(note!==undefined) lastNote=note;
+    var vis=visible().length;
+    el("status").innerHTML="нашлось <b>"+jobs.length+"</b> по Алматы, показано <b>"+vis+"</b>"
+      +(lastErrs?" · часть запросов не прошла ("+lastErrs+")":"")
+      +(lastNote?" · "+lastNote:"");
+  }
+
+  function fail(msg){
+    el("err").hidden=false;
+    el("err").innerHTML="<b>Запрос в hh не прошёл: "+esc(msg)+".</b> Так бывает, если hh блокирует адрес "
+      +"(например, при включённом VPN или из офисной сети), изменил API или ограничил частоту запросов. "
+      +"Проверить руками: <a href=\"https://hh.kz/search/vacancy?text=devops&area=160\" target=\"_blank\" rel=\"noopener\">обычный поиск hh по Алматы ↗</a>. "
+      +"Ссылки на другие сайты внизу страницы работают всегда.";
+    el("status").textContent="hh недоступен — работают только ссылки внизу";
+  }
+
+  // ── подробный разбор: полные описания вакансий ──
+  function deepParse(){
+    var targets=visible().slice(0,40);
+    if(!targets.length) return;
+    el("deep").disabled=true;
+    var done=0, running=0, i=0;
+    function next(){
+      if(i>=targets.length){
+        if(running===0){
+          deepDone=true;
+          jobs.forEach(function(j){ j.score=scoreOf(j) });
+          sortJobs(); render();
+          statusLine("разобрано полных описаний: "+done+" из "+targets.length);
+          el("deep").textContent="разобрать ещё";
+          el("deep").disabled=false;
+        }
+        return;
+      }
+      var job=targets[i++]; running++;
+      el("status").innerHTML="читаю описания: <b>"+(done+1)+"</b> из "+targets.length;
+      fetchJson("https://api.hh.ru/vacancies/"+job.id).then(function(v){
+        job.full=strip(v.description||"");
+        job.text=[job.name,job.req,job.resp,job.full].join(" ");
+        job.tech=techOf(job.text);
+        job.key_skills=(v.key_skills||[]).map(function(k){return k.name});
+        if(job.key_skills.length) job.tech=techOf(job.text+" "+job.key_skills.join(" "));
+        done++;
+      }).catch(function(){}).then(function(){ running--; next() });
+      if(running<4) next();
+    }
+    next();
+  }
+
+  // ── сортировка и фильтры ──
+  function sortJobs(){
+    jobs.sort(function(a,b){
+      var ra=rank(a), rb=rank(b);
+      if(rb!==ra) return rb-ra;
+      return String(b.published||"").localeCompare(String(a.published||""));
+    });
+  }
+  function visible(){
+    return jobs.filter(function(j){
+      if(onlySalary && !j.salary) return false;
+      if(!withRemote && j.schedule==="remote") return false;
+      if(hideApplied && marks[j.id]) return false;
+      return true;
+    });
+  }
+
+  // ── отрисовка ──
+  function render(){
+    var vis=visible();
+    el("empty").hidden=vis.length>0 || jobs.length===0;
+    el("list").innerHTML=vis.map(function(j){
+      var have=j.tech.filter(haveTech), miss=j.tech.filter(function(t){return !haveTech(t)});
+      var fresh=daysAgo(j.published);
+      return '<article class="job'+(marks[j.id]?" applied":"")+'" data-id="'+esc(j.id)+'">'
+        +'<div class="jh"><div class="jt">'
+        +'<h3><a href="'+esc(j.url)+'" target="_blank" rel="noopener">'+esc(j.name)+'</a></h3>'
+        +'<div class="jmeta"><span>'+esc(j.employer)+'</span><span>·</span><span>'+esc(j.area)+'</span>'
+        +(j.salary?'<span>·</span><span class="sal">'+esc(j.salary)+'</span>'
+                  :'<span>·</span><span class="nosal">вилка не указана</span>')
+        +(j.experience?'<span>·</span><span>'+esc(j.experience)+'</span>':'')
+        +(j.scheduleName?'<span>·</span><span>'+esc(j.scheduleName)+'</span>':'')
+        +'<span>·</span><span>'+esc(whenText(j.published))+'</span>'
+        +(fresh!==null&&fresh<=2?' <span class="fresh">свежая</span>':'')
+        +'</div></div>'
+        +'<div class="score"><span class="sv">'+(j.fit===null?"—":j.fit+"%")+'</span>'
+        +'<span class="sl">закрываешь</span>'
+        +'<span class="kind '+KIND_CLS[j.kind]+'">'+esc(j.kind)+'</span>'
+        +(j.grow?'<span class="sl">нового: '+j.grow+'</span>':'')
+        +'</div></div>'
+        +(j.tech.length?'<ul class="jstack">'
+            +have.map(function(t){return '<li class="have">'+esc(t)+'</li>'}).join("")
+            +miss.map(function(t){return '<li class="miss">'+esc(t)+'</li>'}).join("")
+          +'</ul>':'')
+        +(j.req?'<p class="jsnip"><b>Требования.</b> '+esc(j.req.slice(0,320))+(j.req.length>320?"…":"")+'</p>':'')
+        +'<div class="jacts">'
+        +'<a href="'+esc(j.url)+'" target="_blank" rel="noopener">открыть на hh ↗</a>'
+        +'<button type="button" data-mark="'+esc(j.id)+'"'+(marks[j.id]?' class="on"':'')+'>'
+        + (marks[j.id]?"откликнулся ✓":"отметить отклик")+'</button>'
+        +'<button type="button" data-diary="'+esc(j.id)+'">в дневник</button>'
+        +'</div></article>';
+    }).join("");
+    renderMarket(vis);
+    if(jobs.length) statusLine();
+  }
+
+  function renderMarket(vis){
+    if(!vis.length){ el("market").hidden=true; return }
+    var cnt={};
+    vis.forEach(function(j){ j.tech.forEach(function(t){ cnt[t]=(cnt[t]||0)+1 }) });
+    var rows=Object.keys(cnt).map(function(t){
+      var meta=null;
+      for(var i=0;i<TECH.length;i++) if(TECH[i][0]===t) meta=TECH[i];
+      var lvl=levelOf(meta?meta[2]:[]);
+      // приоритет = спрос × пробел; незакрытое и частое поднимается наверх
+      var gap = lvl===null ? 1 : (2-lvl)/2;
+      return {tech:t, n:cnt[t], share:cnt[t]/vis.length, lvl:lvl, gap:gap,
+              prio:cnt[t]/vis.length*(0.25+gap), qs:meta?meta[2]:[], lesson:meta?meta[3]:null};
+    }).sort(function(a,b){ return b.prio-a.prio }).slice(0,18);
+
+    var max=rows.length?rows[0].n:1;
+    Object.keys(cnt).forEach(function(k){ if(cnt[k]>max) max=cnt[k] });
+
+    el("marketBody").innerHTML=rows.map(function(r){
+      var lvlTxt, cls;
+      if(r.lvl===null){ lvlTxt="не оценивал"; cls="hole" }
+      else if(r.lvl>=1.7){ lvlTxt="уверенно"; cls="ok" }
+      else if(r.lvl>=0.8){ lvlTxt="плыву"; cls="weak" }
+      else { lvlTxt="не знаю"; cls="hole" }
+      var pct=Math.round(r.share*100);
+      return '<tr><td class="tech">'+esc(r.tech)+'</td>'
+        +'<td><span class="demand"><span class="db"><span class="df" style="width:'+Math.round(r.n/max*100)+'%"></span></span>'
+        +'<span class="dn">'+r.n+' из '+vis.length+' · '+pct+'%</span></span></td>'
+        +'<td><span class="gap '+cls+'">'+lvlTxt+'</span></td>'
+        +'<td>'+(r.qs.length?'<a class="go2" href="qa-trainer.html#q'+r.qs[0]+'">вопросы</a> ':"")
+        +(r.lesson?'<a class="go2" href="course.html#l'+r.lesson+'">урок '+r.lesson+'</a>':"")+'</td></tr>';
+    }).join("");
+
+    var holes=rows.filter(function(r){return r.lvl===null||r.lvl<0.8}).slice(0,3).map(function(r){return r.tech});
+    el("marketSub").innerHTML="Посчитано по "+vis.length+" вакансиям в выборке"
+      +(deepDone?" (по полным описаниям)":" (по кратким описаниям — нажми «разобрать требования», станет точнее)")
+      +". Порядок — спрос, умноженный на твой пробел в тренажёре, а не просто частота."
+      +(holes.length?" Первое, что стоит закрыть: <b>"+holes.map(esc).join(", ")+"</b>.":"");
+    el("market").hidden=false;
+  }
+
+  // ── ссылки на сайты без API ──
+  var LINKS=[
+    ["LinkedIn · DevOps в Казахстане","https://www.linkedin.com/jobs/search/?keywords=DevOps&location=Kazakhstan&f_TPR=r604800","за неделю, все уровни"],
+    ["LinkedIn · SRE и Platform","https://www.linkedin.com/jobs/search/?keywords=SRE%20OR%20%22Platform%20Engineer%22&location=Kazakhstan&f_TPR=r604800","за неделю"],
+    ["hh.kz · обычный поиск","https://hh.kz/search/vacancy?text=devops&area=160&order_by=publication_time","если API не отвечает"],
+    ["hh.kz · Kubernetes","https://hh.kz/search/vacancy?text=kubernetes&area=160&order_by=publication_time","по Алматы"],
+    ["Habr Career","https://career.habr.com/vacancies?q=devops&type=all&with_salary=true","русскоязычный рынок, часто удалёнка"],
+    ["Djinni","https://djinni.co/jobs/?primary_keyword=DevOps","много удалёнки, вилки указаны почти всегда"],
+    ["getmatch","https://getmatch.ru/vacancies?sa=150000&p=1&s=devops","вилки указаны всегда"],
+    ["Telegram · DevOps Jobs","https://t.me/devops_jobs","поток вакансий, много удалёнки"],
+    ["Telegram · Работа в IT КЗ","https://t.me/s/it_jobs_kz","локальный рынок"],
+    ["remoteok · DevOps","https://remoteok.com/remote-devops-jobs","удалёнка в валюте"],
+    ["We Work Remotely","https://weworkremotely.com/categories/remote-devops-sysadmin-jobs","удалёнка в валюте"],
+    ["Kolesa Group · карьера","https://kolesa.group/vacancies","один из крупнейших IT-работодателей Алматы"]
+  ];
+  el("links").innerHTML=LINKS.map(function(l){
+    return '<a class="lcard" href="'+l[1]+'" target="_blank" rel="noopener">'
+      +'<span class="n">'+esc(l[0])+' ↗</span><span class="d">'+esc(l[2])+'</span></a>';
+  }).join("");
+
+  // ── события ──
+  el("search").addEventListener("click",search);
+  el("deep").addEventListener("click",deepParse);
+
+  document.querySelectorAll("[data-preset]").forEach(function(b){
+    b.addEventListener("click",function(){
+      document.querySelectorAll("[data-preset]").forEach(function(x){x.classList.remove("on")});
+      b.classList.add("on"); preset=b.getAttribute("data-preset");
+      el("status").textContent="набор запросов изменён — нажми «искать»";
+      el("search").classList.add("act");
+    });
+  });
+
+  function toggle(id,fn){
+    el(id).addEventListener("click",function(){
+      fn(); el(id).classList.toggle("on"); render();
+    });
+  }
+  toggle("withSalary",function(){ onlySalary=!onlySalary });
+  toggle("withRemote",function(){ withRemote=!withRemote });
+  toggle("hideApplied",function(){ hideApplied=!hideApplied });
+
+  document.addEventListener("click",function(e){
+    var m=e.target.closest("[data-mark]");
+    if(m){
+      var id=m.getAttribute("data-mark");
+      if(marks[id]) delete marks[id]; else marks[id]={applied:Date.now()};
+      saveMarks(); render(); return;
+    }
+    var d=e.target.closest("[data-diary]");
+    if(d){
+      var job=null, jid=d.getAttribute("data-diary");
+      jobs.forEach(function(j){ if(j.id===jid) job=j });
+      if(!job) return;
+      toDiary(job);
+      return;
+    }
+  });
+
+  // заготовка записи прямо в хранилище дневника
+  function toDiary(job){
+    var store={v:{},d:{},notes:{},custom:[],days:{},diary:[]};
+    try{
+      var raw=localStorage.getItem(STUDY);
+      if(raw){ var o=JSON.parse(raw)||{};
+        store={v:o.v||{},d:o.d||{},notes:o.notes||{},custom:o.custom||[],days:o.days||{},diary:o.diary||[]}; }
+    }catch(e){}
+    var dup=store.diary.some(function(x){ return x.company===job.employer && x.role===job.name });
+    if(dup){ alert("Такая запись в дневнике уже есть."); return }
+    var today=new Date(), iso=today.getFullYear()+"-"
+      +String(today.getMonth()+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0");
+    var miss=job.tech.filter(function(t){return !haveTech(t)});
+    store.diary.push({
+      id:"e"+Date.now(),
+      date:iso,
+      company:job.employer,
+      role:job.name,
+      stage:"Скрининг HR",
+      salary:job.salary||"",
+      result:"wait",
+      questions:"",
+      weak:miss.length?("По вакансии могут спросить, а у меня слабо: "+miss.join(", ")):"",
+      notes:"Отклик с "+ (job.url||"hh") + (job.area?" · "+job.area:"")
+    });
+    try{ localStorage.setItem(STUDY,JSON.stringify(store)) }catch(e){}
+    if(!marks[job.id]){ marks[job.id]={applied:Date.now()}; saveMarks() }
+    render();
+    if(confirm("Заготовка записи создана в дневнике. Открыть дневник?")) location.href="diary.html";
+  }
+})();
+</script>
+</body>
+</html>
